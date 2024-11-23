@@ -7,19 +7,19 @@ services:
     build:
       context: backend/rtmpServer
       dockerfile: dockerfile
-    image: liboost/backend-rtmp-server:latest
+    image: liboost/test-backend-rtmp-server:latest
 
   backend-main-server:
     container_name: main-container
     build:
       context: backend/mainServer
       dockerfile: dockerfile
-    image: liboost/backend-main-server:latest
+    image: liboost/test-backend-main-server:latest
 
   backend-chat-server:
     container_name: chat-container
     build:
       context: backend/chatServer
       dockerfile: dockerfile
-    image: liboost/backend-chat-server:latest
+    image: liboost/test-backend-chat-server:latest
 

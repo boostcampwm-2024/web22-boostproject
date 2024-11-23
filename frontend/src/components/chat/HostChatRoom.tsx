@@ -13,7 +13,7 @@ import { getStoredId } from '@utils/id';
 import { UserType } from '@type/user';
 import useFetchStreamKey from '@apis/queries/host/useFetchStreamKey';
 
-const TEST_SOCKET_URL = 'https://liboo.kr';
+const TEST_SOCKET_URL = 'https://test.liboo.kr';
 
 interface ChatRoomProps {
   userType: UserType;

@@ -5,9 +5,10 @@ import { HostModule } from './host/host.module.js';
 import { StreamsModule } from './streams/streams.module.js';
 import { MockDataModule } from './mock-data/mock-data.module.js';
 import { MemoryDBModule } from './memory-db/memory-db.module.js';
+import { ReplayModule } from './replay/replay.module.js';
 
 @Module({
-  imports: [HostModule, StreamsModule, MockDataModule, MemoryDBModule],
+  imports: [HostModule, StreamsModule, MockDataModule, MemoryDBModule, ReplayModule],
   controllers: [AppController],
   providers: [AppService],
 })

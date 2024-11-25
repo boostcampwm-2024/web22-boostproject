@@ -7,12 +7,12 @@ export class ChannelDto {
     description: '(미사용)호스트 ID 문자열',
     example: 'channel123',
   })
-  channelId: string = '';
+    channelId: string = '';
   @ApiProperty({
     description: '호스트 이름',
     example: 'booduck',
   })
-  channelName: string = '';
+    channelName: string = '';
 }
 
 export class MemoryDbDto {
@@ -33,10 +33,11 @@ export class MemoryDbDto {
   category: string = '';
   tags: Array<string> = [];
   state : boolean = false;
+  replay: boolean = false;
   startDate : Date | null = null;
   endDate : Date | null = null;
-  readCount: number;
-  livePr: number;
+  readCount: number = 0;
+  livePr: number = 0;
 
   constructor(data?: Partial<MemoryDbDto>) {
     if (data) {

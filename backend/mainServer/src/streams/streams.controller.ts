@@ -4,6 +4,7 @@ import { Response } from 'express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { MemoryDBService } from '../memory-db/memory-db.service.js';
 import { fromLiveSessionDto } from '../dto/liveSessionDto.js';
+import { MemoryDbDto } from '../dto/memoryDbDto.js';
 
 @ApiTags('Stream Information API')
 @Controller('streams')
@@ -35,7 +36,8 @@ export class StreamsController {
   @ApiOperation({summary : 'Get Live Session Notice', description:'현재 진행 중인 라이브 정보를 최신부터 8개씩 불러옵니다.'})
   async getLatestSession(@Res() res: Response) {
     try {
-      const serchedData = this.memoryDBService.getBroadcastInfo(8);
+      const streamChecker = (item: MemoryDbDto) => item.state;
+      const serchedData = this.memoryDBService.getBroadcastInfo(8, fromLiveSessionDto, streamChecker);
       res.status(HttpStatus.OK).json({info: serchedData});
     } catch (error) {
       if ((error as { status: number }).status === 400) {

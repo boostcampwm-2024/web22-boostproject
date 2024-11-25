@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { MemoryDbDto } from '../dto/memoryDbDto.js';
 import { getRandomElementsFromArray } from '../common/util.js';
-import { fromLiveSessionDto } from '../dto/liveSessionDto.js';
 
 @Injectable()
 export class MemoryDBService {
@@ -33,13 +32,13 @@ export class MemoryDBService {
     return getRandomElementsFromArray(liveSession, count);
   }
 
-  getBroadcastInfo(size: number) {
-    const liveSession = this.db.filter(item => item.state);
-    if (liveSession.length < size) {
-      const liveSessionRev = liveSession.reverse().map((info) => fromLiveSessionDto(info));
-      return [...liveSessionRev];
+  getBroadcastInfo<T>(size: number, dtoTransformer: (info: MemoryDbDto) => T, checker: (item: MemoryDbDto) => boolean) {
+    const findSession = this.db.filter(item => checker(item));
+    if (findSession.length < size) {
+      const findSessionRev = findSession.reverse().map((info) => dtoTransformer(info));
+      return [...findSessionRev];
     }
-    return liveSession.slice(-size).reverse().map((info) => fromLiveSessionDto(info));
+    return findSession.slice(-size).reverse().map((info) => dtoTransformer(info));
   }
 
   create(item: Partial<MemoryDbDto>): void {

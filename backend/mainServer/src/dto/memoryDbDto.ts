@@ -1,8 +1,17 @@
 import { LiveVideoRequestDto } from './liveSessionDto.js';
 import { DEFAULT_VALUE } from '../common/constants.js';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class ChannelDto {
+  @ApiProperty({
+    description: '(미사용)호스트 ID 문자열',
+    example: 'channel123',
+  })
   channelId: string = '';
+  @ApiProperty({
+    description: '호스트 이름',
+    example: 'booduck',
+  })
   channelName: string = '';
 }
 
@@ -26,6 +35,8 @@ export class MemoryDbDto {
   state : boolean = false;
   startDate : Date | null = null;
   endDate : Date | null = null;
+  readCount: number;
+  livePr: number;
 
   constructor(data?: Partial<MemoryDbDto>) {
     if (data) {

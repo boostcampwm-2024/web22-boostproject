@@ -22,6 +22,19 @@ function createRedisClusterAdapter() {
     { host: 'redisc-2vucse.vpc-cdb.ntruss.com', port: 6379 },
   ]);
 
+  // 연결 테스트
+  cluster.on('connect', () => {
+    console.log('Connected to Redis cluster successfully');
+  });
+
+  cluster.on('ready', () => {
+    console.log('Redis cluster is ready for operations');
+  });
+
+  cluster.on('error', (err) => {
+    console.error('Error connecting to Redis cluster:', err);
+  });
+
   // Socket.IO Redis Adapter 생성
   const pubClient = cluster;
   const subClient = cluster.duplicate(); // 구독 용도로 클라이언트를 복제합니다.

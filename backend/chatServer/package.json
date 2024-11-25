@@ -31,7 +31,8 @@
     "ioredis": "^5.4.1",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "socket.io-adapter": "^2.5.5"
   },
   "devDependencies": {
     "@babel/cli": "^7.25.9",

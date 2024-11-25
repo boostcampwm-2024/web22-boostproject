@@ -8,7 +8,7 @@ import { MemoryDBModule } from './memory-db/memory-db.module.js';
 import { ReplayModule } from './replay/replay.module.js';
 
 @Module({
-  imports: [HostModule, StreamsModule, MockDataModule, MemoryDBModule, ReplayModule],
+  imports: [MemoryDBModule, HostModule, StreamsModule, ReplayModule, MockDataModule],
   controllers: [AppController],
   providers: [AppService],
 })

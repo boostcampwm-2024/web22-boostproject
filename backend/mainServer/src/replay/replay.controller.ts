@@ -12,7 +12,7 @@ export class ReplayController {
   @Get('/latest')
   async getLatestReplay(@Res() res: Response) {
     try {
-      const replayChecker = (item: MemoryDbDto) => item.replay;
+      const replayChecker = (item: MemoryDbDto) => { return item.replay && !item.state; };
       const serchedData = this.memoryDBService.getBroadcastInfo(8, memoryDbDtoToReplayVideoDto, replayChecker);
       res.status(HttpStatus.OK).json({info: serchedData});
     } catch (error) {

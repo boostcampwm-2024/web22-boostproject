@@ -1,4 +1,4 @@
-import NodeMediaServer from '@hoeeeeeh/node-media-server';
+import NodeMediaServer from '@hoeeeeeh/test-node-media-server';
 
 import dotenv from 'dotenv';
 import path from 'path';

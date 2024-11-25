@@ -18,8 +18,8 @@ import { CanActivate, ExecutionContext, Injectable, UseGuards } from '@nestjs/co
 import { OutgoingMessageDto } from '../event/dto/OutgoingMessage.dto';
 import { User } from '../room/user.interface';
 import { RoomService } from '../room/room.service';
-import { RedisService } from '../redis/redis.service';
 import { createAdapter } from '@socket.io/redis-adapter';
+import { Redis } from 'ioredis';
 
 @Injectable()
 export class checkValidUser implements CanActivate {
@@ -63,23 +63,27 @@ export class checkHostUser implements CanActivate {
 
 @WebSocketGateway({ cors: true })
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private roomService: RoomService, private redisService: RedisService) {};
+  redisAdapter: ReturnType<typeof createAdapter>;
+  constructor(private roomService: RoomService) {
+    // Redis 클러스터 연결 설정
+    const redisClient = new Redis.Cluster([
+      { host: 'redisc-2vucs8.vpc-cdb.ntruss.com', port: 6379 },
+      { host: 'redisc-2vucsb.vpc-cdb.ntruss.com', port: 6379 },
+      { host: 'redisc-2vucse.vpc-cdb.ntruss.com', port: 6379 },
+    ]);
+
+    // 어댑터 설정
+    this.redisAdapter = createAdapter(redisClient, redisClient);
+  };
+
+  afterInit() {
+    // Socket.IO 서버에 Redis 어댑터 연결
+    this.server.adapter(this.redisAdapter);
+  }
 
   @WebSocketServer()
     server!: Server;
 
-  async afterInit(server: Server) {
-    try {
-      const pubClient = this.redisService.getClient();
-      const subClient = pubClient.duplicate();
-
-      server.adapter(createAdapter(pubClient, subClient));
-      console.log('Socket.IO server initialized with Redis Cluster adapter');
-    } catch (error) {
-      console.error('Failed to initialize Socket.IO Redis adapter:', error);
-      throw error;
-    }
-  }
 
   handleConnection(client: Socket) {
     console.log(`Client connected: ${client.id}`);

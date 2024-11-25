@@ -2,6 +2,7 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
+  OnGatewayInit,
   OnGatewayConnection,
   OnGatewayDisconnect, WsException
 } from '@nestjs/websockets';
@@ -17,6 +18,8 @@ import { CanActivate, ExecutionContext, Injectable, UseGuards } from '@nestjs/co
 import { OutgoingMessageDto } from '../event/dto/OutgoingMessage.dto';
 import { User } from '../room/user.interface';
 import { RoomService } from '../room/room.service';
+import { RedisService } from '../redis/redis.service';
+import { createAdapter } from '@socket.io/redis-adapter';
 
 @Injectable()
 export class checkValidUser implements CanActivate {
@@ -59,11 +62,24 @@ export class checkHostUser implements CanActivate {
 
 
 @WebSocketGateway({ cors: true })
-export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private roomService: RoomService){};
+export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+  constructor(private roomService: RoomService, private redisService: RedisService) {};
 
   @WebSocketServer()
     server!: Server;
+
+  async afterInit(server: Server) {
+    try {
+      const pubClient = this.redisService.getClient();
+      const subClient = pubClient.duplicate();
+
+      server.adapter(createAdapter(pubClient, subClient));
+      console.log('Socket.IO server initialized with Redis Cluster adapter');
+    } catch (error) {
+      console.error('Failed to initialize Socket.IO Redis adapter:', error);
+      throw error;
+    }
+  }
 
   handleConnection(client: Socket) {
     console.log(`Client connected: ${client.id}`);

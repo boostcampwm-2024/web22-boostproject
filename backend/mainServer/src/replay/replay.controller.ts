@@ -33,7 +33,7 @@ export class ReplayController {
   async getReplayInfo(@Query('videoId') sessionKey: string, @Res() res: Response) {
     try {
       const sessionInfo = this.memoryDBService.findBySessionKey(sessionKey);
-      if (!sessionInfo && !sessionInfo.replay) {
+      if (!sessionInfo || !sessionInfo.replay) {
         throw new HttpException('No Available Session', HttpStatus.BAD_REQUEST);
       }
       res.status(HttpStatus.OK).json({info : memoryDbDtoToReplayVideoDto(sessionInfo)});

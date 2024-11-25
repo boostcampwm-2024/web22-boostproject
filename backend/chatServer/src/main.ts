@@ -7,6 +7,7 @@ import { ServerOptions } from 'socket.io';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  // app.enableCors(); // CORS 설정 (웹 클라이언트와의 연결을 허용)
   const redisAdapter = createRedisClusterAdapter();
   app.useWebSocketAdapter(redisAdapter);
   await app.listen(4000);
@@ -16,9 +17,9 @@ async function bootstrap() {
 function createRedisClusterAdapter() {
   // Redis 클러스터 초기 노드 설정
   const cluster = new Cluster([
-    { host: 'liboo-redis-001-001-64s9', port: 6379 },
-    { host: 'liboo-redis-002-001-64sa', port: 6379 },
-    { host: 'liboo-redis-003-001-64sb', port: 6379 },
+    { host: 'redisc-2vucs8.vpc-cdb.ntruss.com', port: 6379 },
+    { host: 'redisc-2vucsb.vpc-cdb.ntruss.com', port: 6379 },
+    { host: 'redisc-2vucse.vpc-cdb.ntruss.com', port: 6379 },
   ]);
 
   // Socket.IO Redis Adapter 생성

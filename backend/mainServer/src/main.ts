@@ -16,6 +16,8 @@ async function bootstrap() {
     credentials: true, // 필요에 따라 true로 설정
   });
 
+  app.enableShutdownHooks();
+
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

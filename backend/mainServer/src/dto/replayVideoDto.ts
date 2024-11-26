@@ -26,7 +26,6 @@ export class ReplayVideoDto {
   })
     startDate: Date;
 
-
   @ApiProperty({
     description: '방송 종료 날짜',
     example: '2024-11-25T11:00:00.000Z',
@@ -58,13 +57,6 @@ export class ReplayVideoDto {
     required: false,
   })
     readCount?: number;
-
-  @ApiProperty({
-    description: '게시 날짜의 타임스탬프',
-    example: 1732400400000,
-    required: false,
-  })
-    publishDateAt?: number;
 
   @ApiProperty({
     description: '방송 카테고리',
@@ -99,7 +91,6 @@ export class ReplayVideoDto {
     this.trailerUrl = init?.trailerUrl;
     this.duration = init?.duration ?? 0;
     this.readCount = init?.readCount;
-    this.publishDateAt = init?.publishDateAt;
     this.category = init?.category ?? '';
     this.livePr = init?.livePr ?? 0;
     this.channel = init?.channel ?? new ChannelDto();

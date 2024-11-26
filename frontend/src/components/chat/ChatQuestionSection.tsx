@@ -2,23 +2,19 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import QuestionCard from './QuestionCard';
 import { MessageReceiveData, MessageSendData } from '@type/chat';
-import { Socket } from 'socket.io-client';
 import { CHATTING_SOCKET_SEND_EVENT } from '@constants/chat';
-import { useParams } from 'react-router-dom';
 import { getStoredId } from '@utils/id';
 import { UserType } from '@type/user';
 
 export interface ChatQuestionSectionProps {
   questions: MessageReceiveData[];
-  socket: Socket | null;
+  worker: MessagePort | null;
   userType: UserType;
-  roomId?: string;
+  roomId: string;
 }
 
-export const ChatQuestionSection = ({ questions, socket, userType, roomId }: ChatQuestionSectionProps) => {
+export const ChatQuestionSection = ({ questions, worker, userType, roomId }: ChatQuestionSectionProps) => {
   const [expanded, setExpanded] = useState(false);
-
-  const { id } = useParams();
 
   const userId = getStoredId();
 
@@ -27,13 +23,16 @@ export const ChatQuestionSection = ({ questions, socket, userType, roomId }: Cha
   };
 
   const handleQuestionDone = (questionId: number) => {
-    if (!socket) return;
+    if (!worker) return;
 
-    socket.emit(CHATTING_SOCKET_SEND_EVENT.QUESTION_DONE, {
-      roomId: userType === 'client' ? id : roomId,
-      userId,
-      questionId
-    } as MessageSendData);
+    worker.postMessage({
+      type: CHATTING_SOCKET_SEND_EVENT.QUESTION_DONE,
+      payload: {
+        roomId,
+        userId,
+        questionId
+      } as MessageSendData
+    });
   };
 
   return (

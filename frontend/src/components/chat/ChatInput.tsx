@@ -4,29 +4,25 @@ import QuestionIcon from '@assets/icons/question.svg';
 import SpeakerIcon from '@assets/icons/speaker.svg';
 import SendIcon from '@assets/icons/send.svg';
 import { useRef, useEffect, useState, ChangeEvent, KeyboardEvent } from 'react';
-import { Socket } from 'socket.io-client';
-import { useParams } from 'react-router-dom';
 import { CHATTING_SOCKET_SEND_EVENT, CHATTING_TYPES } from '@constants/chat';
-import { ChattingTypes, MessageSendData } from '@type/chat';
+import { ChattingTypes } from '@type/chat';
 import { getStoredId } from '@utils/id';
 import { UserType } from '@type/user';
 
 interface ChatInputProps {
-  socket: Socket | null;
+  worker: MessagePort | null;
   userType: UserType;
-  roomId?: string;
+  roomId: string;
 }
 
 const INITIAL_TEXTAREA_HEIGHT = 15;
 
-export const ChatInput = ({ socket, userType, roomId }: ChatInputProps) => {
+export const ChatInput = ({ worker, userType, roomId }: ChatInputProps) => {
   const [hasInput, setHasInput] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [msgType, setMsgType] = useState<ChattingTypes>(CHATTING_TYPES.NORMAL);
   const [message, setMessage] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-
-  const { id } = useParams();
 
   const userId = getStoredId();
 
@@ -42,7 +38,7 @@ export const ChatInput = ({ socket, userType, roomId }: ChatInputProps) => {
   };
 
   const handleMessageSend = () => {
-    if (!socket || !message.trim()) return;
+    if (!worker || !message.trim()) return;
 
     const eventMap = {
       [CHATTING_TYPES.NORMAL]: CHATTING_SOCKET_SEND_EVENT.NORMAL,
@@ -52,11 +48,14 @@ export const ChatInput = ({ socket, userType, roomId }: ChatInputProps) => {
 
     const eventName = eventMap[msgType];
 
-    socket.emit(eventName, {
-      roomId: id ? id : roomId,
-      userId,
-      msg: message
-    } as MessageSendData);
+    worker.postMessage({
+      type: eventName,
+      payload: {
+        roomId,
+        userId,
+        msg: message
+      }
+    });
 
     resetTextareaHeight();
     setMessage('');

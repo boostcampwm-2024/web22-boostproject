@@ -1,21 +1,21 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 
-import LiveVideoCard from './LiveVideoCard';
+import ReplayVideoCard from './ReplayVideoCard';
 import LoadMoreDivider from './LoadMoreDivider';
-import { useRecentLive } from '@queries/main/useFetchRecentLive';
+import { useRecentReplay } from '@queries/main/useFetchRecentReplay';
 import { VIDEO_VIEW } from '@constants/videoView';
 
-interface MainLiveSectionProps {
+interface MainReplaySectionProps {
   title: string;
 }
 
-const MainLiveSection = ({ title }: MainLiveSectionProps) => {
+const MainReplaySection = ({ title }: MainReplaySectionProps) => {
   const [textStatus, setTextStatus] = useState(VIDEO_VIEW.MORE_VIEW);
 
-  const { data: liveData = { info: [], appendInfo: [] }, isLoading, error } = useRecentLive();
+  const { data: replayData = { info: [], appendInfo: [] }, isLoading, error } = useRecentReplay();
 
-  const { info: infoData, appendInfo: appendInfoData } = liveData;
+  const { info: infoData, appendInfo: appendInfoData } = replayData;
   const displayedData = textStatus === VIDEO_VIEW.FOLD ? [...infoData, ...appendInfoData] : infoData;
 
   const handleTextChange = () => {
@@ -39,14 +39,11 @@ const MainLiveSection = ({ title }: MainLiveSectionProps) => {
 
       <MainSectionContentList>
         {displayedData.map((video) => (
-          <LiveVideoCard key={video.id} videoData={video} />
+          <ReplayVideoCard key={video.videoNo} videoData={video} />
         ))}
       </MainSectionContentList>
 
-      <LoadMoreDivider
-        text={textStatus}
-        onClick={handleTextChange}
-      />
+      <LoadMoreDivider text={textStatus} onClick={handleTextChange} />
       <div className="parent">
         <div className="child"></div>
       </div>
@@ -54,7 +51,7 @@ const MainLiveSection = ({ title }: MainLiveSectionProps) => {
   );
 };
 
-export default MainLiveSection;
+export default MainReplaySection;
 
 const MainSectionContainer = styled.section`
   display: flex;

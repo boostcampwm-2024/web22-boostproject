@@ -5,6 +5,7 @@ import { MainPage, ClientPage, HostPage } from './pages';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '@apis/index';
 import withUserId from '@hocs/withUserId';
+import ReplayPage from '@pages/ReplayPage';
 
 function AppComponent() {
   return (
@@ -20,6 +21,8 @@ function AppComponent() {
             <Route path="/" element={<MainPage />} />
             <Route path="/live" element={<ClientPage />} />
             <Route path="/live/:id" element={<ClientPage />} />
+            <Route path="/replay" element={<ReplayPage />} />
+            <Route path="/replay/:id" element={<ReplayPage />} />
             <Route path="/host" element={<HostPage />} />
             <Route path="/host/:id" element={<HostPage />} />
           </Routes>

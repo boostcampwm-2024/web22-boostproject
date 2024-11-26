@@ -1,29 +1,54 @@
 import styled from 'styled-components';
 import QuestionCard from './QuestionCard';
-import { useContext, useEffect, useRef } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { MessageReceiveData } from '@type/chat';
 import { CHATTING_TYPES } from '@constants/chat';
 import { ChatContext } from 'src/contexts/chatContext';
 import NoticeCard from './NoticeCard';
+import ChatAutoScroll from './ChatAutoScroll';
 
 export interface ChatListProps {
   messages: MessageReceiveData[];
   userId: string | undefined;
 }
 
-export const ChatList = ({ messages, userId }: ChatListProps) => {
+const ChatList = ({ messages, userId }: ChatListProps) => {
   const { state } = useContext(ChatContext);
+  const [isAtBottom, setIsAtBottom] = useState(true);
+  const [currentChat, setCurrentChat] = useState<MessageReceiveData | null>(null);
+
   const chatListRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
+  const checkIfAtBottom = () => {
+    if (!chatListRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = chatListRef.current;
+
+    const atBottom = scrollHeight - scrollTop - clientHeight < 1;
+    setIsAtBottom(atBottom);
+
+    if (atBottom && currentChat) {
+      setCurrentChat(null);
+    }
+  };
+
+  const scrollToBottom = () => {
     if (chatListRef.current) {
       chatListRef.current.scrollTop = chatListRef.current.scrollHeight;
+      setCurrentChat(null);
+    }
+  };
+
+  useEffect(() => {
+    if (chatListRef.current && isAtBottom) {
+      scrollToBottom();
+    } else {
+      setCurrentChat(messages[messages.length - 1]);
     }
   }, [messages]);
 
   return (
     <ChatListSection>
-      <ChatListWrapper ref={chatListRef}>
+      <ChatListWrapper ref={chatListRef} onScroll={checkIfAtBottom}>
         {messages.map((chat, index) => (
           <ChatItemWrapper key={index}>
             {chat.msgType === CHATTING_TYPES.QUESTION ? (
@@ -43,6 +68,7 @@ export const ChatList = ({ messages, userId }: ChatListProps) => {
           </ChatItemWrapper>
         ))}
       </ChatListWrapper>
+      <ChatAutoScroll currentChat={currentChat} isAtBottom={isAtBottom} scrollToBottom={scrollToBottom} />
       {state.isNoticePopupOpen && (
         <PopupWrapper>
           <NoticeCard />

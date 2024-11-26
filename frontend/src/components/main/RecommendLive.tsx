@@ -1,37 +1,32 @@
 import styled from 'styled-components';
-import Hls from 'hls.js';
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { LiveBadgeLarge } from './ThumbnailBadge';
-import { useMainLive } from '@apis/queries/main/useFetchMainLive';
+import { useMainLive } from '@queries/main/useFetchMainLive';
 import sampleProfile from '@assets/sample_profile.png';
+import useRotatingPlayer from '@hooks/useRotatePlayer';
+import RecommendList from './RecommendList';
+import { getLiveURL } from '@utils/getVideoURL';
 
 const RecommendLive = () => {
   const navigate = useNavigate();
+  
+  const { videoRef, initPlayer } = useRotatingPlayer();
   const { data: mainLiveData, isLoading, error } = useMainLive();
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
 
   useEffect(() => {
-    if (!mainLiveData || mainLiveData.length === 0) return;
+    if (!mainLiveData || !mainLiveData[currentUrlIndex]) return;
 
-    const videoElement = videoRef.current;
-    if (videoElement && Hls.isSupported()) {
-      const hls = new Hls();
-      hls.loadSource(videoUrl);
-      hls.attachMedia(videoElement);
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        videoElement?.play();
-      });
+    const playVideo = () => {
+      const liveId = mainLiveData[currentUrlIndex].liveId;
+      const videoUrl = getLiveURL(liveId);
+      initPlayer(videoUrl);
+    };
 
-      return () => {
-        hls.destroy();
-      };
-    } else if (videoElement) {
-      videoElement.src = videoUrl;
-      videoElement.play();
-    }
-  }, [mainLiveData]);
+    playVideo();
+  }, [mainLiveData, currentUrlIndex, initPlayer]);
 
   if (error) {
     return <div>데이터를 가져오는 중 에러가 발생했습니다.</div>;
@@ -41,9 +36,12 @@ const RecommendLive = () => {
     return <div>추천 라이브 데이터가 없습니다.</div>;
   }
 
-  const liveData = mainLiveData[0];
+  const liveData = mainLiveData[currentUrlIndex];
   const { liveId, liveTitle, concurrentUserCount, channel, category } = liveData;
-  const videoUrl = `https://kr.object.ncloudstorage.com/web22/live/${liveId}/index.m3u8`;
+
+  const onSelect = (index: number) => {
+    setCurrentUrlIndex(index);
+  };
 
   return (
     <RecommendLiveContainer>
@@ -60,13 +58,20 @@ const RecommendLive = () => {
         </RecommendLiveHeader>
 
         <RecommendLiveInformation>
-          <RecommendLiveProfile>
-            <img src={sampleProfile} />
-          </RecommendLiveProfile>
-          <RecommendLiveArea>
-            <span className="video_card_name">{channel.channelName}</span>
-            <span className="video_card_category">{category}</span>
-          </RecommendLiveArea>
+          <Flex>
+            <RecommendLiveProfile>
+              <img src={sampleProfile} alt="profile" />
+            </RecommendLiveProfile>
+            <RecommendLiveArea>
+              <span className="video_card_name">{channel.channelName}</span>
+              <span className="video_card_category">{category}</span>
+            </RecommendLiveArea>
+          </Flex>
+          <RecommendList
+            mainLiveData={mainLiveData}
+            onSelect={onSelect}
+            currentLiveId={mainLiveData[currentUrlIndex].liveId}
+          />
         </RecommendLiveInformation>
       </RecommendLiveWrapper>
     </RecommendLiveContainer>
@@ -104,7 +109,12 @@ const RecommendLiveBox = styled.div<{ $isLoading: boolean }>`
     position: absolute;
     left: 0;
     top: 0;
-    object-fit: cover;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 1;
+
+    &.transitioning {
+      opacity: 0;
+    }
   }
 `;
 
@@ -140,6 +150,7 @@ const RecommendLiveInformation = styled.div`
   display: flex;
   align-items: center;
   flex-grow: 0.5;
+  justify-content: space-between;
 `;
 
 const RecommendLiveProfile = styled.div`
@@ -150,6 +161,7 @@ const RecommendLiveProfile = styled.div`
   display: block;
   overflow: hidden;
   position: relative;
+  flex-shrink: 0;
   width: 70px;
   height: 70px;
 
@@ -173,10 +185,20 @@ const RecommendLiveArea = styled.div`
     ${({ theme }) => theme.tokenTypographys['display-bold20']}
     color: ${({ theme }) => theme.tokenColors['text-strong']};
     margin-bottom: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .video_card_category {
     ${({ theme }) => theme.tokenTypographys['display-bold16']}
     color: ${({ theme }) => theme.tokenColors['brand-default']};
     margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
+`;
+
+const Flex = styled.div`
+  display: flex;
 `;

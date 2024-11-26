@@ -1,23 +1,32 @@
 import { ASSETS } from '@constants/assets';
 import styled from 'styled-components';
 
-import ElapsedTime from './ElapsedTime';
 import sampleProfile from '@assets/sample_profile.png';
 import ShowInfoBadge from '@common/ShowInfoBadge';
-import { ClientLive } from '@type/live';
+import { ReplayStream } from '@type/replay';
+import { formatTimeDifference } from '@utils/formatTimeDifference';
 
-const PlayerInfo = ({ clientLiveData }: { clientLiveData: ClientLive }) => {
-  const { channel, concurrentUserCount, liveTitle, category, tags, startDate } = clientLiveData;
+const PlayerInfo = ({ clientReplayData }: { clientReplayData: ReplayStream }) => {
+  const { channel, category, startDate, readCount, tags, videoTitle } = clientReplayData;
+
+  const now = new Date();
+  const startDateFormat = new Date(startDate);
+  const formatTime = formatTimeDifference({ startDate: startDateFormat, now });
 
   return (
     <PlayerInfoContainer>
-      <VideoTitle>{liveTitle}</VideoTitle>
+      <ReplayInfoBox>
+        <VideoTitle>{videoTitle}</VideoTitle>
+        <ReplayInfo>
+          <p>조회수 {readCount}</p>
+          <p>{formatTime}</p>
+        </ReplayInfo>
+      </ReplayInfoBox>
       <PlayerInfoBox>
         <HostProfileBox>
           <HostProfile>
             <img src={sampleProfile} />
           </HostProfile>
-          <LiveBox>LIVE</LiveBox>
         </HostProfileBox>
         <VideoInfo>
           <VideoUploader>{channel.channelName}</VideoUploader>
@@ -27,11 +36,6 @@ const PlayerInfo = ({ clientLiveData }: { clientLiveData: ClientLive }) => {
               <ShowInfoBadge key={index} badgeType="tag" text={tag} />
             ))}
           </TagBox>
-          <LiveInfo>
-            <p>{concurrentUserCount}명 시청 중</p>
-            <p>·</p>
-            <ElapsedTime startDate={startDate} />
-          </LiveInfo>
         </VideoInfo>
       </PlayerInfoBox>
       <BannerLink href="https://boostcamp.connect.or.kr/" target="_blank" rel="noopener noreferrer">
@@ -54,7 +58,20 @@ const PlayerInfoContainer = styled.div`
 const VideoTitle = styled.h1`
   color: ${({ theme }) => theme.tokenColors['text-strong']};
   ${({ theme }) => theme.tokenTypographys['display-bold24']};
+`;
+
+const ReplayInfoBox = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 24px;
+`;
+
+const ReplayInfo = styled.div`
+  display: flex;
+  gap: 16px;
+  color: ${({ theme }) => theme.tokenColors['text-default']};
+  ${({ theme }) => theme.tokenTypographys['display-bold14']};
 `;
 
 const PlayerInfoBox = styled.div`
@@ -95,19 +112,6 @@ const HostProfile = styled.div`
   }
 `;
 
-const LiveBox = styled.div`
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 2px 8px;
-  border-radius: 4px;
-  background-color: ${({ theme }) => theme.tokenColors['red-default']};
-  color: ${({ theme }) => theme.tokenColors['text-strong']};
-  ${({ theme }) => theme.tokenTypographys['display-bold14']};
-  line-height: 1.2;
-`;
-
 const VideoInfo = styled.div`
   display: flex;
   flex-direction: column;
@@ -127,13 +131,6 @@ const Category = styled.p`
 const TagBox = styled.div`
   display: flex;
   gap: 8px;
-`;
-
-const LiveInfo = styled.div`
-  display: flex;
-  gap: 8px;
-  color: ${({ theme }) => theme.tokenColors['text-bold']};
-  ${({ theme }) => theme.tokenTypographys['display-bold12']};
 `;
 
 const BannerLink = styled.a`

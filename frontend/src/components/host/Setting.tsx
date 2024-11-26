@@ -1,9 +1,11 @@
-import styled from 'styled-components';
-import Player from './Player';
-import SettingForm from './SettingForm';
-import { useBroadcastStatusPolling } from '@apis/queries/host/useBroadcastStatusPolling';
-import { getSessionKey } from '@utils/streamKey';
 import { useEffect, useState } from 'react';
+import styled from 'styled-components';
+
+import Player from './StreamingDisplay';
+import SettingForm from './SettingForm';
+import { useBroadcastStatusPolling } from '@queries/host/useBroadcastStatusPolling';
+import { getSessionKey } from '@utils/streamKey';
+
 
 export default function Setting() {
   const [sessionKey, setSessionKey] = useState(getSessionKey());

@@ -19,11 +19,11 @@ export const ChatHeader = ({ outBtnHandler }: ChatHeaderProps) => {
 
   const handleClickOutside = useCallback(
     (event: MouseEvent) => {
-      if (headerRef.current && !headerRef.current.contains(event.target as Node)) {
+      if (headerRef.current && !headerRef.current.contains(event.target as Node) && state.isSettingsOpen) {
         dispatch({ type: 'CLOSE_SETTINGS' });
       }
     },
-    [dispatch]
+    [dispatch, state.isSettingsOpen]
   );
 
   useEffect(() => {

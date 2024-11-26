@@ -34,7 +34,7 @@ const HeaderContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 0;
+  padding: 5px 0;
   height: 60px;
   min-width: 800px;
   position: fixed;

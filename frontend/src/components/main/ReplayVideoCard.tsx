@@ -4,30 +4,29 @@ import { useNavigate } from 'react-router-dom';
 import sampleProfile from '@assets/sample_profile.png';
 import ShowInfoBadge from '@common/ShowInfoBadge';
 import { ASSETS } from '@constants/assets';
-import { RecentLive } from '@type/live';
+import { ReplayStream } from '@type/replay';
 import { ReplayBadge, ReplayViewCountBadge } from './ThumbnailBadge';
 
 interface ReplayVideoCardProps {
-  videoData: RecentLive;
+  videoData: ReplayStream;
 }
 
 const ReplayVideoCard = ({ videoData }: ReplayVideoCardProps) => {
   const navigate = useNavigate();
 
-  const { concurrentUserCount, category, channel, tags, defaultThumbnailImageUrl, liveId, liveImageUrl, liveTitle } =
-    videoData;
+  const { category, channel, tags, thumbnailImageUrl, livePr, videoTitle, videoId } = videoData;
 
-  const handleLiveClick = () => {
-    navigate(`/live/${liveId}`);
+  const handleReplayClick = () => {
+    navigate(`/replay/${videoId}`);
   };
 
   return (
     <VideoCardContainer>
-      <VideoCardThumbnail onClick={handleLiveClick}>
-        <VideoCardImage src={defaultThumbnailImageUrl ?? liveImageUrl} />
+      <VideoCardThumbnail onClick={handleReplayClick}>
+        <VideoCardImage src={thumbnailImageUrl} />
         <VideoCardDescription>
           <ReplayBadge />
-          <ReplayViewCountBadge count={concurrentUserCount} />
+          <ReplayViewCountBadge count={livePr} />
         </VideoCardDescription>
       </VideoCardThumbnail>
 
@@ -36,8 +35,8 @@ const ReplayVideoCard = ({ videoData }: ReplayVideoCardProps) => {
           <img src={sampleProfile} />
         </VideoCardProfile>
         <VideoCardArea>
-          <span className="video_card_title" style={{ cursor: 'pointer' }} onClick={handleLiveClick}>
-            {liveTitle}
+          <span className="video_card_title" style={{ cursor: 'pointer' }} onClick={handleReplayClick}>
+            {videoTitle}
           </span>
           <span className="video_card_name">{channel.channelName}</span>
           <VideoCardInformation>
@@ -96,6 +95,7 @@ const VideoCardProfile = styled.div`
   margin-right: 10px;
   background: ${({ theme }) => theme.tokenColors['surface-alt']} no-repeat 50% / cover;
   border-radius: 50%;
+  margin-top: 5px;
   display: block;
   overflow: hidden;
   width: 40px;

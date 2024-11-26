@@ -47,9 +47,7 @@ export class HostController {
   }
 
   @Get('/state')
-  @ApiOperation({
-    summary: 'Response this session is live", description: "현재 방송 세션이 라이브 상태인지 반환합니다.'
-  })
+  @ApiOperation({summary: 'Response this session is live', description: '현재 방송 세션이 라이브 상태인지 반환합니다.'})
   @ApiResponse({ status: 200, description: '현재 방송 상태에 대한 응답' })
   async getBroadcastState(@Query('sessionKey') sessionKey: string, @Res() res: Response) {
     const liveState = this.memoryDBService.findBySessionKey(sessionKey);

@@ -4,17 +4,21 @@ import { ReplayService } from './replay.service.js';
 import { MemoryDBService } from '../memory-db/memory-db.service.js';
 import { memoryDbDtoToReplayVideoDto } from '../common/transformers.js';
 import { MemoryDbDto } from '../dto/memoryDbDto.js';
+import { ReplayVideoDto } from 'src/dto/replayVideoDto.js';
+import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 
 @Controller('replay')
 export class ReplayController {
   constructor(private readonly replayService: ReplayService, private readonly memoryDBService: MemoryDBService) {}
 
   @Get('/latest')
+  @ApiOperation({summary: 'Get 8ea Replay And 8ea Append Replay Info', description: '가장 최근에 등록된 다시보기 8개와 추가 8개의 다시보기를 불러옵니다. (다시보기가 없을 경우 빈 배열 반환)'})
+  @ApiOkResponse({description: '정상적으로 데이터를 불러왔습니다.'})
   async getLatestReplay(@Res() res: Response) {
     try {
       const replayChecker = (item: MemoryDbDto) => { return item.replay && !item.state; };
-      const serchedData = this.memoryDBService.getBroadcastInfo(8, memoryDbDtoToReplayVideoDto, replayChecker);
-      res.status(HttpStatus.OK).json({info: serchedData});
+      const [serchedData, appendData] = this.memoryDBService.getBroadcastInfo<ReplayVideoDto>(8, memoryDbDtoToReplayVideoDto, replayChecker, 8);
+      res.status(HttpStatus.OK).json({info: serchedData, appendInfo: appendData});
     } catch (error) {
       if ((error as { status: number }).status === 400) {
         res.status(HttpStatus.BAD_REQUEST).json({
@@ -30,6 +34,7 @@ export class ReplayController {
   }
 
   @Get('/video')
+  @ApiOperation({summary : 'Get Replay Info', description:'videoId에 대해 다시보기 정보를 불러옵니다.'})
   async getReplayInfo(@Query('videoId') sessionKey: string, @Res() res: Response) {
     try {
       const sessionInfo = this.memoryDBService.findBySessionKey(sessionKey);

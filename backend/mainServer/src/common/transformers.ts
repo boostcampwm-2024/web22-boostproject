@@ -15,6 +15,7 @@ export function memoryDbDtoToReplayVideoDto(memoryDbDto: MemoryDbDto): ReplayVid
     readCount: memoryDbDto.readCount || 0,
     publishDateAt: memoryDbDto.startDate ? memoryDbDto.startDate.getTime() : undefined,
     category: memoryDbDto.category || 'unknown',
+    tags: memoryDbDto.tags || [],
     livePr: memoryDbDto.livePr || 0,
     channel: {
       channelId: memoryDbDto.channel.channelId,

@@ -32,13 +32,24 @@ export class MemoryDBService {
     return getRandomElementsFromArray(liveSession, count);
   }
 
-  getBroadcastInfo<T>(size: number, dtoTransformer: (info: MemoryDbDto) => T, checker: (item: MemoryDbDto) => boolean) {
+  getBroadcastInfo<T>(size: number, dtoTransformer: (info: MemoryDbDto) => T, checker: (item: MemoryDbDto) => boolean, appender: number = 0) {
     const findSession = this.db.filter(item => checker(item));
     if (findSession.length < size) {
       const findSessionRev = findSession.reverse().map((info) => dtoTransformer(info));
-      return [...findSessionRev];
+      return [[...findSessionRev], []];
     }
-    return findSession.slice(-size).reverse().map((info) => dtoTransformer(info));
+    const latestSession = findSession.slice(-size).reverse().map((info) => dtoTransformer(info));
+    if (appender === 0) {
+      return [[...latestSession], []];
+    }
+    else if (findSession.length < size + appender) {
+      const appendSession = findSession.slice(0, findSession.length - size).reverse().map((info) => dtoTransformer(info));
+      return [[...latestSession], [...appendSession]];
+    }
+    else {
+      const appendSession = findSession.slice(-size - appender, -size).reverse().map((info) => dtoTransformer(info));
+      return [[...latestSession], [...appendSession]];
+    }
   }
 
   create(item: Partial<MemoryDbDto>): void {

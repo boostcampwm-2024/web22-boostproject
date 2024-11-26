@@ -30,6 +30,7 @@ export class HostController {
         throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
       }
       sessionInfo.state = true;
+      sessionInfo.replay = false;
       sessionInfo.startDate = new Date();
       this.memoryDBService.updateBySessionKey(streamKey, sessionInfo);
       res.status(HttpStatus.OK).json({ 'session-key': sessionInfo.sessionKey });
@@ -147,6 +148,7 @@ export class HostController {
         const liveTime = calculateSecondsBetweenDates(sessionInfo.startDate, sessionInfo.endDate);
         const m3u8Data = generatePlaylist(Math.floor(liveTime / 2) - REPLAY_VIDEO_LATENCY);
         this.hostService.uploadToS3(m3u8Data, sessionInfo.sessionKey, 'replay', 'm3u8');
+        sessionInfo.replay = true;
       }
       this.memoryDBService.updateBySessionKey(streamKey, sessionInfo);
       res.status(HttpStatus.OK).send();

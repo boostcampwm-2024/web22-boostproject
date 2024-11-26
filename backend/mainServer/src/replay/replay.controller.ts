@@ -4,7 +4,7 @@ import { ReplayService } from './replay.service.js';
 import { MemoryDBService } from '../memory-db/memory-db.service.js';
 import { memoryDbDtoToReplayVideoDto } from '../common/transformers.js';
 import { MemoryDbDto } from '../dto/memoryDbDto.js';
-import { ReplayVideoDto } from 'src/dto/replayVideoDto.js';
+import { ReplayVideoDto } from '../dto/replayVideoDto.js';
 import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 
 @Controller('replay')

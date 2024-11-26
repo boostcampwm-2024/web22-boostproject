@@ -6,14 +6,14 @@ export function memoryDbDtoToReplayVideoDto(memoryDbDto: MemoryDbDto): ReplayVid
     videoNo: memoryDbDto.id,
     videoId: memoryDbDto.sessionKey,
     videoTitle: memoryDbDto.liveTitle,
-    publishDate: memoryDbDto.startDate || new Date(),
+    startDate: memoryDbDto.startDate || new Date(),
+    endDate: memoryDbDto.endDate || new Date(),
     thumbnailImageUrl: memoryDbDto.defaultThumbnailImageUrl || memoryDbDto.liveImageUrl,
     trailerUrl: memoryDbDto.liveImageUrl || null,
     duration: memoryDbDto.endDate && memoryDbDto.startDate
       ? Math.floor((memoryDbDto.endDate.getTime() - memoryDbDto.startDate.getTime()) / 1000)
       : 0,
     readCount: memoryDbDto.readCount || 0,
-    publishDateAt: memoryDbDto.startDate ? memoryDbDto.startDate.getTime() : undefined,
     category: memoryDbDto.category || 'unknown',
     tags: memoryDbDto.tags || [],
     livePr: memoryDbDto.livePr || 0,

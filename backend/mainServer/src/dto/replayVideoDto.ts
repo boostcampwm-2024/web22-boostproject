@@ -21,10 +21,17 @@ export class ReplayVideoDto {
     videoTitle: string;
 
   @ApiProperty({
-    description: '방송 게시 날짜',
+    description: '방송 시작 날짜',
     example: '2024-11-25T10:00:00.000Z',
   })
-    publishDate: Date;
+    startDate: Date;
+
+
+  @ApiProperty({
+    description: '방송 종료 날짜',
+    example: '2024-11-25T11:00:00.000Z',
+  })
+    endDate: Date;
 
   @ApiProperty({
     description: '썸네일 이미지 URL',
@@ -86,7 +93,8 @@ export class ReplayVideoDto {
     this.videoNo = init?.videoNo ?? 0;
     this.videoId = init?.videoId ?? '';
     this.videoTitle = init?.videoTitle ?? '';
-    this.publishDate = init?.publishDate ?? new Date(0);
+    this.startDate = init?.startDate ?? new Date(0);
+    this.endDate = init?.endDate ?? new Date(0);
     this.thumbnailImageUrl = init?.thumbnailImageUrl ?? '';
     this.trailerUrl = init?.trailerUrl;
     this.duration = init?.duration ?? 0;

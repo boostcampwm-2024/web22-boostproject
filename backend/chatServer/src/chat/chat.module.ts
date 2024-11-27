@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
-import { ChatGateway, checkHostUser, checkValidUser } from './chat.gateway';
-import { RoomService } from '../room/room.service';
+import { ChatGateway } from './chat.gateway';
+import { RoomModule } from '../room/room.module';
+import { MessageGuard } from './chat.guard';
 
 @Module({
-  imports: [],
-  providers: [ChatGateway, checkValidUser, checkHostUser, RoomService],
+  imports: [RoomModule],
+  providers: [ChatGateway, MessageGuard],
 })
 export class ChatModule {}

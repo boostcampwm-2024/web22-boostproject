@@ -4,97 +4,65 @@ import {
   WebSocketServer,
   OnGatewayInit,
   OnGatewayConnection,
-  OnGatewayDisconnect, WsException
+  OnGatewayDisconnect,
+  MessageBody,
+  ConnectedSocket,
 } from '@nestjs/websockets';
+import { UseGuards } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import {
-  CHATTING_SOCKET_ERROR,
   CHATTING_SOCKET_DEFAULT_EVENT,
   CHATTING_SOCKET_RECEIVE_EVENT, CHATTING_SOCKET_SEND_EVENT
 } from '../event/constants';
-import { IncomingMessageDto } from '../event/dto/IncomingMessage.dto';
+import {
+  NormalIncomingMessageDto, NoticeIncomingMessageDto, QuestionDoneIncomingMessageDto, QuestionIncomingMessageDto
+} from '../event/dto/IncomingMessage.dto';
 import { JoiningRoomDto } from '../event/dto/JoiningRoom.dto';
-import { CanActivate, ExecutionContext, Injectable, UseGuards } from '@nestjs/common';
-import { OutgoingMessageDto } from '../event/dto/OutgoingMessage.dto';
-import { User } from '../room/user.interface';
 import { RoomService } from '../room/room.service';
 import { createAdapter } from '@socket.io/redis-adapter';
-import { Redis } from 'ioredis';
-
-@Injectable()
-export class checkValidUser implements CanActivate {
-  constructor(private roomService: RoomService) {};
-
-  canActivate(context: ExecutionContext): boolean {
-    const client = context.switchToWs().getClient<Socket>();
-    const payload = context.switchToWs().getData();
-    const { roomId, userId } = payload;
-    const room = this.roomService.getRoom(roomId);
-
-    console.log(roomId, userId, payload, room);
-    if(!room) throw new WsException(CHATTING_SOCKET_ERROR.ROOM_EMPTY);
-    console.log('guard', room.users);
-    const user = this.roomService.getRoom(roomId)!.users.get(userId);
-
-    // if(!user) throw new WsException(CHATTING_SOCKET_ERROR.INVALID_USER);
-
-    console.log('guard', user , client.id , user?.clientId);
-    if(!client.data.userId) client.data = {roomId, userId, ...user};
-    return true;
-  }
-}
-
-@Injectable()
-export class checkHostUser implements CanActivate {
-  constructor(private roomService: RoomService) {};
-
-  canActivate(context: ExecutionContext): boolean {
-    // const client = context.switchToWs().getClient<Socket>();
-    const payload = context.switchToWs().getData();
-
-    const { userId, roomId } = payload;
-    const hostId = this.roomService.getRoom(roomId)?.hostId;
-    console.log(userId, roomId, hostId, this.roomService.getRoom(roomId));
-    if(userId !== hostId) throw new WsException(CHATTING_SOCKET_ERROR.INVALID_USER);
-    return true;
-  }
-}
-
+import { HostGuard, MessageGuard } from './chat.guard';
+import { LeavingRoomDto } from '../event/dto/LeavingRoom.dto';
+import {
+  NormalOutgoingMessageDto,
+  NoticeOutgoingMessageDto,
+  QuestionOutgoingMessageDto
+} from '../event/dto/OutgoingMessage.dto';
+import { QuestionDto } from '../event/dto/Question.dto';
 
 @WebSocketGateway({ cors: true })
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-  redisAdapter: ReturnType<typeof createAdapter>;
-  constructor(private roomService: RoomService) {
-    // Redis 클러스터 연결 설정
-    const redisClient = new Redis.Cluster([
-      { host: 'redisc-2vucs8.vpc-cdb.ntruss.com', port: 6379 },
-      { host: 'redisc-2vucsb.vpc-cdb.ntruss.com', port: 6379 },
-      { host: 'redisc-2vucse.vpc-cdb.ntruss.com', port: 6379 },
-    ]);
+  constructor(private roomService: RoomService) {};
 
-    // 어댑터 설정
-    this.redisAdapter = createAdapter(redisClient, redisClient);
-  };
-
-  afterInit() {
-    // Socket.IO 서버에 Redis 어댑터 연결
-    this.server.adapter(this.redisAdapter);
+  async afterInit() {
+    const { pubClient, subClient } = this.roomService.getPubSubClients();
+    const redisAdapter = createAdapter(pubClient, subClient);
+    this.server.adapter(redisAdapter);
+    console.log('Redis adapter set');
   }
 
   @WebSocketServer()
     server!: Server;
 
 
-  handleConnection(client: Socket) {
+  async handleConnection(client: Socket) {
     console.log(`Client connected: ${client.id}`);
-    client.leave(client.id);
+    const user = await this.roomService.createUser(client.id);
+    console.log(user);
+
+    /*
+      2024-11-27 기준으로 socket.io 내부 로직의 문제로 default room 에서 나가게되면
+      socket.broadcast 로직이 '자기 자신을 제외한' 유저에게 브로드캐스트 되는 것이 아니라
+      '자기 자신을 포함한' 모든 유저에게 브로드캐스트 되도록 바뀜.
+      https://github.com/socketio/socket.io/issues/4524
+     */
+
+    // client.leave(client.id);
   }
 
-  handleDisconnect(client: Socket) {
+  async handleDisconnect(client: Socket) {
     console.log('Client disconnected: ', client.id, client.data);
-    const { roomId, userId } = client.data;
     try {
-      this.roomService.deleteUser(roomId, userId);
+      await this.roomService.deleteUser(client.id);
     } catch (error) {
       console.log(error);
     }
@@ -102,108 +70,99 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   // 특정 방에 참여하기 위한 메서드
   @SubscribeMessage(CHATTING_SOCKET_DEFAULT_EVENT.JOIN_ROOM)
-  handleJoinRoom(client: Socket, payload: JoiningRoomDto) {
+  async handleJoinRoom(client: Socket, payload: JoiningRoomDto) {
     const { roomId, userId } = payload;
     client.join(roomId);
 
-    const room = this.roomService.getRoom(roomId);
-    if(!room){
-      this.roomService.createRoom(roomId, userId);
-    }
-
-    console.log(`cliend id = ${ client.id }, user id = ${ userId } 가 ${roomId} 에 입장했습니다.`);
-    const questionList = this.roomService.getQuestionsNotDone(roomId);
-
-    console.log('new user join', this.roomService.createUser(roomId, userId, client.id));
-
-    client.emit(CHATTING_SOCKET_RECEIVE_EVENT.INIT, { questionList });
+    console.log(payload);
+    // 만약 방이 없다면, 새로운 방을 만들고 호스트가 된다.
+    await this.roomService.createRoom(roomId, userId);
+    console.log(client.id, userId, roomId);
+    const questionList = await this.roomService.getQuestionsNotDone(roomId);
+    console.log('questionList', questionList);
+    client.emit(CHATTING_SOCKET_RECEIVE_EVENT.INIT, { roomId, questionList });
   }
 
   // 특정 방에서 나가기 위한 메서드
   @SubscribeMessage(CHATTING_SOCKET_DEFAULT_EVENT.LEAVE_ROOM)
-  handleLeaveRoom(client: Socket, payload: IncomingMessageDto) {
+  handleLeaveRoom(client: Socket, payload: LeavingRoomDto) {
     const { roomId, userId } = payload;
     console.log('leave', roomId, userId);
-    this.roomService.deleteUser(roomId, userId);
+    this.roomService.deleteUser(client.id);
     client.leave(roomId);
   }
 
   // 방에 NORMAL 메시지를 보내기 위한 메서드
-  @UseGuards(checkValidUser)
+  @UseGuards(MessageGuard)
   @SubscribeMessage(CHATTING_SOCKET_SEND_EVENT.NORMAL)
-  handleNormalMessage(client: Socket, payload: IncomingMessageDto) {
-    const room = client.rooms.values().next().value;
-    if(!room) throw new WsException(CHATTING_SOCKET_ERROR.ROOM_EMPTY);
-    const user: User = client.data;
-    const outgoingMessage: OutgoingMessageDto = {
-      userId: payload.userId,
-      nickname: user.nickname,
-      color: user.color,
-      msg: payload.msg,
+  async handleNormalMessage(@ConnectedSocket() client: Socket, @MessageBody() payload: NormalIncomingMessageDto) {
+    const { roomId, userId, msg } = payload;
+    const user = await this.roomService.getUserByClientId(client.id);
+    const normalOutgoingMessage: Omit<NormalOutgoingMessageDto, 'owner'> = {
+      roomId,
+      ...user,
+      msg,
       msgTime: new Date().toISOString(),
-      msgType: 'normal',
+      msgType: 'normal'
     };
-    this.server.to(room).emit(CHATTING_SOCKET_RECEIVE_EVENT.NORMAL, outgoingMessage);
+    console.log('Normal Message Come In: ', normalOutgoingMessage);
+    const hostId = await this.roomService.getHostOfRoom(roomId);
+    if(hostId === userId) {
+      this.server.emit(CHATTING_SOCKET_RECEIVE_EVENT.NORMAL,  { ...normalOutgoingMessage, owner: 'host' });
+    } else {
+      // 나를 제외한, 방에 있는 모든 사람에게는 owner : user 로 보내고
+      console.log('people', this.server.sockets.adapter.rooms.get(roomId));
+      client.emit(CHATTING_SOCKET_RECEIVE_EVENT.NORMAL, { ...normalOutgoingMessage, owner: 'me' });
+      client.broadcast.to(roomId).emit(CHATTING_SOCKET_RECEIVE_EVENT.NORMAL, {
+        ...normalOutgoingMessage,
+        owner: 'user'
+      });
+    }
   }
 
   // 방에 QUESTION 메시지를 보내기 위한 메서드
-  @UseGuards(checkValidUser)
+  @UseGuards(MessageGuard)
   @SubscribeMessage(CHATTING_SOCKET_SEND_EVENT.QUESTION)
-  handleQuestionMessage(client: Socket, payload: IncomingMessageDto) {
-    const room = client.rooms.values().next().value;
-    if(!room) throw new WsException(CHATTING_SOCKET_ERROR.ROOM_EMPTY);
-    const user: User = client.data;
-    const questionWithoutNumber: Omit<OutgoingMessageDto, 'questionId'> = {
-      questionDone: false,
-      userId: payload.userId,
-      nickname: user.nickname,
-      color: user.color,
-      msg: payload.msg,
+  async handleQuestionMessage(@ConnectedSocket() client: Socket, @MessageBody() payload: QuestionIncomingMessageDto) {
+    const { roomId, msg } = payload;
+    const user = await this.roomService.getUserByClientId(client.id);
+    const questionWithoutId: Omit<QuestionDto, 'questionId'> = {
+      roomId,
+      ...user,
+      msg,
       msgTime: new Date().toISOString(),
-      msgType: 'question'
+      msgType: 'question',
+      questionDone: false
     };
-    const newQuestion = this.roomService.addQuestionAndReturnQuestion(room, questionWithoutNumber);
-    console.log(payload, newQuestion);
-    this.server.to(room).emit(CHATTING_SOCKET_RECEIVE_EVENT.QUESTION, newQuestion);
+
+    const question: QuestionOutgoingMessageDto = await this.roomService.addQuestion(roomId, questionWithoutId);
+    this.server.to(roomId).emit(CHATTING_SOCKET_RECEIVE_EVENT.QUESTION, question);
   }
 
   // 방에 QUESTION DONE 메시지를 보내기 위한 메서드
-  @UseGuards(checkValidUser)
-  @UseGuards(checkHostUser)
+  @UseGuards(HostGuard)
   @SubscribeMessage(CHATTING_SOCKET_SEND_EVENT.QUESTION_DONE)
-  handleQuestionDoneMessage(client: Socket, payload: IncomingMessageDto) {
-    const room = client.rooms.values().next().value;
-    if(!room) throw new WsException(CHATTING_SOCKET_ERROR.ROOM_EMPTY);
-
+  async handleQuestionDoneMessage(@ConnectedSocket() client: Socket, @MessageBody() payload: QuestionDoneIncomingMessageDto) {
     const { roomId, questionId } = payload;
-    if(!questionId) throw new WsException(CHATTING_SOCKET_ERROR.QUESTION_EMPTY);
+    const question: QuestionDto = await this.roomService.markQuestionAsDone(roomId, questionId);
 
-    const question = this.roomService.getQuestion(roomId, questionId);
-    if(!question) throw new WsException(CHATTING_SOCKET_ERROR.QUESTION_EMPTY);
-
-    question.questionDone = true;
-
-    this.server.to(room).emit(CHATTING_SOCKET_RECEIVE_EVENT.QUESTION_DONE, question);
+    this.server.to(roomId).emit(CHATTING_SOCKET_RECEIVE_EVENT.QUESTION_DONE, question);
   }
 
   // 방에 NOTICE 메시지를 보내기 위한 메서드
-  @UseGuards(checkValidUser)
-  @UseGuards(checkHostUser)
+  @UseGuards(MessageGuard)
+  @UseGuards(HostGuard)
   @SubscribeMessage(CHATTING_SOCKET_SEND_EVENT.NOTICE)
-  handleNoticeMessage(client: Socket, payload: IncomingMessageDto) {
-    const room = client.rooms.values().next().value;
-    if(!room) throw new WsException(CHATTING_SOCKET_ERROR.ROOM_EMPTY);
-    const user: User = client.data;
-    const outgoingMessage: OutgoingMessageDto = {
-      userId: payload.userId,
-      nickname: user.nickname,
-      color: user.color,
-      msg: payload.msg,
+  async handleNoticeMessage(@ConnectedSocket() client: Socket, @MessageBody() payload: NoticeIncomingMessageDto) {
+    const { roomId, msg } = payload;
+    const user = await this.roomService.getUserByClientId(client.id);
+    const noticeOutgoingMessage: NoticeOutgoingMessageDto = {
+      roomId,
+      ...user,
+      msg,
       msgTime: new Date().toISOString(),
-      msgType: 'notice',
+      msgType: 'notice'
     };
-
-    console.log(payload, outgoingMessage);
-    this.server.to(room).emit(CHATTING_SOCKET_RECEIVE_EVENT.NOTICE, outgoingMessage);
+    this.server.to(roomId).emit(CHATTING_SOCKET_RECEIVE_EVENT.NOTICE, noticeOutgoingMessage);
   }
 }

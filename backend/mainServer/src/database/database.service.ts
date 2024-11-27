@@ -41,7 +41,6 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   async onModuleDestroy(): Promise<void> {
     if (this.pool) {
       const replayInfo = this.memoryDbService.findAll().filter((info) => info.replay);
-      console.log(replayInfo);
       await Promise.all(
         replayInfo.map((info) => this.saveReplayVideoToDb(memoryDbDtoToReplayVideoDto(info))),
       );     

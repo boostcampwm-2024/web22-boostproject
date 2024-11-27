@@ -81,19 +81,12 @@ export class ReplayVideoDto {
     example: ['tag1', 'tag2', 'tag3'],
   })
     tags: Array<string>;
-  constructor(init?: Partial<ReplayVideoDto>) {
-    this.videoNo = init?.videoNo ?? 0;
-    this.videoId = init?.videoId ?? '';
-    this.videoTitle = init?.videoTitle ?? '';
-    this.startDate = init?.startDate ?? new Date(0);
-    this.endDate = init?.endDate ?? new Date(0);
-    this.thumbnailImageUrl = init?.thumbnailImageUrl ?? '';
-    this.trailerUrl = init?.trailerUrl;
-    this.duration = init?.duration ?? 0;
-    this.readCount = init?.readCount;
-    this.category = init?.category ?? '';
-    this.livePr = init?.livePr ?? 0;
-    this.channel = init?.channel ?? new ChannelDto();
-    this.tags = init?.tags ?? [];
-  }
+
+    replayUrl: string;
+
+    constructor(data?: Partial<ReplayVideoDto>) {
+      if (data) {
+        Object.assign(this, data);
+      }
+    }
 }

@@ -21,5 +21,6 @@ export function memoryDbDtoToReplayVideoDto(memoryDbDto: MemoryDbDto): ReplayVid
       channelId: memoryDbDto.channel.channelId,
       channelName: memoryDbDto.channel.channelName,
     },
+    replayUrl: memoryDbDto.replayUrl || '',
   };
 }

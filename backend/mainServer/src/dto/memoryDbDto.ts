@@ -23,6 +23,8 @@ export class MemoryDbDto {
   liveId: string = '';
   liveTitle: string = '';
   liveImageUrl: string = '';
+  streamUrl: string = '';
+  replayUrl: string = '';
   defaultThumbnailImageUrl: string = DEFAULT_VALUE.THUMBNAIL_IMG_URL;
   concurrentUserCount: number = 0;
   channel: ChannelDto = {
@@ -57,6 +59,5 @@ export function memoryDbDtoFromLiveVideoRequestDto(
   memoryDbDto.tags = [...liveVideoDto.tags];
   memoryDbDto.notice = liveVideoDto.notice;
   memoryDbDto.channel.channelName = liveVideoDto.hostName;
-
   return memoryDbDto;
 }

@@ -77,6 +77,19 @@ export class MemoryDBService {
     this.db.splice(index, 1);
     return true;
   }
+  
+  rangeDelete(startId: number, endId: number): boolean {
+    const startIndex = this.db.findIndex(item => item.id >= startId);
+    const endIndex = this.db.findIndex(item => item.id > endId); // endId까지 포함하려면 > 대신 >=를 사용하세요.
+
+    if (startIndex === -1) return false;  
+    if (endIndex === -1) {
+      this.db = this.db.slice(0, startIndex);
+    } else {
+      this.db = [...this.db.slice(0, startIndex), ...this.db.slice(endIndex)];
+    }
+    return true;
+  }  
 }
 
 @Injectable()

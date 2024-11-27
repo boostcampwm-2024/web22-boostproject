@@ -8,14 +8,14 @@ services:
       dockerfile: dockerfile
     image: liboost/nginx:latest
     ports:
-      - "80:80"
-      - "443:443"
-      - "8000:8000"
-      - "1935:1935"
-      - "3000:3000"
+      - '80:80'
+      - '443:443'
+      - '8000:8000'
+      - '1935:1935'
+      - '3000:3000'
     volumes:
-      - /etc/letsencrypt/live/liboo.kr:/etc/letsencrypt/live/liboo.kr:ro
-      - /etc/letsencrypt/archive/liboo.kr:/etc/letsencrypt/archive/liboo.kr:ro
+      - /etc/letsencrypt/live/test.liboo.kr:/etc/letsencrypt/live/test.liboo.kr:ro
+      - /etc/letsencrypt/archive/test.liboo.kr:/etc/letsencrypt/archive/test.liboo.kr:ro
       - /etc/nginx/ssl/dhparams.pem:/etc/nginx/ssl/dhparams.pem:ro
 
     networks:
@@ -42,7 +42,6 @@ services:
     networks:
       - default-network
       - backend-bridge
-
 
 networks:
   backend-bridge:

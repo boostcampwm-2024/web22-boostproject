@@ -1,16 +1,37 @@
 type OutgoingMessageType = 'normal' | 'question' | 'notice';
+type WhoAmI = 'host' | 'me' | 'user';
 
-class OutgoingMessageDto {
-  userId: string = '';
+class DefaultOutgoingMessageDto {
+  roomId: string = '';
   nickname: string = '';
   color: string = '';
-  msg?: string;
   msgTime: string = new Date().toISOString();
-  msgType: OutgoingMessageType = 'normal';
-  questionId?: number; // QuestionList 의 Key 값과 동일
-  questionDone?: boolean;
 }
 
-class Question extends OutgoingMessageDto {}
+class NormalOutgoingMessageDto extends DefaultOutgoingMessageDto {
+  msg: string = '';
+  msgType: OutgoingMessageType = 'normal';
+  owner: WhoAmI = 'user';
+}
 
-export { OutgoingMessageDto, Question };
+class QuestionOutgoingMessageDto extends DefaultOutgoingMessageDto {
+  msg: string = '';
+  questionId: number = -1;
+  questionDone: boolean = false;
+  msgType: OutgoingMessageType = 'question';
+}
+
+class QuestionDoneOutgoingMessageDto extends QuestionOutgoingMessageDto {}
+
+class NoticeOutgoingMessageDto extends DefaultOutgoingMessageDto {
+  msg: string = '';
+  msgType: OutgoingMessageType = 'notice';
+}
+export {
+  NormalOutgoingMessageDto,
+  NoticeOutgoingMessageDto,
+  QuestionDoneOutgoingMessageDto,
+  QuestionOutgoingMessageDto,
+  OutgoingMessageType
+};
+

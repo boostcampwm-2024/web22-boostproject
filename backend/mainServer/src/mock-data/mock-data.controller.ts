@@ -1,6 +1,7 @@
-import { Controller, Delete, Get, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { MemoryDBService } from '../memory-db/memory-db.service.js';
+import { MemoryDbDto } from '../dto/memoryDbDto.js';
 
 @ApiTags('Dev API')
 @Controller('dev')
@@ -35,5 +36,11 @@ export class MockDataController {
     else if (Number(startId) < Number(endId)) {
       this.memoryDbService.rangeDelete(startId, endId);
     }
+  }
+
+  @Post('/append')
+  @ApiOperation({ summary: 'Delete Session Info', description: '방송 정보를 삭제합니다. (start만 적으면 단일, start, end 범위를 적으면 범위 삭제)' })
+  appendMemoryData(@Body() newData: MemoryDbDto) {
+    this.memoryDbService.create(newData);
   }
 }

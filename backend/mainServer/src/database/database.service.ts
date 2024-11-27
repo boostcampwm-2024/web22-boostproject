@@ -23,8 +23,9 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
         }
       });
       console.log('Replay Load Complete');
-    } catch(e) {
+    } catch(err) {
       console.log('Replay Load Error');
+      console.log('Error: ', err);
     }
   }
 

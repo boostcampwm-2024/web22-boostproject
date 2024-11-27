@@ -80,7 +80,7 @@ export class MemoryDBService {
   
   rangeDelete(startId: number, endId: number): boolean {
     const startIndex = this.db.findIndex(item => item.id >= startId);
-    const endIndex = this.db.findIndex(item => item.id > endId); // endId까지 포함하려면 > 대신 >=를 사용하세요.
+    const endIndex = this.db.findIndex(item => item.id > endId);
 
     if (startIndex === -1) return false;  
     if (endIndex === -1) {

@@ -39,7 +39,7 @@ export const ChatQuestionSection = ({ questions, worker, userType, roomId }: Cha
     <SectionWrapper>
       <SectionContainer>
         {questions.length === 0 ? (
-          <NoQuestionMessage>아직 질문이 없어요</NoQuestionMessage>
+          <NoQuestionMessage>아직 질문이 없어요 ( °ᗝ° ).ᐟ.ᐟ</NoQuestionMessage>
         ) : (
           <>
             <QuestionCard
@@ -47,6 +47,7 @@ export const ChatQuestionSection = ({ questions, worker, userType, roomId }: Cha
               type={userType}
               question={questions[0]}
               handleQuestionDone={handleQuestionDone}
+              ellipsis={!expanded}
             />
             {expanded &&
               questions
@@ -72,6 +73,9 @@ const SectionWrapper = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
+  background-color: #090909;
+  border-top: 1px solid ${({ theme }) => theme.tokenColors['surface-alt']};
+  border-bottom: 1px solid ${({ theme }) => theme.tokenColors['surface-alt']};
 `;
 
 const SectionContainer = styled.div`
@@ -83,8 +87,6 @@ const SectionContainer = styled.div`
   scrollbar-width: none;
   padding: 13px 20px 25px 20px;
   gap: 10px;
-  border-top: 1px solid ${({ theme }) => theme.tokenColors['surface-alt']};
-  border-bottom: 1px solid ${({ theme }) => theme.tokenColors['surface-alt']};
 `;
 
 const SwipeBtn = styled.button`
@@ -92,14 +94,13 @@ const SwipeBtn = styled.button`
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 25px;
+  height: 20px;
   cursor: pointer;
-  background-color: ${({ theme }) => theme.tokenColors['surface-default']};
-
+  background-color: #090909;
   &::before {
     content: '';
     position: absolute;
-    top: 35%;
+    top: 45%;
     left: 50%;
     background-color: ${({ theme }) => theme.tokenColors['text-weak']};
     border-radius: 2px;
@@ -113,5 +114,5 @@ const NoQuestionMessage = styled.div`
   text-align: center;
   ${({ theme }) => theme.tokenTypographys['display-medium14']};
   color: ${({ theme }) => theme.tokenColors['text-weak']};
-  padding: 20px 0;
+  padding: 15px 0 0 0;
 `;

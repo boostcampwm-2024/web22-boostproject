@@ -63,6 +63,12 @@ export const ChatInput = ({ worker, userType, roomId }: ChatInputProps) => {
   };
 
   const handleInputChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    const inputValue = e.target.value;
+
+    if (inputValue.length > 150) {
+      return;
+    }
+
     setMessage(e.target.value);
     setHasInput(e.target.value.length > 0);
   };

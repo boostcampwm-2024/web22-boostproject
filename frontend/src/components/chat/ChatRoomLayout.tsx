@@ -54,6 +54,7 @@ const ChatRoomContainer = styled.aside<{ $isVisible: boolean }>`
   flex-direction: column;
   height: 100%;
   min-width: 380px;
+  max-width: 380px;
   border-left: 1px solid ${({ theme }) => theme.tokenColors['surface-alt']};
   background: ${({ theme }) => theme.tokenColors['surface-default']};
 `;

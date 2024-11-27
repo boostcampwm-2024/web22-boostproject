@@ -105,35 +105,34 @@ const ChatListWrapper = styled.div`
 
 const ChatItemWrapper = styled.div`
   margin-top: auto;
-  padding: 5px 0;
+  padding: 6px 0;
 `;
 
 const NoticeChat = styled.div`
   display: flex;
-  align-items: center;
   padding: 10px 15px;
   gap: 10px;
   ${({ theme }) => theme.tokenTypographys['display-medium12']};
   color: ${({ theme }) => theme.tokenColors['text-default']};
   background-color: #0e0f10;
+  border-radius: 8px;
   overflow-wrap: break-word;
   word-break: break-word;
 `;
 
 const NormalChat = styled.div<{ $isHost: boolean; $pointColor: string }>`
-  display: flex;
-  align-items: center;
-  gap: 8px;
   ${({ theme }) => theme.tokenTypographys['display-medium14']};
   color: ${({ $isHost, theme }) => ($isHost ? theme.tokenColors['color-accent'] : theme.tokenColors['color-white'])};
 
   .text_point {
     ${({ theme }) => theme.tokenTypographys['display-bold14']};
     color: ${({ $pointColor }) => $pointColor};
+    margin-right: 8px;
   }
 
   .chat_message {
     color: ${({ $isHost }) => $isHost && '#82e3c4'};
+    line-height: 1.5;
   }
 
   overflow-wrap: break-word;
@@ -149,7 +148,8 @@ const PopupWrapper = styled.div`
 `;
 
 const StyledIcon = styled.svg`
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   cursor: pointer;
+  margin: 0 5px -4px 0;
 `;

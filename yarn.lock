@@ -2728,28 +2728,6 @@ __metadata:
     mkdirp: "npm:^2.1.5"
     ws: "npm:^8.13.0"
   bin:
-    node-media-server: bin/app.js
-  checksum: 10c0/a2ee39f41182b49c5cabcbf1f87ea16e97f5842bfb02c5ee10e11cbb921bbccfcc7dee0ec7ffbfe8b4e35e97bf3acdca42d5e1383f0836bdc78f4af198de585b
-  languageName: node
-  linkType: hard
-
-"@hoeeeeeh/test-node-media-server@npm:0.0.1":
-  version: 0.0.1
-  resolution: "@hoeeeeeh/test-node-media-server@npm:0.0.1"
-  dependencies:
-    "@aws-sdk/client-s3": "npm:^3.688.0"
-    "@types/node": "npm:^22.9.0"
-    basic-auth-connect: "npm:^1.0.0"
-    body-parser: "npm:1.20.3"
-    chalk: "npm:^4.1.0"
-    dateformat: "npm:^4.6.3"
-    express: "npm:^4.19.2"
-    http2-express-bridge: "npm:^1.0.7"
-    lodash: "npm:^4.17.21"
-    minimist: "npm:^1.2.8"
-    mkdirp: "npm:^2.1.5"
-    ws: "npm:^8.13.0"
-  bin:
     test-node-media-server: bin/app.js
   checksum: 10c0/2fb08d22ab0f14061132eec86bb62d1e2c44d72067b70f5dcbafe48a123765de9c7c023ca2e3d44c93e17012c68a3d33ee6ae3ca3d8d41cd0a8eea355484d964
   languageName: node

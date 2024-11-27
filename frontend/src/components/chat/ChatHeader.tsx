@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import ThreePointIcon from '@assets/icons/three-point.svg';
 import OutIcon from '@assets/icons/out.svg';
-import { useCallback, useContext, useEffect, useRef } from 'react';
+import { memo, useCallback, useContext, useEffect, useRef } from 'react';
 import LayerPopup from './LayerPopup';
 import { ChatContext } from 'src/contexts/chatContext';
 
@@ -47,7 +47,7 @@ export const ChatHeader = ({ outBtnHandler }: ChatHeaderProps) => {
   );
 };
 
-export default ChatHeader;
+export default memo(ChatHeader);
 
 const ChatHeaderContainer = styled.div`
   position: relative;

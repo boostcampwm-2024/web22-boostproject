@@ -1,4 +1,5 @@
 export type ChattingTypes = 'normal' | 'question' | 'notice';
+export type WhoAmI = 'host' | 'me' | 'user';
 
 // 기본 서버 응답 데이터
 export interface MessageReceiveData {
@@ -8,6 +9,7 @@ export interface MessageReceiveData {
   msg: string | null;
   msgTime: Date;
   msgType: ChattingTypes;
+  owner?: WhoAmI;
   questionId?: number;
   questionDone?: boolean;
 }

@@ -6,8 +6,8 @@ import {
 } from '../constants/chat';
 import { io } from 'socket.io-client';
 
-const TEST_SOCKET_URL = 'https://liboo.kr';
-const socket = io(TEST_SOCKET_URL, { path: '/chat/socket.io', transports: ['websocket'] });
+const SOCKET_URL = 'https://liboo.kr';
+const socket = io(SOCKET_URL, { path: '/chat/socket.io', transports: ['websocket'] });
 
 const ports: MessagePort[] = [];
 const portRoomMap: Map<MessagePort, string> = new Map();
@@ -58,7 +58,6 @@ const handleSocketMessage = (event: string, payload: any) => {
   const targetPorts = roomMap.get(roomId) || [];
   targetPorts.forEach((port) => {
     port.postMessage({ type: event, payload });
-    // port.postMessage({ type: 'logging', payload }); // 개발 디버깅용
   });
 };
 
@@ -87,17 +86,23 @@ const initializeSocketListeners = () => {
     socket.on(event, (payload) => handleSocketMessage(event, payload));
   });
 
+  socket.onAny((event, ...args) => {
+    ports.forEach((port) => {
+      port.postMessage({ type: 'logging', payload: `[SOCKET LOG] Event: ${event}, Data: ${JSON.stringify(args)}` });
+    });
+  });
+
   socket.on('connect_error', (err) => {
     console.error('Socket connection error:', err);
     ports.forEach((port) => {
-      port.postMessage({ type: 'error', payload: 'Socket connection failed' });
+      port.postMessage({ type: 'logging', payload: 'Socket connection failed' });
     });
   });
 
   socket.on('disconnect', () => {
     console.warn('Socket disconnected');
     ports.forEach((port) => {
-      port.postMessage({ type: 'error', payload: 'Socket disconnected' });
+      port.postMessage({ type: 'logging', payload: 'Socket disconnected' });
     });
   });
 };

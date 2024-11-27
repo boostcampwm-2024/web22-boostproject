@@ -1,0 +1,27 @@
+<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="18" height="18" rx="4" fill="url(#paint0_linear_525_225)"/>
+<g filter="url(#filter0_d_525_225)">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M5.46428 14.8C5.11978 14.8 4.80144 14.7047 4.62919 14.55C4.45694 14.3953 4.45694 14.2047 4.62919 14.05C4.80144 13.8953 5.11978 13.8 5.46428 13.8H12.5357C13.0683 13.8 13.5 14.0239 13.5 14.3C13.5 14.5762 13.0683 14.8 12.5357 14.8H5.46428Z" fill="white" stroke="white" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M3.5 5.80005C4.49392 7.63815 6.69392 9.89447 9 5.30005C11.3061 9.89447 13.5061 7.63815 14.5 5.80005L13.4 12.4H4.6L3.5 5.80005Z" fill="white" stroke="white" stroke-linecap="round" stroke-linejoin="round"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M14.7333 5.56676C14.3284 5.56676 14 5.23844 14 4.83343C14 4.42843 14.3284 4.1001 14.7333 4.1001C15.1384 4.1001 15.4667 4.42843 15.4667 4.83343C15.4667 5.02793 15.3894 5.21445 15.2519 5.35198C15.1144 5.4895 14.9278 5.56676 14.7333 5.56676Z" fill="white" stroke="white" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M14.7333 5.56676C14.3284 5.56676 14 5.23844 14 4.83343C14 4.42843 14.3284 4.1001 14.7333 4.1001C15.1384 4.1001 15.4667 4.42843 15.4667 4.83343C15.4667 5.02793 15.3894 5.21445 15.2519 5.35198C15.1144 5.4895 14.9278 5.56676 14.7333 5.56676Z" fill="white" stroke="white" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M9.03338 5.26672C8.62843 5.26672 8.30005 4.93839 8.30005 4.53338C8.30005 4.12838 8.62843 3.80005 9.03338 3.80005C9.43841 3.80005 9.76672 4.12838 9.76672 4.53338C9.76672 4.72788 9.68947 4.9144 9.55198 5.05193C9.41442 5.18945 9.22788 5.26672 9.03338 5.26672Z" fill="white" stroke="white" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M3.23333 5.56676C2.82838 5.56676 2.5 5.23844 2.5 4.83343C2.5 4.42843 2.82838 4.1001 3.23333 4.1001C3.63836 4.1001 3.96667 4.42843 3.96667 4.83343C3.96667 5.02793 3.88942 5.21445 3.75193 5.35198C3.61437 5.4895 3.42784 5.56676 3.23333 5.56676Z" fill="white" stroke="white" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<filter id="filter0_d_525_225" x="1.55" y="3.55005" width="14.8667" height="13.2" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1"/>
+<feGaussianBlur stdDeviation="0.35"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.4 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_525_225"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_525_225" result="shape"/>
+</filter>
+<linearGradient id="paint0_linear_525_225" x1="9" y1="0" x2="9" y2="18" gradientUnits="userSpaceOnUse">
+<stop stop-color="#0ADD91"/>
+<stop offset="1" stop-color="#75E3BB"/>
+</linearGradient>
+</defs>
+</svg>

@@ -51,5 +51,5 @@ export const useChatRoom = (roomId: string, userId: string) => {
     };
   }, [roomId, userId]);
 
-  return { worker, messages, questions };
+  return { worker: worker?.port ?? null, messages, questions };
 };

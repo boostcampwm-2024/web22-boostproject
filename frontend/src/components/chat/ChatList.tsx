@@ -6,13 +6,13 @@ import { CHATTING_TYPES } from '@constants/chat';
 import { ChatContext } from 'src/contexts/chatContext';
 import NoticeCard from './NoticeCard';
 import ChatAutoScroll from './ChatAutoScroll';
+import HostIconGreen from '@assets/icons/host_icon_green.svg';
 
 export interface ChatListProps {
   messages: MessageReceiveData[];
-  userId: string | undefined;
 }
 
-const ChatList = ({ messages, userId }: ChatListProps) => {
+const ChatList = ({ messages }: ChatListProps) => {
   const { state } = useContext(ChatContext);
   const [isAtBottom, setIsAtBottom] = useState(true);
   const [currentChat, setCurrentChat] = useState<MessageReceiveData | null>(null);
@@ -22,10 +22,8 @@ const ChatList = ({ messages, userId }: ChatListProps) => {
   const checkIfAtBottom = () => {
     if (!chatListRef.current) return;
     const { scrollTop, scrollHeight, clientHeight } = chatListRef.current;
-
     const atBottom = scrollHeight - scrollTop - clientHeight < 1;
     setIsAtBottom(atBottom);
-
     if (atBottom && currentChat) {
       setCurrentChat(null);
     }
@@ -59,10 +57,14 @@ const ChatList = ({ messages, userId }: ChatListProps) => {
                 <span>{chat.msg}</span>
               </NoticeChat>
             ) : (
-              <NormalChat $pointColor={chat.color}>
-                {userId === chat.userId && <span className="text_point">🧀</span>}
+              <NormalChat $isHost={chat.owner === 'host'} $pointColor={chat.owner === 'host' ? '#0ADD91' : chat.color}>
+                {chat.owner === 'me' ? (
+                  <span className="text_point">🧀</span>
+                ) : chat.owner === 'host' ? (
+                  <StyledIcon as={HostIconGreen} />
+                ) : null}
                 <span className="text_point">{chat.nickname}</span>
-                <span>{chat.msg}</span>
+                <span className="chat_message">{chat.msg}</span>
               </NormalChat>
             )}
           </ChatItemWrapper>
@@ -83,7 +85,7 @@ export default ChatList;
 const ChatListSection = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: end;
+  justify-content: flex-end;
   position: relative;
   height: 100%;
 `;
@@ -108,6 +110,7 @@ const ChatItemWrapper = styled.div`
 
 const NoticeChat = styled.div`
   display: flex;
+  align-items: center;
   padding: 10px 15px;
   gap: 10px;
   ${({ theme }) => theme.tokenTypographys['display-medium12']};
@@ -117,13 +120,22 @@ const NoticeChat = styled.div`
   word-break: break-word;
 `;
 
-const NormalChat = styled.div<{ $pointColor: string }>`
+const NormalChat = styled.div<{ $isHost: boolean; $pointColor: string }>`
+  display: flex;
+  align-items: center;
+  gap: 8px;
   ${({ theme }) => theme.tokenTypographys['display-medium14']};
-  color: ${({ theme }) => theme.tokenColors['color-white']};
+  color: ${({ $isHost, theme }) => ($isHost ? theme.tokenColors['color-accent'] : theme.tokenColors['color-white'])};
+
   .text_point {
+    ${({ theme }) => theme.tokenTypographys['display-bold14']};
     color: ${({ $pointColor }) => $pointColor};
-    margin-right: 5px;
   }
+
+  .chat_message {
+    color: ${({ $isHost }) => $isHost && '#82e3c4'};
+  }
+
   overflow-wrap: break-word;
   word-break: break-word;
 `;
@@ -134,4 +146,10 @@ const PopupWrapper = styled.div`
   left: 5%;
   right: 5%;
   z-index: 1000;
+`;
+
+const StyledIcon = styled.svg`
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
 `;

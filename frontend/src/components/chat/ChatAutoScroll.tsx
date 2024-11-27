@@ -34,7 +34,7 @@ const ScrollToBottomButton = styled.button<{ $hasMsg: boolean }>`
   align-items: center;
   justify-content: ${({ $hasMsg }) => ($hasMsg ? 'space-between' : 'center')};
   padding: ${({ $hasMsg }) => ($hasMsg ? '0 4px 0 10px' : '0')};
-  background-color: #373a3f;
+  background-color: #1d1f22;
   color: ${({ theme }) => theme.tokenColors['text-default']};
   border-radius: ${({ $hasMsg }) => ($hasMsg ? '7px' : '100%')};
   cursor: pointer;

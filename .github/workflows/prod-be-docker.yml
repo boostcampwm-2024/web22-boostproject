@@ -51,6 +51,6 @@ jobs:
           mkdir -p ~/.ssh
           echo "$SSH_PEM_KEY" > ~/.ssh/SSH_PEM_KEY.pem
           chmod 600 ~/.ssh/SSH_PEM_KEY.pem
-          ssh -p $SSH_PORT -i ~/.ssh/SSH_PEM_KEY.pem -o StrictHostKeyChecking=no $SSH_USERNAME@test.liboo.kr 'cd prod && bash prod_be.sh'
+          ssh -p $SSH_PORT -i ~/.ssh/SSH_PEM_KEY.pem -o StrictHostKeyChecking=no $SSH_USERNAME@liboo.kr 'cd prod && bash prod_be.sh'
 
 

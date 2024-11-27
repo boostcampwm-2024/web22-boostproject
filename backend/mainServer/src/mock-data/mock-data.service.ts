@@ -315,17 +315,16 @@ export class MockDataService implements OnModuleInit {
 
   constructor(private readonly memoryDbService: MemoryDBService) {}
 
-initializeData() {
-  this.mockData.forEach((data) => {
-    if (data.state) {
-      data['streamUrl'] = `https://kr.object.ncloudstorage.com/web22/live/${data.sessionKey}/index.m3u8`;
-    } else {
-      data['replayUrl'] = `https://kr.object.ncloudstorage.com/web22/live/${data.sessionKey}/replay.m3u8`;
-    }
-    this.memoryDbService.create(data);
-  });
-}
-
+  initializeData() {
+    this.mockData.forEach((data) => {
+      if (data.state) {
+        data['streamUrl'] = `https://kr.object.ncloudstorage.com/web22/live/${data.sessionKey}/index.m3u8`;
+      } else {
+        data['replayUrl'] = `https://kr.object.ncloudstorage.com/web22/live/${data.sessionKey}/replay.m3u8`;
+      }
+      this.memoryDbService.create(data);
+    });
+  }
 
   // 모듈 초기화 시 실행
   onModuleInit() {

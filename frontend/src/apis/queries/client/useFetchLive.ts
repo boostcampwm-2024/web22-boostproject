@@ -6,7 +6,7 @@ import { ClientLive } from '@type/live';
 export const useClientLive = ({ liveId }: { liveId: string }) => {
   return useQuery<ClientLive, Error>({
     queryKey: ['clientLive'],
-    queryFn: () => fetchLive({ liveId: liveId }),
+    queryFn: () => fetchLive({ liveId }),
     refetchOnWindowFocus: false
   });
 };

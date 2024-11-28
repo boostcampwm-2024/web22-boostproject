@@ -6,7 +6,7 @@ import { ReplayStream } from '@type/replay';
 export const useClientReplay = ({ videoId }: { videoId: string }) => {
   return useQuery<ReplayStream, Error>({
     queryKey: ['clientReplay'],
-    queryFn: () => fetchReplay({ videoId: videoId }),
+    queryFn: () => fetchReplay({ videoId }),
     refetchOnWindowFocus: false
   });
 };

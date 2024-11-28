@@ -1,12 +1,13 @@
+import { memo, useCallback, useState } from 'react';
 import styled from 'styled-components';
+
 import ChatHeader from './ChatHeader';
 import ChatInput from './ChatInput';
 import ChatList from './ChatList';
 import ChatQuestionSection from './ChatQuestionSection';
-
-import { UserType } from '@type/user';
-import { memo, useCallback, useState } from 'react';
+import ChatIcon from '@assets/icons/chat_icon.svg';
 import { useChatRoom } from '@hooks/useChatRoom';
+import { UserType } from '@type/user';
 import { getStoredId } from '@utils/id';
 
 interface ChatRoomLayoutProps {
@@ -31,7 +32,7 @@ const ChatRoomLayout = ({ userType, roomId }: ChatRoomLayoutProps) => {
   return (
     <>
       <ChatOpenBtn $isVisible={!isChatRoomVisible} onClick={handleOpenChatRoom}>
-        채팅 보기
+        <StyledChatIcon />
       </ChatOpenBtn>
 
       <ChatRoomContainer $isVisible={isChatRoomVisible}>
@@ -53,8 +54,17 @@ export default memo(ChatRoomLayout);
 
 const ChatOpenBtn = styled.button<{ $isVisible: boolean }>`
   display: ${({ $isVisible }) => ($isVisible ? 'flex' : 'none')};
+  position: relative;
   height: 15px;
-  background-color: #505050;
+`;
+
+const StyledChatIcon = styled(ChatIcon)`
+  position: absolute;
+  top: 0;
+  right: 15px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
 `;
 
 const ChatRoomContainer = styled.aside<{ $isVisible: boolean }>`

@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import QuestionCard from './QuestionCard';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { memo, useContext, useEffect, useRef, useState } from 'react';
 import { MessageReceiveData } from '@type/chat';
 import { CHATTING_TYPES } from '@constants/chat';
 import { ChatContext } from 'src/contexts/chatContext';
@@ -11,6 +11,41 @@ import HostIconGreen from '@assets/icons/host_icon_green.svg';
 export interface ChatListProps {
   messages: MessageReceiveData[];
 }
+
+const ChatItemWrapper = memo(({ chat }: { chat: MessageReceiveData }) => {
+  if (chat.msgType === CHATTING_TYPES.QUESTION) {
+    return (
+      <ChatItem>
+        <QuestionCard type="client" question={chat} />
+      </ChatItem>
+    );
+  } else if (chat.msgType === CHATTING_TYPES.NOTICE) {
+    return (
+      <ChatItem>
+        <NoticeChat>
+          <span>📢</span>
+          <span>{chat.msg}</span>
+        </NoticeChat>
+      </ChatItem>
+    );
+  } else {
+    return (
+      <ChatItem>
+        <NormalChat $isHost={chat.owner === 'host'} $pointColor={chat.owner === 'host' ? '#0ADD91' : chat.color}>
+          {chat.owner === 'me' ? (
+            <span className="text_point">🧀</span>
+          ) : chat.owner === 'host' ? (
+            <StyledIcon as={HostIconGreen} />
+          ) : null}
+          <span className="text_point">{chat.nickname}</span>
+          <span className="chat_message">{chat.msg}</span>
+        </NormalChat>
+      </ChatItem>
+    );
+  }
+});
+
+ChatItemWrapper.displayName = 'ChatItemWrapper';
 
 const ChatList = ({ messages }: ChatListProps) => {
   const { state } = useContext(ChatContext);
@@ -48,26 +83,7 @@ const ChatList = ({ messages }: ChatListProps) => {
     <ChatListSection>
       <ChatListWrapper ref={chatListRef} onScroll={checkIfAtBottom}>
         {messages.map((chat, index) => (
-          <ChatItemWrapper key={index}>
-            {chat.msgType === CHATTING_TYPES.QUESTION ? (
-              <QuestionCard type="client" question={chat} />
-            ) : chat.msgType === CHATTING_TYPES.NOTICE ? (
-              <NoticeChat>
-                <span>📢</span>
-                <span>{chat.msg}</span>
-              </NoticeChat>
-            ) : (
-              <NormalChat $isHost={chat.owner === 'host'} $pointColor={chat.owner === 'host' ? '#0ADD91' : chat.color}>
-                {chat.owner === 'me' ? (
-                  <span className="text_point">🧀</span>
-                ) : chat.owner === 'host' ? (
-                  <StyledIcon as={HostIconGreen} />
-                ) : null}
-                <span className="text_point">{chat.nickname}</span>
-                <span className="chat_message">{chat.msg}</span>
-              </NormalChat>
-            )}
-          </ChatItemWrapper>
+          <ChatItemWrapper chat={chat} key={index} />
         ))}
       </ChatListWrapper>
       <ChatAutoScroll currentChat={currentChat} isAtBottom={isAtBottom} scrollToBottom={scrollToBottom} />
@@ -103,7 +119,7 @@ const ChatListWrapper = styled.div`
   z-index: 100;
 `;
 
-const ChatItemWrapper = styled.div`
+const ChatItem = styled.div`
   margin-top: auto;
   padding: 6px 0;
 `;
@@ -151,5 +167,5 @@ const StyledIcon = styled.svg`
   width: 18px;
   height: 18px;
   cursor: pointer;
-  margin: 0 5px -4px 0;
+  margin: 0 5px -4.5px 0;
 `;

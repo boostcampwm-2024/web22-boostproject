@@ -1,7 +1,9 @@
+import { memo, useEffect, useMemo, useRef } from 'react';
 import styled from 'styled-components';
 import CheckIcon from '@assets/icons/check.svg';
 import { MessageReceiveData } from '@type/chat';
 import QuestionUserIcon from '@assets/icons/question_user_icon.svg';
+import { formatTimeDifference } from '@utils/formatTimeDifference';
 
 interface QuestionCardProps {
   type: 'host' | 'client';
@@ -11,6 +13,29 @@ interface QuestionCardProps {
 }
 
 export const QuestionCard = ({ type, question, handleQuestionDone, ellipsis = false }: QuestionCardProps) => {
+  const startDateFormat = useMemo(() => new Date(question.msgTime), [question.msgTime]);
+  const nowRef = useRef<Date>(new Date());
+
+  const formatTime = useRef<string>(formatTimeDifference({ startDate: startDateFormat, now: nowRef.current }));
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      nowRef.current = new Date();
+      const updatedTime = formatTimeDifference({ startDate: startDateFormat, now: nowRef.current });
+
+      if (formatTime.current !== updatedTime) {
+        formatTime.current = updatedTime;
+        if (timeElement.current) {
+          timeElement.current.innerText = updatedTime;
+        }
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [startDateFormat]);
+
+  const timeElement = useRef<HTMLSpanElement>(null);
+
   return (
     <QuestionCardContainer>
       <QuestionCardTop>
@@ -18,7 +43,9 @@ export const QuestionCard = ({ type, question, handleQuestionDone, ellipsis = fa
           <span className="name_info">
             <StyledIcon as={QuestionUserIcon} /> {question.nickname}
           </span>
-          <span className="time_info">n분전</span>
+          <span className="time_info" ref={timeElement}>
+            {formatTime.current}
+          </span>
         </QuestionInfo>
         {type === 'host' && handleQuestionDone && (
           <CheckBtn onClick={() => handleQuestionDone(question.questionId as number)}>
@@ -31,7 +58,8 @@ export const QuestionCard = ({ type, question, handleQuestionDone, ellipsis = fa
     </QuestionCardContainer>
   );
 };
-export default QuestionCard;
+
+export default memo(QuestionCard);
 
 const QuestionCardContainer = styled.div`
   display: flex;
@@ -82,15 +110,13 @@ const StyledCheckIcon = styled(CheckIcon)`
 `;
 
 const QuestionCardBottom = styled.div<{ $ellipsis: boolean }>`
-  /* max-height: 80px; */
-  overflow-y: scroll;
   ${({ theme }) => theme.tokenTypographys['display-bold14']}
   padding: 10px 15px 0 15px;
-  overflow-y: ${({ $ellipsis }) => ($ellipsis ? 'hidden' : 'scroll')};
   white-space: ${({ $ellipsis }) => ($ellipsis ? 'nowrap' : 'normal')};
   text-overflow: ${({ $ellipsis }) => ($ellipsis ? 'ellipsis' : 'clip')};
-  overflow-wrap: ${({ $ellipsis }) => ($ellipsis ? 'unset' : 'break-word')};
-  word-break: ${({ $ellipsis }) => ($ellipsis ? 'unset' : 'break-word')};
+  overflow-wrap: break-word;
+  word-break: break-word;
+  overflow: hidden;
 `;
 
 const StyledIcon = styled.svg`

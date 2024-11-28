@@ -4,7 +4,9 @@ export const formatTimeDifference = ({ startDate, now }: { startDate: Date; now:
   const diffInMinutes = Math.floor(diffInMilliseconds / (1000 * 60));
   const diffInHours = Math.floor(diffInMilliseconds / (1000 * 60 * 60));
 
-  if (diffInMinutes < 60) {
+  if (diffInMilliseconds < 60 * 1000) {
+    return '방금 전';
+  } else if (diffInMinutes < 60) {
     return `${diffInMinutes}분 전`;
   } else if (diffInHours < 24) {
     return `${diffInHours}시간 전`;

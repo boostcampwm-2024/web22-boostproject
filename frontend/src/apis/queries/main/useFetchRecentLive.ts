@@ -7,6 +7,7 @@ export const useRecentLive = () => {
   return useQuery<RecentLiveResponse, Error>({
     queryKey: ['recentLive'],
     queryFn: fetchRecentLive,
-    refetchOnWindowFocus: false
+    refetchOnWindowFocus: false,
+    initialData: { info: [], appendInfo: [] }
   });
 };

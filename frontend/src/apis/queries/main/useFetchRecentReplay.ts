@@ -7,6 +7,7 @@ export const useRecentReplay = () => {
   return useQuery<RecentReplayResponse, Error>({
     queryKey: ['recentReplay'],
     queryFn: fetchRecentReplay,
-    refetchOnWindowFocus: false
+    refetchOnWindowFocus: false,
+    initialData: { info: [], appendInfo: [] }
   });
 };

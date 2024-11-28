@@ -9,7 +9,6 @@ import sampleProfile from '@assets/sample_profile.png';
 import { RECOMMEND_LIVE } from '@constants/recommendLive';
 import useRotatingPlayer from '@hooks/useRotatePlayer';
 import { useMainLive } from '@queries/main/useFetchMainLive';
-import { getLiveURL } from '@utils/getVideoURL';
 
 const RecommendLive = () => {
   const navigate = useNavigate();
@@ -21,7 +20,7 @@ const RecommendLive = () => {
 
   useEffect(() => {
     if (!mainLiveData?.[currentUrlIndex]) return;
-    const videoUrl = getLiveURL(mainLiveData[currentUrlIndex].liveId);
+    const videoUrl = mainLiveData[currentUrlIndex].streamUrl;
     initPlayer(videoUrl);
   }, [mainLiveData, currentUrlIndex, initPlayer]);
 

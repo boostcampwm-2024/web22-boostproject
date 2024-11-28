@@ -8,7 +8,6 @@ import { ASSETS } from '@constants/assets';
 import { RecentLive } from '@type/live';
 import { LiveBadge, LiveViewCountBadge } from './ThumbnailBadge';
 import usePlayer from '@hooks/usePlayer';
-import { getLiveURL } from '@utils/getVideoURL';
 
 interface LiveVideoCardProps {
   videoData: RecentLive;
@@ -20,10 +19,10 @@ const LiveVideoCard = ({ videoData }: LiveVideoCardProps) => {
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const thumbnailRef = useRef<HTMLDivElement>(null);
 
-  const { concurrentUserCount, category, channel, tags, defaultThumbnailImageUrl, liveId, liveImageUrl, liveTitle } =
+  const { concurrentUserCount, category, channel, tags, defaultThumbnailImageUrl, liveId, liveImageUrl, liveTitle, streamUrl } =
     videoData;
 
-  const videoRef = usePlayer(getLiveURL(liveId));
+  const videoRef = usePlayer(streamUrl);
 
   useEffect(() => {
     const video = videoRef.current;

@@ -6,7 +6,6 @@ import PlayerInfo from './PlayerInfo';
 import Footer from '@common/Footer';
 import Header from '@common/Header';
 import { useClientLive } from '@queries/client/useFetchLive';
-import { getLiveURL } from '@utils/getVideoURL';
 
 const ClientView = () => {
   const { id: liveId } = useParams();
@@ -20,7 +19,7 @@ const ClientView = () => {
     <ClientViewContainer>
       <Header />
       <h1 className="hidden">클라이언트 페이지</h1>
-      <Player videoUrl={getLiveURL(liveId as string)} />
+      <Player videoUrl={clientLiveData.streamUrl} />
       <PlayerInfo clientLiveData={clientLiveData} />
       <Footer />
     </ClientViewContainer>

@@ -14,6 +14,7 @@ export interface ReplayStream {
   tags: string[];
   livePr: number;
   channel: ChannelInfo;
+  replayUrl: string;
 }
 
 export type RecentReplayResponse = {

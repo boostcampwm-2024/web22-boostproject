@@ -54,7 +54,7 @@ const TooltipContent = styled.div`
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   transform: translateX(-50%);
   background: rgba(0, 0, 0, 0.8);
-  padding: 4px;
+  padding: 10px;
   border-radius: 4px;
   margin-bottom: 8px;
   white-space: nowrap;
@@ -115,9 +115,16 @@ const Title = styled.strong`
   color: white;
   font-size: 14px;
   margin-bottom: 4px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 `;
 
 const StreamerName = styled.span`
   color: #ccc;
   font-size: 12px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: block;
 `;

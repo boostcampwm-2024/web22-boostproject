@@ -28,7 +28,11 @@ interface StyledProps {
 const VideoPlayer: React.FC<VideoPlayerProps> = ({ url, isLive = false, onTimeUpdate, onDuration }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const [volume, setVolume] = useState(1);
+  const [volume, setVolume] = useState(() => {
+    // localStorage에서 볼륨값을 가져오거나 기본값 1 사용
+    const savedVolume = localStorage.getItem('videoPlayerVolume');
+    return savedVolume ? parseFloat(savedVolume) : 1;
+  });
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isControlsVisible, setIsControlsVisible] = useState(true);
@@ -40,11 +44,21 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ url, isLive = false, onTimeUp
   const [isDragging, setIsDragging] = useState(false);
 
   const videoRef = usePlayer(url);
-  // const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const progressContainerRef = useRef<HTMLDivElement>(null);
   const playerContainerRef = useRef<HTMLDivElement>(null);
 
-  // Handle video event listeners
+  // 볼륨값이 변경될 때마다 localStorage에 저장
+  useEffect(() => {
+    localStorage.setItem('videoPlayerVolume', volume.toString());
+  }, [volume]);
+
+  // 초기 볼륨값 설정
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.volume = volume;
+    }
+  }, [videoRef, volume]);
+
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -82,6 +96,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ url, isLive = false, onTimeUp
 
       const target = e.target as HTMLElement;
       const isInput = ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable;
+
       if (!isInput) {
         if (e.code === 'Space') {
           e.preventDefault();
@@ -95,13 +110,28 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ url, isLive = false, onTimeUp
         } else if (e.code === 'ArrowRight') {
           e.preventDefault();
           seekForward(5);
+        } else if (e.code === 'ArrowUp') {
+          e.preventDefault();
+          adjustVolume(0.1);
+        } else if (e.code === 'ArrowDown') {
+          e.preventDefault();
+          adjustVolume(-0.1);
         }
       }
     };
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [currentTime, videoRef]);
+  }, [currentTime, volume, videoRef]);
+
+  const adjustVolume = (delta: number) => {
+    if (!videoRef.current) return;
+
+    const newVolume = Math.max(0, Math.min(1, volume + delta));
+    setVolume(newVolume);
+    videoRef.current.volume = newVolume;
+    setIsMuted(newVolume === 0);
+  };
 
   function handlePlayPause() {
     if (!videoRef.current) return;
@@ -110,7 +140,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ url, isLive = false, onTimeUp
       videoRef.current.pause();
     } else {
       videoRef.current.play().catch((error) => {
-        console.error('Error attempting to play', error);
+        console.error('재생 시도 중 오류 발생', error);
       });
     }
   }
@@ -120,7 +150,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ url, isLive = false, onTimeUp
 
     if (!document.fullscreenElement) {
       playerContainerRef.current.requestFullscreen().catch((err) => {
-        console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+        console.error(`전체화면 모드 활성화 중 오류 발생: ${err.message}`);
       });
     } else {
       document.exitFullscreen();
@@ -217,7 +247,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ url, isLive = false, onTimeUp
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging, handleMouseMove, handleMouseUp]);
+  }, [isDragging]);
 
   const formatTime = (time: number) => {
     const hours = Math.floor(time / 3600);
@@ -295,8 +325,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ url, isLive = false, onTimeUp
             ))}
 
           <Progress $progress={calculateProgress(currentTime)} $isLive={isLive} />
-
-          {/* 원형 핸들 추가 */}
           <ProgressHandle style={{ left: `${calculateProgress(currentTime)}%` }} />
 
           {previewTime !== null && !isLive && (

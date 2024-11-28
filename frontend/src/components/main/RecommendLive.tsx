@@ -12,16 +12,43 @@ import { useMainLive } from '@queries/main/useFetchMainLive';
 
 const RecommendLive = () => {
   const navigate = useNavigate();
-
   const { videoRef, initPlayer } = useRotatingPlayer();
   const { data: mainLiveData } = useMainLive();
   const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
   const recommendListRef = useRef<HTMLDivElement>(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const prevUrlIndexRef = useRef(currentUrlIndex);
+  const isInitialMount = useRef(true);
 
   useEffect(() => {
-    if (!mainLiveData?.[currentUrlIndex]) return;
-    const videoUrl = mainLiveData[currentUrlIndex].streamUrl;
-    initPlayer(videoUrl);
+    if (!mainLiveData) return;
+    if (!mainLiveData[currentUrlIndex]) return;
+
+    const handleTransition = async () => {
+      const videoUrl = mainLiveData[currentUrlIndex].streamUrl;
+
+      if (isInitialMount.current) {
+        initPlayer(videoUrl);
+        setTimeout(() => {
+          isInitialMount.current = false;
+        }, 100);
+        return;
+      }
+
+      if (prevUrlIndexRef.current !== currentUrlIndex) {
+        setIsTransitioning(true);
+        await new Promise((resolve) => setTimeout(resolve, 200));
+
+        initPlayer(videoUrl);
+        prevUrlIndexRef.current = currentUrlIndex;
+
+        setTimeout(() => {
+          setIsTransitioning(false);
+        }, 100);
+      }
+    };
+
+    handleTransition();
   }, [mainLiveData, currentUrlIndex, initPlayer]);
 
   const onSelect = useCallback((index: number) => {
@@ -29,12 +56,12 @@ const RecommendLive = () => {
   }, []);
 
   const currentLiveData = useMemo(() => mainLiveData?.[currentUrlIndex], [mainLiveData, currentUrlIndex]);
-
+  
   const { liveId, liveTitle, concurrentUserCount, channel, category } = currentLiveData;
 
   return (
     <RecommendLiveContainer $height={RECOMMEND_LIVE.HEIGHT}>
-      <RecommendLiveBox>
+      <RecommendLiveBox $isTransitioning={isTransitioning}>
         <video ref={videoRef} autoPlay muted />
       </RecommendLiveBox>
       <RecommendLiveWrapper onClick={() => navigate(`/live/${liveId}`)}>
@@ -66,7 +93,7 @@ const RecommendLiveContainer = styled.div<{ $height: string }>`
   z-index: 0;
 `;
 
-const RecommendLiveBox = styled.div`
+const RecommendLiveBox = styled.div<{ $isTransitioning: boolean }>`
   background: ${({ theme }) => theme.tokenColors['surface-default']};
   padding-top: 56.25%;
   position: absolute;
@@ -76,7 +103,9 @@ const RecommendLiveBox = styled.div`
   height: 100%;
   z-index: -1;
   box-shadow: inset 180px -180px 300px 0px #141517;
-  opacity: 0.6;
+  opacity: ${({ $isTransitioning }) => ($isTransitioning ? 0 : 0.6)};
+  transition: opacity 0.3s ease-in-out;
+
   video {
     width: 100%;
     height: 100%;

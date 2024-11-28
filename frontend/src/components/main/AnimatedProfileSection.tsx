@@ -76,7 +76,7 @@ const RecommendLiveProfile = styled.div`
 const RecommendLiveArea = styled.div`
   display: flex;
   flex-direction: column;
-  max-width: 300px;
+  width: 192px;
   gap: 5px;
   .video_card_name {
     ${({ theme }) => theme.tokenTypographys['display-bold20']}
@@ -91,8 +91,8 @@ const RecommendLiveArea = styled.div`
     color: ${({ theme }) => theme.tokenColors['brand-default']};
     margin-bottom: 4px;
     overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
+    text-overflow: ellipsis;
   }
 `;
 

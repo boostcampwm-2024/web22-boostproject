@@ -26,7 +26,6 @@ const MainLiveSection = ({ title }: MainLiveSectionProps) => {
     <MainSectionContainer>
       <MainSectionHeader>
         <p className="live_section_title">{title}</p>
-        <button className="live_section_button">전체보기</button>
       </MainSectionHeader>
 
       <MainSectionContentList>
@@ -56,10 +55,6 @@ const MainSectionHeader = styled.div`
   .live_section_title {
     ${({ theme }) => theme.tokenTypographys['display-bold20']}
     color: ${({ theme }) => theme.tokenColors['color-white']};
-  }
-  .live_section_button {
-    ${({ theme }) => theme.tokenTypographys['display-bold14']}
-    color: ${({ theme }) => theme.tokenColors['text-default']};
   }
 `;
 

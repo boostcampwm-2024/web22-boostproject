@@ -28,7 +28,7 @@ const MainLiveSection = ({ title }: MainLiveSectionProps) => {
         <p className="live_section_title">{title}</p>
       </MainSectionHeader>
 
-      <MainSectionContentList>
+      <MainSectionContentList $textStatus={textStatus}>
         {displayedData.map((video) => (
           <LiveVideoCard key={video.id} videoData={video} />
         ))}
@@ -58,26 +58,27 @@ const MainSectionHeader = styled.div`
   }
 `;
 
-const MainSectionContentList = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
+const MainSectionContentList = styled.div<{ $textStatus: string }>`
+  display: grid;
   gap: 14px;
   row-gap: 30px;
   margin-bottom: 30px;
 
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  overflow: ${({ $textStatus }) => ($textStatus === VIDEO_VIEW.MORE_VIEW ? 'hidden' : 'visible')};
+  max-height: ${({ $textStatus }) => ($textStatus === VIDEO_VIEW.MORE_VIEW ? 'calc(2 * (320px + 30px))' : 'none')};
+
   > div {
-    flex: 1 0 calc(20% - 14px);
-    max-width: calc(20% - 10px);
+    max-width: 100%;
+  }
 
-    @media (max-width: 1700px) {
-      flex: 1 0 calc(25% - 14px);
-      max-width: calc(25% - 10px);
-    }
+  @media (max-width: 1700px) {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    max-height: ${({ $textStatus }) => ($textStatus === VIDEO_VIEW.MORE_VIEW ? 'calc(2 * (320px + 30px))' : 'none')};
+  }
 
-    @media (max-width: 1500px) {
-      flex: 1 0 calc(33.33% - 14px);
-      max-width: calc(33.33% - 10px);
-    }
+  @media (max-width: 1500px) {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    max-height: ${({ $textStatus }) => ($textStatus === VIDEO_VIEW.MORE_VIEW ? 'calc(2 * (300px + 30px))' : 'none')};
   }
 `;

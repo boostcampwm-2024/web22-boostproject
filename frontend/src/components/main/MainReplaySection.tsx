@@ -66,7 +66,7 @@ const MainSectionContentList = styled.div<{ $textStatus: string }>`
 
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   overflow: ${({ $textStatus }) => ($textStatus === VIDEO_VIEW.MORE_VIEW ? 'hidden' : 'visible')};
-  max-height: ${({ $textStatus }) => ($textStatus === VIDEO_VIEW.MORE_VIEW ? 'calc(2 * (320px + 30px))' : 'none')};
+  max-height: ${({ $textStatus }) => ($textStatus === VIDEO_VIEW.MORE_VIEW ? 'calc(2 * (320px + 30px) - 30px)' : 'none')};
 
   > div {
     max-width: 100%;
@@ -74,11 +74,11 @@ const MainSectionContentList = styled.div<{ $textStatus: string }>`
 
   @media (max-width: 1700px) {
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    max-height: ${({ $textStatus }) => ($textStatus === VIDEO_VIEW.MORE_VIEW ? 'calc(2 * (320px + 30px))' : 'none')};
+    max-height: ${({ $textStatus }) => ($textStatus === VIDEO_VIEW.MORE_VIEW ? 'calc(2 * (320px + 30px) - 30px)' : 'none')};
   }
 
   @media (max-width: 1500px) {
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    max-height: ${({ $textStatus }) => ($textStatus === VIDEO_VIEW.MORE_VIEW ? 'calc(2 * (300px + 30px))' : 'none')};
+    max-height: ${({ $textStatus }) => ($textStatus === VIDEO_VIEW.MORE_VIEW ? 'calc(2 * (300px + 30px) - 30px)' : 'none')};
   }
 `;

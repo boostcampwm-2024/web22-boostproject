@@ -3,9 +3,10 @@ export type WhoAmI = 'host' | 'me' | 'user';
 
 // 기본 서버 응답 데이터
 export interface MessageReceiveData {
-  userId: string;
+  socketId: string;
   nickname: string;
   color: string;
+  entryTime: string;
   msg: string | null;
   msgTime: Date;
   msgType: ChattingTypes;
@@ -19,6 +20,7 @@ export interface MessageSendData {
   userId: string;
   questionId?: number;
   msg?: string;
+  socketId?: string;
 }
 
 export interface ChatInitData {

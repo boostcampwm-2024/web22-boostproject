@@ -41,6 +41,9 @@ const handlePortMessage = (type: string, payload: any, port: MessagePort) => {
     case CHATTING_SOCKET_DEFAULT_EVENT.JOIN_ROOM:
       handleJoinRoom(payload, port);
       break;
+    case CHATTING_SOCKET_DEFAULT_EVENT.BAN_USER:
+      handleBanUser(payload);
+      break;
     case CHATTING_SOCKET_SEND_EVENT.NORMAL:
     case CHATTING_SOCKET_SEND_EVENT.QUESTION:
     case CHATTING_SOCKET_SEND_EVENT.NOTICE:
@@ -72,6 +75,13 @@ const handleJoinRoom = (payload: { roomId: string; userId: string }, port: Messa
   socket.emit(CHATTING_SOCKET_DEFAULT_EVENT.JOIN_ROOM, { roomId, userId });
 };
 
+/** 유저 벤 처리 */
+const handleBanUser = (payload: { roomId: string; userId: string; socketId: string }) => {
+  const { roomId, userId, socketId } = payload;
+
+  socket.emit(CHATTING_SOCKET_DEFAULT_EVENT.BAN_USER, { roomId, userId, socketId });
+};
+
 /** 전역 소켓 리스너 등록 */
 const initializeSocketListeners = () => {
   const socketEvents = [
@@ -79,7 +89,8 @@ const initializeSocketListeners = () => {
     CHATTING_SOCKET_RECEIVE_EVENT.NORMAL,
     CHATTING_SOCKET_RECEIVE_EVENT.NOTICE,
     CHATTING_SOCKET_RECEIVE_EVENT.QUESTION,
-    CHATTING_SOCKET_RECEIVE_EVENT.QUESTION_DONE
+    CHATTING_SOCKET_RECEIVE_EVENT.QUESTION_DONE,
+    'exception'
   ];
 
   socketEvents.forEach((event) => {
@@ -119,6 +130,14 @@ sharedWorker.onconnect = (e: MessageEvent) => {
   // 포트 메시지 처리
   port.onmessage = (e) => {
     const { type, payload } = e.data;
+
+    ports.forEach((p) => {
+      p.postMessage({
+        type: 'logging',
+        payload: `[PORT LOG] Message from port: Type: ${type}, Payload: ${JSON.stringify(payload)}`
+      });
+    });
+
     handlePortMessage(type, payload, port);
   };
 

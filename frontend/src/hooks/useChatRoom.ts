@@ -38,6 +38,9 @@ export const useChatRoom = (roomId: string, userId: string) => {
         case CHATTING_SOCKET_RECEIVE_EVENT.QUESTION_DONE:
           setQuestions((prevQuestions) => prevQuestions.filter((message) => message.questionId !== payload.questionId));
           break;
+        case 'exception':
+          console.log(payload);
+          break;
         case 'logging':
           console.log(payload);
           break;

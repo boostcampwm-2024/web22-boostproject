@@ -5,7 +5,8 @@ export const CHATTING_TYPES = {
 } as const;
 
 export const CHATTING_SOCKET_DEFAULT_EVENT = {
-  JOIN_ROOM: 'join_room'
+  JOIN_ROOM: 'join_room',
+  BAN_USER: 'ban_user'
 } as const;
 
 export const CHATTING_SOCKET_RECEIVE_EVENT = {

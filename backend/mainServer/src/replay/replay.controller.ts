@@ -58,4 +58,20 @@ export class ReplayController {
     }
   }
 
+  @Get('/existence')
+  @ApiOperation({summary: 'Get replay exited', description: '다시보기에 대한 존재 여부를 반환 받습니다.'})
+  async getExistence(@Query('videoId') videoId: string, @Res() res: Response) {
+    try {
+      const replaySessions = this.memoryDBService.findAll().filter((info) => info.replay);
+      if (replaySessions.some((info) => info.sessionKey === videoId)) {
+        res.status(HttpStatus.OK).json({exited: true}); 
+      }
+      else {
+        res.status(HttpStatus.OK).json({exited: false});
+      }
+    } catch (err) {
+      console.log(err);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send();
+    }
+  }
 }

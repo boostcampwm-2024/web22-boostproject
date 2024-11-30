@@ -1,4 +1,4 @@
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback, useContext, useState } from 'react';
 import styled from 'styled-components';
 
 import ChatHeader from './ChatHeader';
@@ -9,6 +9,9 @@ import ChatIcon from '@assets/icons/chat_icon.svg';
 import { useChatRoom } from '@hooks/useChatRoom';
 import { UserType } from '@type/user';
 import { getStoredId } from '@utils/id';
+import NoticeCard from './NoticeCard';
+import { ChatContext } from '@contexts/chatContext';
+import UserInfoCard from './UserInfoCard';
 
 interface ChatRoomLayoutProps {
   userType: UserType;
@@ -20,6 +23,8 @@ const ChatRoomLayout = ({ userType, roomId }: ChatRoomLayoutProps) => {
 
   const userId = getStoredId();
   const { worker, messages, questions } = useChatRoom(roomId as string, userId);
+
+  const { state } = useContext(ChatContext);
 
   const handleCloseChatRoom = useCallback(() => {
     setIsChatRoomVisible(false);
@@ -41,6 +46,18 @@ const ChatRoomLayout = ({ userType, roomId }: ChatRoomLayoutProps) => {
         <ChatQuestionSection questions={questions} worker={worker} userType={userType} roomId={roomId} />
 
         <ChatList messages={messages} />
+
+        {state.isNoticePopupOpen && (
+          <PopupWrapper>
+            <NoticeCard />
+          </PopupWrapper>
+        )}
+
+        {state.isUserInfoPopupOpen && (
+          <PopupWrapper>
+            <UserInfoCard worker={worker} roomId={roomId} />
+          </PopupWrapper>
+        )}
 
         <ChatInputContainer>
           <ChatInput worker={worker} userType={userType} roomId={roomId} />
@@ -68,6 +85,7 @@ const StyledChatIcon = styled(ChatIcon)`
 `;
 
 const ChatRoomContainer = styled.aside<{ $isVisible: boolean }>`
+  position: relative;
   display: ${({ $isVisible }) => ($isVisible ? 'flex' : 'none')};
   flex-direction: column;
   height: 100%;
@@ -79,4 +97,12 @@ const ChatRoomContainer = styled.aside<{ $isVisible: boolean }>`
 
 const ChatInputContainer = styled.div`
   padding: 10px 20px;
+`;
+
+const PopupWrapper = styled.div`
+  position: absolute;
+  bottom: 60px;
+  left: 5%;
+  right: 5%;
+  z-index: 1000;
 `;

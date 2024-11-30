@@ -21,6 +21,11 @@ class NoticeIncomingMessageDto extends DefaultIncomingMessageDto {
   msg: string = '';
 }
 
+class BanUserIncomingMessageDto extends DefaultIncomingMessageDto {
+  userId: string = '';
+  socketId: string = '';
+}
+
 
 
 export {
@@ -28,5 +33,6 @@ export {
   QuestionIncomingMessageDto,
   QuestionDoneIncomingMessageDto,
   DefaultIncomingMessageDto,
-  NoticeIncomingMessageDto
+  NoticeIncomingMessageDto,
+  BanUserIncomingMessageDto
 };

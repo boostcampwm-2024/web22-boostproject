@@ -80,7 +80,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     console.log(client.id, userId, roomId);
     const questionList = await this.roomService.getQuestionsNotDone(roomId);
     console.log('questionList', questionList);
-    client.emit(CHATTING_SOCKET_RECEIVE_EVENT.INIT, { roomId, questionList });
+    client.emit(CHATTING_SOCKET_RECEIVE_EVENT.INIT, { roomId, questionList: questionList.reverse() });
   }
 
   // 특정 방에서 나가기 위한 메서드

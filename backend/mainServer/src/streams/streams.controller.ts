@@ -16,7 +16,7 @@ export class StreamsController {
   @ApiResponse({ status: 200, description: '랜덤한 4개의 방송 정보를 받았습니다.' })
   async findSession(@Res() res: Response) {
     try {
-      const serchedData = this.memoryDBService.getRandomBroadcastInfo(4);
+      const serchedData = await this.memoryDBService.getRandomBroadcastInfo(4);
       res.status(HttpStatus.OK).json({info: serchedData});
     } catch (error) {
       if ((error as { status: number }).status === 400) {
@@ -97,6 +97,23 @@ export class StreamsController {
           error: 'Server logic error',
         });
       }
+    }
+  }
+
+  @Get('/existence')
+  @ApiOperation({summary: 'Get Session exited', description: '방송 세션에 대한 존재 여부를 반환 받습니다.'})
+  async getExistence(@Query('sessionKey') sessionKey: string, @Res() res: Response) {
+    try {
+      const liveSessions = this.memoryDBService.findAll().filter((info) => info.state);
+      if (liveSessions.some((info) => info.sessionKey === sessionKey)) {
+        res.status(HttpStatus.OK).json({exited: true}); 
+      }
+      else {
+        res.status(HttpStatus.OK).json({exited: false});
+      }
+    } catch (err) {
+      console.log(err);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send();
     }
   }
 }

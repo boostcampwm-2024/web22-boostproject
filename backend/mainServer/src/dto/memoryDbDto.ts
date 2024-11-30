@@ -51,11 +51,11 @@ export class MemoryDbDto {
     description: '라이브 제목',
     example: 'live title',
   })
-    liveTitle: string = '';
+    liveTitle: string = 'Liboo 방송';
 
   @ApiProperty({
     description: '라이브 썸네일 이미지 URL',
-    example: 'https://kr.object.ncloudstorage.com/web22/static/replay_test7_thumbnail.png',
+    example: DEFAULT_VALUE.THUMBNAIL_IMG_URL,
   })
     liveImageUrl: string = '';
 
@@ -81,7 +81,7 @@ export class MemoryDbDto {
     description: '동시 시청자 수',
     example: 0,
   })
-    concurrentUserCount: number = 0;
+    concurrentUserCount: number = Math.floor(Math.random() * 1000);
 
   @ApiProperty({
     description: '채널 정보',
@@ -106,11 +106,11 @@ export class MemoryDbDto {
     description: '카테고리',
     example: 'category',
   })
-    category: string = '';
+    category: string = 'live';
 
   @ApiProperty({
     description: '태그 목록',
-    example: ['tag1', 'tag2', 'tag3'],
+    example: ['Liboo', 'Web22'],
   })
     tags: Array<string> = [];
 

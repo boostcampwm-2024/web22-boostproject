@@ -14,6 +14,7 @@ export class LiveCurationDto {
     channelName : ''
   };
   category: string = '';
+  streamUrl: string = '';
 }
 
 export function fromLiveCurationDto(memoryDbDto: MemoryDbDto): LiveCurationDto {
@@ -25,7 +26,8 @@ export function fromLiveCurationDto(memoryDbDto: MemoryDbDto): LiveCurationDto {
     defaultThumbnailImageUrl = 'https://kr.object.ncloudstorage.com/web22/static/liboo_default_thumbnail.png',
     concurrentUserCount,
     channel,
-    category
+    category,
+    streamUrl
   } = memoryDbDto;
 
   return {
@@ -37,5 +39,6 @@ export function fromLiveCurationDto(memoryDbDto: MemoryDbDto): LiveCurationDto {
     concurrentUserCount,
     channel,
     category,
+    streamUrl
   };
 }

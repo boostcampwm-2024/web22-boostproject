@@ -316,11 +316,13 @@ export class MockDataService implements OnModuleInit {
   constructor(private readonly memoryDbService: MemoryDBService) {}
 
   initializeData() {
+    const mockVideo = ['mock_dan24', 'mock_ifkakao', 'mock_toss_slash'];
     this.mockData.forEach((data) => {
+      const randomNumber = Math.floor(Math.random() * 3);
       if (data.state) {
-        data['streamUrl'] = `https://kr.object.ncloudstorage.com/web22/live/${data.sessionKey}/index.m3u8`;
+        data['streamUrl'] = `https://kr.object.ncloudstorage.com/web22/live/${mockVideo[randomNumber]}/index.m3u8`;
       } else {
-        data['replayUrl'] = `https://kr.object.ncloudstorage.com/web22/live/${data.sessionKey}/replay.m3u8`;
+        data['replayUrl'] = `https://kr.object.ncloudstorage.com/web22/live/${mockVideo[randomNumber]}/replay.m3u8`;
       }
       this.memoryDbService.create(data);
     });

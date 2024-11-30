@@ -1,4 +1,3 @@
-import { memo, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { MainLive } from '@type/live';
 
@@ -9,39 +8,26 @@ interface MiniPlayerItemProps {
   isSelected: boolean;
 }
 
-const MiniPlayerItem = memo<MiniPlayerItemProps>(
-  ({ item, onMouseEnter, index, isSelected }) => {
-    const handleMouseEnter = useCallback(() => {
-      onMouseEnter(index);
-    }, [onMouseEnter, index]);
+const MiniPlayerItem = ({ item, onMouseEnter, index, isSelected }: MiniPlayerItemProps) => {
+  const thumbnailUrl = item.defaultThumbnailImageUrl ?? item.liveImageUrl;
 
-    const thumbnailUrl = useMemo(
-      () => item.defaultThumbnailImageUrl ?? item.liveImageUrl,
-      [item.defaultThumbnailImageUrl, item.liveImageUrl]
-    );
-
-    return (
-      <MiniPlayerItemStyled role="none" onMouseEnter={handleMouseEnter}>
-        <Thumbnail role="tab" aria-selected={isSelected}>
-          <ThumbnailWrapper $backgroundUrl={thumbnailUrl} />
-        </Thumbnail>
-        <TooltipContent>
-          <Title>{item.liveTitle}</Title>
-          <StreamerName>{item.channel.channelName}</StreamerName>
-        </TooltipContent>
-      </MiniPlayerItemStyled>
-    );
-  },
-  (prevProps, nextProps) => {
-    return (
-      prevProps.isSelected === nextProps.isSelected &&
-      prevProps.item.liveId === nextProps.item.liveId &&
-      prevProps.index === nextProps.index
-    );
-  }
-);
-
-MiniPlayerItem.displayName = 'MiniPlayerItem';
+  return (
+    <MiniPlayerItemStyled
+      role="none"
+      onMouseEnter={() => {
+        onMouseEnter(index);
+      }}
+    >
+      <Thumbnail role="tab" aria-selected={isSelected}>
+        <ThumbnailWrapper $backgroundUrl={thumbnailUrl} />
+      </Thumbnail>
+      <TooltipContent>
+        <Title>{item.liveTitle}</Title>
+        <StreamerName>{item.channel.channelName}</StreamerName>
+      </TooltipContent>
+    </MiniPlayerItemStyled>
+  );
+};
 
 export default MiniPlayerItem;
 

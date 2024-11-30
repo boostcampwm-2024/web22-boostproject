@@ -99,4 +99,21 @@ export class StreamsController {
       }
     }
   }
+
+  @Get('/existence')
+  @ApiOperation({summary: 'Get Session exited', description: '방송 세션에 대한 존재 여부를 반환 받습니다.'})
+  async getExistence(@Query('sessionKey') sessionKey: string, @Res() res: Response) {
+    try {
+      const liveSessions = this.memoryDBService.findAll().filter((info) => info.state);
+      if (liveSessions.some((info) => info.sessionKey === sessionKey)) {
+        res.status(HttpStatus.OK).json({exited: true}); 
+      }
+      else {
+        res.status(HttpStatus.OK).json({exited: false});
+      }
+    } catch (err) {
+      console.log(err);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send();
+    }
+  }
 }

@@ -1,7 +1,6 @@
 import { MainLive } from '@type/live';
 import { useEffect, useRef, useState } from 'react';
 import useRotatingPlayer from './useRotatePlayer';
-import { c } from 'vite/dist/node/types.d-aGj9QkWt';
 
 const MOUNT_DELAY = 100;
 const TRANSITION_DELAY = 300;

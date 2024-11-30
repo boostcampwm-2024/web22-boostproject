@@ -12,6 +12,7 @@ class NormalOutgoingMessageDto extends DefaultOutgoingMessageDto {
   msg: string = '';
   msgType: OutgoingMessageType = 'normal';
   owner: WhoAmI = 'user';
+  socketId: string = '';
 }
 
 class QuestionOutgoingMessageDto extends DefaultOutgoingMessageDto {
@@ -19,9 +20,15 @@ class QuestionOutgoingMessageDto extends DefaultOutgoingMessageDto {
   questionId: number = -1;
   questionDone: boolean = false;
   msgType: OutgoingMessageType = 'question';
+  socketId: string = '';
 }
 
-class QuestionDoneOutgoingMessageDto extends QuestionOutgoingMessageDto {}
+class QuestionDoneOutgoingMessageDto extends DefaultOutgoingMessageDto {
+  msg: string = '';
+  questionId: number = -1;
+  questionDone: boolean = false;
+  msgType: OutgoingMessageType = 'question';
+}
 
 class NoticeOutgoingMessageDto extends DefaultOutgoingMessageDto {
   msg: string = '';

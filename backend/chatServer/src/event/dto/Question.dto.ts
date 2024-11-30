@@ -8,6 +8,7 @@ class QuestionDto {
   msgTime: string = new Date().toISOString();
   msgType: OutgoingMessageType = 'question';
   questionId: number = -1;
+  socketId: string = '';
   questionDone: boolean = false;
 }
 

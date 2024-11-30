@@ -4,6 +4,7 @@ class QuestionDto {
   roomId: string = '';
   nickname: string = '';
   color: string = '';
+  entryTime: string = '';
   msg: string = '';
   msgTime: string = new Date().toISOString();
   msgType: OutgoingMessageType = 'question';

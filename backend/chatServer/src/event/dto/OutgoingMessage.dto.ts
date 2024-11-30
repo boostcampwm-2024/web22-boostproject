@@ -5,6 +5,7 @@ class DefaultOutgoingMessageDto {
   roomId: string = '';
   nickname: string = '';
   color: string = '';
+  entryTime: string = '';
   msgTime: string = new Date().toISOString();
 }
 

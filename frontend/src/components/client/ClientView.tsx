@@ -10,18 +10,23 @@ import { getLiveURL } from '@utils/getVideoURL';
 
 const ClientView = () => {
   const { id: liveId } = useParams();
-  const { data: clientLiveData } = useClientLive({ liveId: liveId as string });
 
-  if (!clientLiveData) {
-    return <div>로딩 중...</div>;
-  }
+  const { data: clientLiveData, isError, error } = useClientLive({
+    liveId: liveId as string
+  });
+  console.log("isError", isError);
+  // if (isError) {
+  //   throw error;
+  // }
+
+  const { info } = clientLiveData;
 
   return (
     <ClientViewContainer>
       <Header />
       <h1 className="hidden">클라이언트 페이지</h1>
       <Player videoUrl={getLiveURL(liveId as string)} />
-      <PlayerInfo clientLiveData={clientLiveData} />
+      <PlayerInfo clientLiveData={info} />
       <Footer />
     </ClientViewContainer>
   );

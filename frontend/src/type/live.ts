@@ -26,3 +26,7 @@ export type RecentLiveResponse = {
   info: RecentLive[];
   appendInfo: RecentLive[];
 };
+
+export type ClientLiveResponse = {
+  info: ClientLive;
+}

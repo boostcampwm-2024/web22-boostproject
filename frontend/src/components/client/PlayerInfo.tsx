@@ -1,9 +1,9 @@
-import { ASSETS } from '@constants/assets';
 import styled from 'styled-components';
 
 import ElapsedTime from './ElapsedTime';
 import sampleProfile from '@assets/sample_profile.png';
 import ShowInfoBadge from '@common/ShowInfoBadge';
+import { ASSETS } from '@constants/assets';
 import { ClientLive } from '@type/live';
 
 const PlayerInfo = ({ clientLiveData }: { clientLiveData: ClientLive }) => {
@@ -20,10 +20,10 @@ const PlayerInfo = ({ clientLiveData }: { clientLiveData: ClientLive }) => {
           <LiveBox>LIVE</LiveBox>
         </HostProfileBox>
         <VideoInfo>
-          <VideoUploader>{channel.channelName}</VideoUploader>
+          <VideoUploader>{channel?.channelName}</VideoUploader>
           <Category>{category}</Category>
           <TagBox>
-            {tags.map((tag, index) => (
+            {tags?.map((tag, index) => (
               <ShowInfoBadge key={index} badgeType="tag" text={tag} />
             ))}
           </TagBox>

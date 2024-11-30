@@ -1,14 +1,18 @@
 import styled from 'styled-components';
 import { ClientView, Header } from '@components/client';
 import { ClientChatRoom } from '@components/chat';
+import { AsyncBoundary } from '@components/common/AsyncBoundary';
+import { PlayerStreamError } from '@components/error';
 
 export default function ClientPage() {
   return (
     <>
       <Header />
       <ClientContainer>
-        <ClientView />
-        <ClientChatRoom />
+        <AsyncBoundary pendingFallback={<></>} rejectedFallback={() => <PlayerStreamError />}>
+          <ClientView />
+          <ClientChatRoom />
+        </AsyncBoundary>
       </ClientContainer>
     </>
   );

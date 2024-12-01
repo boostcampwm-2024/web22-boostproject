@@ -106,10 +106,10 @@ export class StreamsController {
     try {
       const liveSessions = this.memoryDBService.findAll().filter((info) => info.state);
       if (liveSessions.some((info) => info.sessionKey === sessionKey)) {
-        res.status(HttpStatus.OK).json({exited: true}); 
+        res.status(HttpStatus.OK).json({existed: true}); 
       }
       else {
-        res.status(HttpStatus.OK).json({exited: false});
+        res.status(HttpStatus.OK).json({existed: false});
       }
     } catch (err) {
       console.log(err);

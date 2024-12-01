@@ -1,10 +1,12 @@
 import styled from 'styled-components';
-import { ClientView, Header } from '@components/client';
+
 import { ClientChatRoom } from '@components/chat';
+import { ClientView, Header } from '@components/client';
 import { AsyncBoundary } from '@components/common/AsyncBoundary';
 import { PlayerStreamError } from '@components/error';
+import withLiveExistCheck from '@hocs/withLiveExistCheck';
 
-export default function ClientPage() {
+function ClientPageComponent() {
   return (
     <>
       <Header />
@@ -17,6 +19,10 @@ export default function ClientPage() {
     </>
   );
 }
+
+const ClientPage = withLiveExistCheck(ClientPageComponent);
+
+export default ClientPage;
 
 const ClientContainer = styled.div`
   box-sizing: border-box;

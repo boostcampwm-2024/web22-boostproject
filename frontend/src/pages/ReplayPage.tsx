@@ -1,8 +1,9 @@
 import styled from 'styled-components';
 
 import { ReplayView, Header } from '@components/replay';
+import withReplayExistCheck from '@hocs/withReplayExistCheck';
 
-export default function ReplayPage() {
+function ReplayPageComponent() {
   return (
     <>
       <Header />
@@ -12,6 +13,10 @@ export default function ReplayPage() {
     </>
   );
 }
+
+const ReplayPage = withReplayExistCheck(ReplayPageComponent);
+
+export default ReplayPage;
 
 const ReplayContainer = styled.div`
   box-sizing: border-box;

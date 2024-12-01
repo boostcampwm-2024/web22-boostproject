@@ -9,7 +9,7 @@ const ErrorPage = () => {
   return (
     <ErrorContainer>
       <WarningIconStyled />
-      <ErrorMainText>존재하지 않는 채널입니다.</ErrorMainText>
+      <ErrorMainText>존재하지 않는 방송입니다.</ErrorMainText>
       <ErrorSubText>지금 입력하신 주소의 페이지는 사라졌거나 다른 페이지로 변경되었습니다.</ErrorSubText>
       <ErrorSubText>주소를 다시 확인해주세요.</ErrorSubText>
       <HomeBox onClick={() => navigate('/')}>다른 방송 보러가기</HomeBox>

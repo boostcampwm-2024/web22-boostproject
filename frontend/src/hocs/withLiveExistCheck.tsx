@@ -9,7 +9,7 @@ export default function withLiveExistCheck<P extends object>(WrappedComponent: C
     const navigate = useNavigate();
 
     const { data: isLiveExistData } = useCheckLiveExist({ liveId: liveId as string });
-    const isLiveExist = isLiveExistData?.exited;
+    const isLiveExist = isLiveExistData?.existed;
 
     useEffect(() => {
       if (!isLiveExist) {

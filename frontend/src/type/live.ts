@@ -34,5 +34,5 @@ export type ClientLiveResponse = {
 };
 
 export type LiveExistenceResponse = {
-  exited: boolean;
+  existed: boolean;
 };

@@ -22,5 +22,5 @@ export type RecentReplayResponse = {
 };
 
 export type ReplayExistenceResponse = {
-  exited: boolean;
+  existed: boolean;
 };

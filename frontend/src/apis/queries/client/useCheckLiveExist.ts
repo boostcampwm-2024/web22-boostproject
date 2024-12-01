@@ -8,6 +8,6 @@ export const useCheckLiveExist = ({ liveId }: { liveId: string }) => {
     queryKey: ['checkLiveExist'],
     queryFn: () => checkLiveExist({ liveId }),
     refetchOnWindowFocus: false,
-    initialData: { exited: true }
+    initialData: { existed: true }
   });
 };

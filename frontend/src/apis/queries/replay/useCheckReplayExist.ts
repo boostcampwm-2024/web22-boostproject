@@ -8,6 +8,6 @@ export const useCheckReplayExist = ({ videoId }: { videoId: string }) => {
     queryKey: ['checkReplayExist'],
     queryFn: () => checkReplayExist({ videoId }),
     refetchOnWindowFocus: false,
-    initialData: { exited: true }
+    initialData: { existed: true }
   });
 };

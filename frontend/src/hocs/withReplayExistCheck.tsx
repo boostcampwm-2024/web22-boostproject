@@ -9,7 +9,7 @@ export default function withReplayExistCheck<P extends object>(WrappedComponent:
     const navigate = useNavigate();
 
     const { data: isReplayExistData } = useCheckReplayExist({ videoId: videoId as string });
-    const isReplayExist = isReplayExistData?.exited;
+    const isReplayExist = isReplayExistData?.existed;
 
     useEffect(() => {
       if (!isReplayExist) {

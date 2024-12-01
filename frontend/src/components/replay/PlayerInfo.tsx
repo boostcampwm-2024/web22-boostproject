@@ -29,10 +29,10 @@ const PlayerInfo = ({ clientReplayData }: { clientReplayData: ReplayStream }) =>
           </HostProfile>
         </HostProfileBox>
         <VideoInfo>
-          <VideoUploader>{channel.channelName}</VideoUploader>
+          <VideoUploader>{channel?.channelName}</VideoUploader>
           <Category>{category}</Category>
           <TagBox>
-            {tags.map((tag, index) => (
+            {tags?.map((tag, index) => (
               <ShowInfoBadge key={index} badgeType="tag" text={tag} />
             ))}
           </TagBox>

@@ -10,7 +10,6 @@ import { getLiveURL } from '@utils/getVideoURL';
 
 const ClientView = () => {
   const { id: liveId } = useParams();
-
   const { data: clientLiveData } = useClientLive({
     liveId: liveId as string
   });

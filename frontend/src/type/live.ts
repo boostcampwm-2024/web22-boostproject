@@ -1,5 +1,3 @@
-import { checkReplayExist } from './../apis/checkReplayExist';
-import { checkLiveExist } from './../apis/checkLiveExist';
 import { ChannelInfo } from './channel';
 export interface MainLive {
   id: number;

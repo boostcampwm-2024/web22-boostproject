@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { ChatRoomLayout } from './ChatRoomLayout';
+import ChatRoomLayout from './ChatRoomLayout';
 
 import { ChatProvider } from 'src/contexts/chatContext';
 

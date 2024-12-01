@@ -1,11 +1,13 @@
-import styled from 'styled-components';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
+import { ReplayBadge, ReplayViewCountBadge } from './ThumbnailBadge';
 import sampleProfile from '@assets/sample_profile.png';
 import ShowInfoBadge from '@common/ShowInfoBadge';
 import { ASSETS } from '@constants/assets';
+import usePlayer from '@hooks/usePlayer';
 import { ReplayStream } from '@type/replay';
-import { ReplayBadge, ReplayViewCountBadge } from './ThumbnailBadge';
 
 interface ReplayVideoCardProps {
   videoData: ReplayStream;
@@ -13,8 +15,44 @@ interface ReplayVideoCardProps {
 
 const ReplayVideoCard = ({ videoData }: ReplayVideoCardProps) => {
   const navigate = useNavigate();
+  const [isHovered, setIsHovered] = useState(false);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const { category, channel, tags, thumbnailImageUrl, livePr, videoTitle, videoId } = videoData;
+  const { category, channel, tags, thumbnailImageUrl, livePr, replayUrl, videoTitle, videoId } = videoData;
+
+  const videoRef = usePlayer(replayUrl);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const resetVideo = () => {
+      video.pause();
+      video.currentTime = 0;
+    };
+
+    const playVideo = () => {
+      video.currentTime = 0;
+      video.play();
+    };
+
+    const clearHoverTimeout = () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+        hoverTimeoutRef.current = null;
+      }
+    };
+
+    if (isHovered) {
+      hoverTimeoutRef.current = setTimeout(playVideo, 500);
+      return;
+    }
+
+    clearHoverTimeout();
+    resetVideo();
+
+    return clearHoverTimeout;
+  }, [isHovered]);
 
   const handleReplayClick = () => {
     navigate(`/replay/${videoId}`);
@@ -22,7 +60,14 @@ const ReplayVideoCard = ({ videoData }: ReplayVideoCardProps) => {
 
   return (
     <VideoCardContainer>
-      <VideoCardThumbnail onClick={handleReplayClick}>
+      <VideoCardThumbnail
+        onClick={handleReplayClick}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <VideoBox $isVisible={isHovered}>
+          <video ref={videoRef} muted playsInline />
+        </VideoBox>
         <VideoCardImage src={thumbnailImageUrl} />
         <VideoCardDescription>
           <ReplayBadge />
@@ -66,6 +111,26 @@ const VideoCardThumbnail = styled.div`
   padding-top: 56.25%;
   position: relative;
   cursor: pointer;
+`;
+
+const VideoBox = styled.div<{ $isVisible: boolean }>`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: ${(props) => (props.$isVisible ? 1 : 0)};
+  transition: opacity 0.3s ease-in-out;
+  z-index: 1;
+
+  video {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    object-fit: cover;
+  }
 `;
 
 const VideoCardImage = styled.img`

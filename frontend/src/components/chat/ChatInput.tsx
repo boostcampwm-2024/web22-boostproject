@@ -15,7 +15,7 @@ interface ChatInputProps {
   roomId: string;
 }
 
-const INITIAL_TEXTAREA_HEIGHT = 15;
+const INITIAL_TEXTAREA_HEIGHT = 20;
 
 export const ChatInput = ({ worker, userType, roomId }: ChatInputProps) => {
   const [hasInput, setHasInput] = useState(false);
@@ -101,7 +101,7 @@ export const ChatInput = ({ worker, userType, roomId }: ChatInputProps) => {
         textarea.removeEventListener('input', handleResize);
       }
     };
-  }, [textareaRef.current]);
+  }, []);
 
   const handleBlur = () => {
     if (textareaRef.current) {
@@ -184,7 +184,7 @@ const ChatInputWrapper = styled.div<{ $hasInput: boolean; $isFocused: boolean }>
 
 const ChatInputArea = styled.textarea`
   width: 100%;
-  max-height: 65px;
+  min-height: 20px;
   scrollbar-width: none;
   resize: none;
   border: none;

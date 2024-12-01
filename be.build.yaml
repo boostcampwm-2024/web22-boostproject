@@ -1,0 +1,25 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  backend-rtmp-server:
+    container_name: rtmp-container
+    build:
+      context: backend/rtmpServer
+      dockerfile: dockerfile
+    image: liboost/backend-rtmp-server:latest
+
+  backend-main-server:
+    container_name: main-container
+    build:
+      context: backend/mainServer
+      dockerfile: dockerfile
+    image: liboost/backend-main-server:latest
+
+  backend-chat-server:
+    container_name: chat-container
+    build:
+      context: backend/chatServer
+      dockerfile: dockerfile
+    image: liboost/backend-chat-server:latest
+

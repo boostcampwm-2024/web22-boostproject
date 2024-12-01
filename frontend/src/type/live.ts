@@ -10,6 +10,7 @@ export interface MainLive {
   defaultThumbnailImageUrl: string;
   concurrentUserCount: number;
   channel: ChannelInfo;
+  streamUrl: string;
 }
 
 export interface RecentLive extends MainLive {

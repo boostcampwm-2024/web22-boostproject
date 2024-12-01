@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import QuestionCard from './QuestionCard';
 import { MessageReceiveData, MessageSendData } from '@type/chat';
@@ -13,27 +13,30 @@ export interface ChatQuestionSectionProps {
   roomId: string;
 }
 
-export const ChatQuestionSection = ({ questions, worker, userType, roomId }: ChatQuestionSectionProps) => {
+const ChatQuestionSection = ({ questions, worker, userType, roomId }: ChatQuestionSectionProps) => {
   const [expanded, setExpanded] = useState(false);
 
   const userId = getStoredId();
 
-  const toggleSection = () => {
+  const toggleSection = useCallback(() => {
     setExpanded((prev) => !prev);
-  };
+  }, []);
 
-  const handleQuestionDone = (questionId: number) => {
-    if (!worker) return;
+  const handleQuestionDone = useCallback(
+    (questionId: number) => {
+      if (!worker) return;
 
-    worker.postMessage({
-      type: CHATTING_SOCKET_SEND_EVENT.QUESTION_DONE,
-      payload: {
-        roomId,
-        userId,
-        questionId
-      } as MessageSendData
-    });
-  };
+      worker.postMessage({
+        type: CHATTING_SOCKET_SEND_EVENT.QUESTION_DONE,
+        payload: {
+          roomId,
+          userId,
+          questionId
+        } as MessageSendData
+      });
+    },
+    [worker, roomId, userId]
+  );
 
   return (
     <SectionWrapper>
@@ -67,7 +70,8 @@ export const ChatQuestionSection = ({ questions, worker, userType, roomId }: Cha
     </SectionWrapper>
   );
 };
-export default ChatQuestionSection;
+
+export default memo(ChatQuestionSection);
 
 const SectionWrapper = styled.div`
   position: relative;
@@ -89,7 +93,7 @@ const SectionContainer = styled.div`
   gap: 10px;
 `;
 
-const SwipeBtn = styled.button`
+const SwipeBtn = memo(styled.button`
   position: absolute;
   bottom: 0;
   left: 0;
@@ -100,15 +104,15 @@ const SwipeBtn = styled.button`
   &::before {
     content: '';
     position: absolute;
-    top: 45%;
+    top: 40%;
     left: 50%;
     background-color: ${({ theme }) => theme.tokenColors['text-weak']};
     border-radius: 2px;
-    height: 5px;
-    width: 50px;
+    height: 4px;
+    width: 60px;
     transform: translate(-50%, -50%);
   }
-`;
+`);
 
 const NoQuestionMessage = styled.div`
   text-align: center;

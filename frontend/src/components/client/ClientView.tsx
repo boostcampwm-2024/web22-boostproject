@@ -11,13 +11,9 @@ import { getLiveURL } from '@utils/getVideoURL';
 const ClientView = () => {
   const { id: liveId } = useParams();
 
-  const { data: clientLiveData, isError, error } = useClientLive({
+  const { data: clientLiveData } = useClientLive({
     liveId: liveId as string
   });
-  console.log("isError", isError);
-  // if (isError) {
-  //   throw error;
-  // }
 
   const { info } = clientLiveData;
 

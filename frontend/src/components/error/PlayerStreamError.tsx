@@ -5,7 +5,7 @@ import WarningIcon from '@assets/icons/warning_icon.svg';
 
 const PlayerStreamError = () => {
   const navigate = useNavigate();
-  console.log('error2');
+
   return (
     <ErrorContainer>
       <WarningIconStyled />

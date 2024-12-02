@@ -7,6 +7,9 @@ import { getStoredId } from '@utils/id';
 import { UserType } from '@type/user';
 import { parseDate } from '@utils/parseDate';
 import { memo } from 'react';
+import { usePortal } from '@hooks/usePortal';
+import { useModal } from '@hooks/useModal';
+import ConfirmModal from '@components/common/ConfirmModal';
 
 interface UserInfoCardProps {
   worker: MessagePort | null;
@@ -16,6 +19,8 @@ interface UserInfoCardProps {
 
 export const UserInfoCard = ({ worker, roomId, userType }: UserInfoCardProps) => {
   const { state, dispatch } = useChat();
+  const { isOpen, closeModal, openModal } = useModal();
+  const createPortal = usePortal();
 
   const toggleSettings = () => {
     dispatch({ type: 'CLOSE_USER_INFO_POPUP' });
@@ -36,6 +41,8 @@ export const UserInfoCard = ({ worker, roomId, userType }: UserInfoCardProps) =>
         roomId
       }
     });
+
+    toggleSettings();
   };
 
   return (
@@ -57,16 +64,25 @@ export const UserInfoCard = ({ worker, roomId, userType }: UserInfoCardProps) =>
           <StyledCloseIcon />
         </CloseBtn>
       </UserInfoCardHeader>
-
       {userType === 'host' && selectedUser?.owner === 'user' && (
         <>
-          <NoticeMessage>사용자 차단 시, 나의 모든 방송에서 채팅이 금지됩니다.</NoticeMessage>
-          <BanBtn onClick={onBan}>
+          <BanBtn onClick={openModal}>
             <StyledUserBlockIcon />
             사용자 차단
           </BanBtn>
         </>
       )}
+      {isOpen &&
+        createPortal(
+          <ConfirmModal
+            title="사용자 차단"
+            description="사용자 차단 시, 나의 모든 방송에서 해당 유저의 채팅이 금지됩니다."
+            leftBtnText="취소"
+            rightBtnText="차단하기"
+            rightBtnAction={onBan}
+            closeModal={closeModal}
+          />
+        )}
     </UserInfoCardContainer>
   );
 };

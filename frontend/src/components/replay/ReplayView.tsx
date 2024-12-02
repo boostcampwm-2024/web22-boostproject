@@ -6,7 +6,6 @@ import PlayerInfo from './PlayerInfo';
 import Footer from '@common/Footer';
 import Header from '@common/Header';
 import { useClientReplay } from '@queries/replay/useFetchReplay';
-import { getReplayURL } from '@utils/getVideoURL';
 
 const ReplayView = () => {
   const { id: videoId } = useParams();
@@ -18,7 +17,7 @@ const ReplayView = () => {
     <ReplayViewContainer>
       <Header />
       <h1 className="hidden">다시보기 페이지</h1>
-      <Player videoUrl={getReplayURL(videoId as string)} />
+      <Player videoUrl={info.replayUrl} />
       <PlayerInfo clientReplayData={info} />
       <Footer />
     </ReplayViewContainer>

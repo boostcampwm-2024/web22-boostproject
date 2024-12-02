@@ -6,8 +6,8 @@ import { ReplayBadge, ReplayViewCountBadge } from './ThumbnailBadge';
 import sampleProfile from '@assets/sample_profile.png';
 import ShowInfoBadge from '@common/ShowInfoBadge';
 import { ASSETS } from '@constants/assets';
-import usePlayer from '@hooks/usePlayer';
 import { ReplayStream } from '@type/replay';
+import { useVideoPreview } from '@hooks/useVideoPreview';
 
 interface ReplayVideoCardProps {
   videoData: ReplayStream;
@@ -15,44 +15,10 @@ interface ReplayVideoCardProps {
 
 const ReplayVideoCard = ({ videoData }: ReplayVideoCardProps) => {
   const navigate = useNavigate();
-  const [isHovered, setIsHovered] = useState(false);
-  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const { category, channel, tags, thumbnailImageUrl, livePr, replayUrl, videoTitle, videoId } = videoData;
 
-  const videoRef = usePlayer(replayUrl);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const resetVideo = () => {
-      video.pause();
-      video.currentTime = 0;
-    };
-
-    const playVideo = () => {
-      video.currentTime = 0;
-      video.play();
-    };
-
-    const clearHoverTimeout = () => {
-      if (hoverTimeoutRef.current) {
-        clearTimeout(hoverTimeoutRef.current);
-        hoverTimeoutRef.current = null;
-      }
-    };
-
-    if (isHovered) {
-      hoverTimeoutRef.current = setTimeout(playVideo, 500);
-      return;
-    }
-
-    clearHoverTimeout();
-    resetVideo();
-
-    return clearHoverTimeout;
-  }, [isHovered]);
+  const { isHovered, isVideoLoaded, videoRef, handleMouseEnter, handleMouseLeave } = useVideoPreview(replayUrl);
 
   const handleReplayClick = () => {
     navigate(`/replay/${videoId}`);
@@ -60,27 +26,25 @@ const ReplayVideoCard = ({ videoData }: ReplayVideoCardProps) => {
 
   return (
     <VideoCardContainer>
-      <VideoCardThumbnail
-        onClick={handleReplayClick}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        <VideoBox $isVisible={isHovered}>
+      <ThumbnailContainer onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} onClick={handleReplayClick}>
+        <VideoBox $isVisible={isHovered && isVideoLoaded}>
           <video ref={videoRef} muted playsInline />
         </VideoBox>
-        <VideoCardImage src={thumbnailImageUrl} />
+        <VideoCardThumbnail $isVideoVisible={isHovered && isVideoLoaded}>
+          <VideoCardImage src={thumbnailImageUrl} />
+        </VideoCardThumbnail>
         <VideoCardDescription>
           <ReplayBadge />
           <ReplayViewCountBadge count={livePr} />
         </VideoCardDescription>
-      </VideoCardThumbnail>
+      </ThumbnailContainer>
 
       <VideoCardWrapper>
         <VideoCardProfile>
-          <img src={sampleProfile} />
+          <img src={sampleProfile} alt="profile" />
         </VideoCardProfile>
         <VideoCardArea>
-          <span className="video_card_title" style={{ cursor: 'pointer' }} onClick={handleReplayClick}>
+          <span className="video_card_title" onClick={handleReplayClick}>
             {videoTitle}
           </span>
           <span className="video_card_name">{channel.channelName}</span>
@@ -99,18 +63,17 @@ const ReplayVideoCard = ({ videoData }: ReplayVideoCardProps) => {
 export default ReplayVideoCard;
 
 const VideoCardContainer = styled.div`
+  position: relative;
   word-wrap: break-word;
   word-break: break-all;
 `;
 
-const VideoCardThumbnail = styled.div`
-  background: #21242a url(${ASSETS.IMAGES.THUMBNAIL.DEFAULT}) no-repeat center center / cover;
-  overflow: hidden;
-  border-radius: 12px;
-  display: block;
-  padding-top: 56.25%;
+const ThumbnailContainer = styled.div`
   position: relative;
   cursor: pointer;
+  padding-top: 56.25%;
+  border-radius: 12px;
+  overflow: hidden;
 `;
 
 const VideoBox = styled.div<{ $isVisible: boolean }>`
@@ -120,7 +83,7 @@ const VideoBox = styled.div<{ $isVisible: boolean }>`
   width: 100%;
   height: 100%;
   opacity: ${(props) => (props.$isVisible ? 1 : 0)};
-  transition: opacity 0.3s ease-in-out;
+  transition: opacity 0.3s ease-in-out 0.6s;
   z-index: 1;
 
   video {
@@ -133,10 +96,19 @@ const VideoBox = styled.div<{ $isVisible: boolean }>`
   }
 `;
 
-const VideoCardImage = styled.img`
+const VideoCardThumbnail = styled.div<{ $isVideoVisible: boolean }>`
   position: absolute;
   top: 0;
   left: 0;
+  width: 100%;
+  height: 100%;
+  background: #21242a url(${ASSETS.IMAGES.THUMBNAIL.DEFAULT}) no-repeat center center / cover;
+  opacity: ${(props) => (props.$isVideoVisible ? 0 : 1)};
+  transition: opacity 0.3s ease-in-out;
+  z-index: 2;
+`;
+
+const VideoCardImage = styled.img`
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -148,6 +120,7 @@ const VideoCardDescription = styled.div`
   left: 10px;
   display: flex;
   gap: 4px;
+  z-index: 3;
 `;
 
 const VideoCardWrapper = styled.div`
@@ -160,9 +133,9 @@ const VideoCardProfile = styled.div`
   margin-right: 10px;
   background: ${({ theme }) => theme.tokenColors['surface-alt']} no-repeat 50% / cover;
   border-radius: 50%;
-  margin-top: 5px;
   display: block;
   overflow: hidden;
+  margin-top: 5px;
   width: 40px;
   height: 40px;
 
@@ -181,6 +154,7 @@ const VideoCardArea = styled.div`
     ${({ theme }) => theme.tokenTypographys['display-bold16']}
     color: ${({ theme }) => theme.tokenColors['text-strong']};
     margin-bottom: 8px;
+    cursor: pointer;
   }
   .video_card_name {
     ${({ theme }) => theme.tokenTypographys['display-medium14']}

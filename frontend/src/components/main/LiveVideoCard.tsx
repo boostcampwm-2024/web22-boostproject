@@ -7,7 +7,7 @@ import ShowInfoBadge from '@common/ShowInfoBadge';
 import { ASSETS } from '@constants/assets';
 import { RecentLive } from '@type/live';
 import { LiveBadge, LiveViewCountBadge } from './ThumbnailBadge';
-import usePreviewPlayer from '@hooks/usePreviewPlayer';
+import { useVideoPreview } from '@hooks/useVideoPreview';
 
 interface LiveVideoCardProps {
   videoData: RecentLive;
@@ -15,11 +15,6 @@ interface LiveVideoCardProps {
 
 const LiveVideoCard = ({ videoData }: LiveVideoCardProps) => {
   const navigate = useNavigate();
-  const [isHovered, setIsHovered] = useState(false);
-  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
-  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const thumbnailRef = useRef<HTMLDivElement>(null);
-  const [videoRef, playerController] = usePreviewPlayer();
 
   const {
     concurrentUserCount,
@@ -33,64 +28,15 @@ const LiveVideoCard = ({ videoData }: LiveVideoCardProps) => {
     streamUrl
   } = videoData;
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const handleLoadedData = () => {
-      setIsVideoLoaded(true);
-    };
-
-    video.addEventListener('loadeddata', handleLoadedData);
-
-    return () => {
-      video.removeEventListener('loadeddata', handleLoadedData);
-      playerController.reset();
-    };
-  }, []);
-
-  useEffect(() => {
-    const clearHoverTimeout = () => {
-      if (hoverTimeoutRef.current) {
-        clearTimeout(hoverTimeoutRef.current);
-        hoverTimeoutRef.current = null;
-      }
-    };
-
-    if (isHovered) {
-      clearHoverTimeout();
-      hoverTimeoutRef.current = setTimeout(() => {
-        playerController.loadSource(streamUrl);
-        playerController.play();
-      }, 400);
-    } else {
-      clearHoverTimeout();
-      playerController.reset();
-    }
-
-    return clearHoverTimeout;
-  }, [isHovered, isVideoLoaded, streamUrl]);
+  const { isHovered, isVideoLoaded, videoRef, handleMouseEnter, handleMouseLeave } = useVideoPreview(streamUrl);
 
   const handleLiveClick = () => {
     navigate(`/live/${liveId}`);
   };
 
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-  };
-
   return (
     <VideoCardContainer>
-      <ThumbnailContainer
-        ref={thumbnailRef}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        onClick={handleLiveClick}
-      >
+      <ThumbnailContainer onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} onClick={handleLiveClick}>
         <VideoBox $isVisible={isHovered && isVideoLoaded}>
           <video ref={videoRef} muted playsInline preload="none" />
         </VideoBox>

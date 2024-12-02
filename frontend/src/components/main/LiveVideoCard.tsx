@@ -57,15 +57,12 @@ const LiveVideoCard = ({ videoData }: LiveVideoCardProps) => {
       }
     };
 
-    if (isHovered && !isVideoLoaded) {
-      playerController.loadSource(streamUrl);
-    }
-
     if (isHovered) {
       clearHoverTimeout();
       hoverTimeoutRef.current = setTimeout(() => {
+        playerController.loadSource(streamUrl);
         playerController.play();
-      }, 500);
+      }, 400);
     } else {
       clearHoverTimeout();
       playerController.reset();
@@ -150,7 +147,7 @@ const VideoBox = styled.div<{ $isVisible: boolean }>`
   width: 100%;
   height: 100%;
   opacity: ${(props) => (props.$isVisible ? 1 : 0)};
-  transition: opacity 0.3s ease-in-out;
+  transition: opacity 0.3s ease-in-out 0.6s;
   z-index: 1;
 
   video {

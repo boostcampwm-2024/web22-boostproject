@@ -70,9 +70,14 @@ export default function usePreviewPlayer(): [React.RefObject<HTMLVideoElement>, 
       }
     },
     reset: () => {
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
       if (videoRef.current) {
         videoRef.current.pause();
-        videoRef.current.currentTime = 0;
+        videoRef.current.src = '';
+        videoRef.current.load();
       }
     }
   };

@@ -104,6 +104,10 @@ export class StreamsController {
   @ApiOperation({summary: 'Get Session exited', description: '방송 세션에 대한 존재 여부를 반환 받습니다.'})
   async getExistence(@Query('sessionKey') sessionKey: string, @Res() res: Response) {
     try {
+      if (this.memoryDBService.chzzkSwitch && sessionKey in this.memoryDBService.chzzkDb) {
+        res.status(HttpStatus.OK).json({existed: true});
+        return;
+      }
       const liveSessions = this.memoryDBService.findAll().filter((info) => info.state);
       if (liveSessions.some((info) => info.sessionKey === sessionKey)) {
         res.status(HttpStatus.OK).json({existed: true}); 

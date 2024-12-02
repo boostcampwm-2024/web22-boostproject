@@ -37,19 +37,20 @@ export class BlacklistGuard implements CanActivate {
 
     const client: Socket = context.switchToWs().getClient<Socket>();
     const address = client.handshake.address.replaceAll('::ffff:', '');
-    const forwarded = client.handshake.headers.forwarded?.split(',')[0] ?? address;
+    const userAgent = client.handshake.headers['user-agent'];
 
-    const isValidUser = await this.whenJoinRoom(roomId, address, forwarded);
+    if(!userAgent) throw new ChatException(CHATTING_SOCKET_ERROR.INVALID_USER, roomId);
+    const isValidUser = await this.whenJoinRoom(roomId, address, userAgent);
 
     if(!isValidUser) throw new ChatException(CHATTING_SOCKET_ERROR.BAN_USER, roomId);
     return true;
   }
 
-  async whenJoinRoom(roomId: string, address: string, forwarded: string) {
-    console.log(roomId, address, forwarded);
+  async whenJoinRoom(roomId: string, address: string, userAgent: string) {
+    console.log(roomId, address, userAgent);
     const blacklistInRoom = await this.roomService.getUserBlacklist(roomId, address);
     console.log(blacklistInRoom);
-    const isInBlacklistUser = blacklistInRoom.some((blackForwarded) => blackForwarded === forwarded);
+    const isInBlacklistUser = blacklistInRoom.some((bannedUserAgent) => bannedUserAgent === userAgent);
     console.log('blacklistInRoom:', isInBlacklistUser);
     return !isInBlacklistUser;
   }

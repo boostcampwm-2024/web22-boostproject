@@ -178,10 +178,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     if(!address) throw new ChatException(CHATTING_SOCKET_ERROR.INVALID_USER, roomId);
 
-    const forwarded = banUser?.handshake.headers.forwarded ?? address;
-    console.log('ban:', roomId, address, forwarded);
+    const userAgent = banUser?.handshake.headers['user-agent'];
+    if(!userAgent) throw new ChatException(CHATTING_SOCKET_ERROR.INVALID_USER, roomId);
 
-    await this.roomService.addUserToBlacklist(roomId, address, forwarded);
+    await this.roomService.addUserToBlacklist(roomId, address, userAgent);
     console.log(await this.roomService.getUserBlacklist(roomId, address));
   }
 }

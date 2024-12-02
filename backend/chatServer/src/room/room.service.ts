@@ -174,7 +174,7 @@ export class RoomService implements OnModuleInit, OnModuleDestroy {
     return await this.redisRepository.getUserBlacklist(roomId, address);
   }
 
-  async addUserToBlacklist(roomId: string, address: string, forwarded: string){
-    return await this.redisRepository.addUserBlacklistToRoom(roomId, address, forwarded);
+  async addUserToBlacklist(roomId: string, address: string, userAgent: string){
+    return await this.redisRepository.addUserBlacklistToRoom(roomId, address, userAgent);
   }
 }

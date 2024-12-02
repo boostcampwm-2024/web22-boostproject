@@ -6,21 +6,21 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
   MessageBody,
-  ConnectedSocket,
+  ConnectedSocket
 } from '@nestjs/websockets';
 import { UseGuards } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import {
-  CHATTING_SOCKET_DEFAULT_EVENT,
-  CHATTING_SOCKET_RECEIVE_EVENT, CHATTING_SOCKET_SEND_EVENT
+  CHATTING_SOCKET_DEFAULT_EVENT, CHATTING_SOCKET_RECEIVE_EVENT, CHATTING_SOCKET_SEND_EVENT
 } from '../event/constants';
 import {
+  BanUserIncomingMessageDto,
   NormalIncomingMessageDto, NoticeIncomingMessageDto, QuestionDoneIncomingMessageDto, QuestionIncomingMessageDto
 } from '../event/dto/IncomingMessage.dto';
 import { JoiningRoomDto } from '../event/dto/JoiningRoom.dto';
 import { RoomService } from '../room/room.service';
 import { createAdapter } from '@socket.io/redis-adapter';
-import { HostGuard, MessageGuard } from './chat.guard';
+import { BlacklistGuard, HostGuard, MessageGuard } from './chat.guard';
 import { LeavingRoomDto } from '../event/dto/LeavingRoom.dto';
 import {
   NormalOutgoingMessageDto,
@@ -28,6 +28,7 @@ import {
   QuestionOutgoingMessageDto
 } from '../event/dto/OutgoingMessage.dto';
 import { QuestionDto } from '../event/dto/Question.dto';
+import { ChatException, CHATTING_SOCKET_ERROR } from './chat.error';
 
 @WebSocketGateway({ cors: true })
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -69,6 +70,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   // 특정 방에 참여하기 위한 메서드
+  @UseGuards(BlacklistGuard)
   @SubscribeMessage(CHATTING_SOCKET_DEFAULT_EVENT.JOIN_ROOM)
   async handleJoinRoom(client: Socket, payload: JoiningRoomDto) {
     const { roomId, userId } = payload;
@@ -93,7 +95,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   // 방에 NORMAL 메시지를 보내기 위한 메서드
-  @UseGuards(MessageGuard)
+  @UseGuards(MessageGuard, BlacklistGuard)
   @SubscribeMessage(CHATTING_SOCKET_SEND_EVENT.NORMAL)
   async handleNormalMessage(@ConnectedSocket() client: Socket, @MessageBody() payload: NormalIncomingMessageDto) {
     const { roomId, userId, msg } = payload;
@@ -103,7 +105,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       ...user,
       msg,
       msgTime: new Date().toISOString(),
-      msgType: 'normal'
+      msgType: 'normal',
+      socketId: client.id
     };
     console.log('Normal Message Come In: ', normalOutgoingMessage);
     const hostId = await this.roomService.getHostOfRoom(roomId);
@@ -121,7 +124,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   // 방에 QUESTION 메시지를 보내기 위한 메서드
-  @UseGuards(MessageGuard)
+  @UseGuards(MessageGuard,BlacklistGuard)
   @SubscribeMessage(CHATTING_SOCKET_SEND_EVENT.QUESTION)
   async handleQuestionMessage(@ConnectedSocket() client: Socket, @MessageBody() payload: QuestionIncomingMessageDto) {
     const { roomId, msg } = payload;
@@ -132,7 +135,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       msg,
       msgTime: new Date().toISOString(),
       msgType: 'question',
-      questionDone: false
+      questionDone: false,
+      socketId: client.id
     };
 
     const question: QuestionOutgoingMessageDto = await this.roomService.addQuestion(roomId, questionWithoutId);
@@ -150,8 +154,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   // 방에 NOTICE 메시지를 보내기 위한 메서드
-  @UseGuards(MessageGuard)
-  @UseGuards(HostGuard)
+  @UseGuards(MessageGuard, HostGuard)
   @SubscribeMessage(CHATTING_SOCKET_SEND_EVENT.NOTICE)
   async handleNoticeMessage(@ConnectedSocket() client: Socket, @MessageBody() payload: NoticeIncomingMessageDto) {
     const { roomId, msg } = payload;
@@ -164,5 +167,21 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       msgType: 'notice'
     };
     this.server.to(roomId).emit(CHATTING_SOCKET_RECEIVE_EVENT.NOTICE, noticeOutgoingMessage);
+  }
+
+  @UseGuards(HostGuard)
+  @SubscribeMessage(CHATTING_SOCKET_DEFAULT_EVENT.BAN_USER)
+  async handleBanUserMessage(@ConnectedSocket() client: Socket, @MessageBody() payload: BanUserIncomingMessageDto) {
+    const { roomId, socketId } = payload;
+    const banUser = this.server.sockets.sockets.get(socketId);
+    const address = banUser?.handshake.address.replaceAll('::ffff:', '');
+
+    if(!address) throw new ChatException(CHATTING_SOCKET_ERROR.INVALID_USER, roomId);
+
+    const userAgent = banUser?.handshake.headers['user-agent'];
+    if(!userAgent) throw new ChatException(CHATTING_SOCKET_ERROR.INVALID_USER, roomId);
+
+    await this.roomService.addUserToBlacklist(roomId, address, userAgent);
+    console.log(await this.roomService.getUserBlacklist(roomId, address));
   }
 }

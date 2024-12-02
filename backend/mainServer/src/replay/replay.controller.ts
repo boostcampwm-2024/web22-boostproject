@@ -64,10 +64,10 @@ export class ReplayController {
     try {
       const replaySessions = this.memoryDBService.findAll().filter((info) => info.replay);
       if (replaySessions.some((info) => info.sessionKey === videoId)) {
-        res.status(HttpStatus.OK).json({exited: true}); 
+        res.status(HttpStatus.OK).json({existed: true}); 
       }
       else {
-        res.status(HttpStatus.OK).json({exited: false});
+        res.status(HttpStatus.OK).json({existed: false});
       }
     } catch (err) {
       console.log(err);

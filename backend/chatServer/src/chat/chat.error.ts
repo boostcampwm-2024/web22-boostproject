@@ -8,7 +8,7 @@ class ChatException extends WsException {
     this.statusCode = statusCode;
   }
 
-  getError(): object {
+  getError() {
     return {
       statusCode: this.statusCode,
       msg: this.message,
@@ -38,6 +38,11 @@ const CHATTING_SOCKET_ERROR = {
     message: '유효하지 않는 유저입니다.'
   },
 
+  UNAUTHORIZED: {
+    statusCode: HttpStatus.UNAUTHORIZED,
+    message: '해당 명령에 대한 권한이 없습니다.'
+  },
+
   QUESTION_EMPTY: {
     statusCode: HttpStatus.BAD_REQUEST,
     message: '유효하지 않은 질문입니다.'
@@ -46,6 +51,11 @@ const CHATTING_SOCKET_ERROR = {
   BAN_USER: {
     statusCode: HttpStatus.FORBIDDEN,
     message: '호스트에 의해 밴 당한 유저입니다.'
+  },
+
+  MSG_TOO_LONG:{
+    statusCode: HttpStatus.NOT_ACCEPTABLE,
+    message: '메세지의 내용이 없거나, 길이가 150자를 초과했습니다.'
   }
 
 

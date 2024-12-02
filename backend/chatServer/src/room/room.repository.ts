@@ -76,7 +76,7 @@ export class RoomRepository {
 
   async getHost(roomId: string) {
     const hostId = await this.redisClient.get(this.getRoomStringWithPrefix(roomId));
-    if(!hostId) throw new ChatException(CHATTING_SOCKET_ERROR.ROOM_EMPTY);
+    if(!hostId) throw new ChatException(CHATTING_SOCKET_ERROR.ROOM_EMPTY, roomId);
     return hostId;
   }
 
@@ -98,7 +98,7 @@ export class RoomRepository {
 
   async markQuestionAsDone(roomId: string, questionId: number): Promise<QuestionDto> {
     const question = await this.getQuestion(roomId, questionId);
-    if(!question) throw new ChatException(CHATTING_SOCKET_ERROR.QUESTION_EMPTY);
+    if(!question) throw new ChatException(CHATTING_SOCKET_ERROR.QUESTION_EMPTY, roomId);
     question.questionDone = true;
     this.redisClient.lset(this.getQuestionStringWithPrefix(roomId), questionId, JSON.stringify(question));
     return question;
@@ -114,7 +114,7 @@ export class RoomRepository {
   async getQuestion(roomId: string, questionId: number): Promise<QuestionDto> {
     const question = await this.lindex<Omit<QuestionDto, 'questionId'>>(this.getQuestionStringWithPrefix(roomId), questionId);
     if(question) return {...question, questionId };
-    throw new ChatException(CHATTING_SOCKET_ERROR.QUESTION_EMPTY);
+    throw new ChatException(CHATTING_SOCKET_ERROR.QUESTION_EMPTY, roomId);
   }
 
   async getQuestionId(roomId: string) {

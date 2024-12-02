@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 
 import sampleProfile from '@assets/sample_profile.png';

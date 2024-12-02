@@ -55,7 +55,7 @@ const ChatRoomLayout = ({ userType, roomId }: ChatRoomLayoutProps) => {
 
         {state.isUserInfoPopupOpen && (
           <PopupWrapper>
-            <UserInfoCard worker={worker} roomId={roomId} />
+            <UserInfoCard worker={worker} roomId={roomId} userType={userType} />
           </PopupWrapper>
         )}
 

@@ -1,15 +1,20 @@
 import styled from 'styled-components';
 import CloseIcon from '@assets/icons/close.svg';
+import UserBlockIcon from '@assets/icons/user-block.svg';
 import { useChat } from 'src/contexts/chatContext';
 import { CHATTING_SOCKET_DEFAULT_EVENT } from '@constants/chat';
 import { getStoredId } from '@utils/id';
+import { UserType } from '@type/user';
+import { parseDate } from '@utils/parseDate';
+import { memo } from 'react';
 
 interface UserInfoCardProps {
   worker: MessagePort | null;
   roomId: string;
+  userType: UserType;
 }
 
-export const UserInfoCard = ({ worker, roomId }: UserInfoCardProps) => {
+export const UserInfoCard = ({ worker, roomId, userType }: UserInfoCardProps) => {
   const { state, dispatch } = useChat();
 
   const toggleSettings = () => {
@@ -37,13 +42,15 @@ export const UserInfoCard = ({ worker, roomId }: UserInfoCardProps) => {
     <UserInfoCardContainer>
       <UserInfoCardHeader>
         <UserInfoCardWrapper>
-          <UserInfoCardProfile></UserInfoCardProfile>
           <UserInfoCardArea>
             <div className="text_info">
-              <span className="text_point">{selectedUser?.nickname}</span>
+              <span className="text_point">
+                {selectedUser?.owner === 'host' && '[호스트] '}
+                {selectedUser?.nickname}
+              </span>
               <span>님</span>
             </div>
-            <div className="entry_time">{selectedUser?.entryTime} 입장</div>
+            <div className="entry_time">{parseDate(selectedUser?.entryTime as string)} 입장</div>
           </UserInfoCardArea>
         </UserInfoCardWrapper>
         <CloseBtn onClick={toggleSettings}>
@@ -51,12 +58,19 @@ export const UserInfoCard = ({ worker, roomId }: UserInfoCardProps) => {
         </CloseBtn>
       </UserInfoCardHeader>
 
-      <NoticeMessage>해당 방송이 진행되는 동안 채팅이 불가능하게 막을 수 있습니다.</NoticeMessage>
-      <BanBtn onClick={onBan}>벤하기</BanBtn>
+      {userType === 'host' && selectedUser?.owner === 'user' && (
+        <>
+          <NoticeMessage>사용자 차단 시, 나의 모든 방송에서 채팅이 금지됩니다.</NoticeMessage>
+          <BanBtn onClick={onBan}>
+            <StyledUserBlockIcon />
+            사용자 차단
+          </BanBtn>
+        </>
+      )}
     </UserInfoCardContainer>
   );
 };
-export default UserInfoCard;
+export default memo(UserInfoCard);
 
 const UserInfoCardContainer = styled.div`
   display: flex;
@@ -78,22 +92,6 @@ const UserInfoCardHeader = styled.div`
 const UserInfoCardWrapper = styled.div`
   display: flex;
   align-items: center;
-`;
-
-const UserInfoCardProfile = styled.div`
-  margin-right: 10px;
-  background: ${({ theme }) => theme.tokenColors['surface-default']} no-repeat 50% / cover;
-  border-radius: 50%;
-  display: block;
-  overflow: hidden;
-  width: 60px;
-  height: 60px;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
 `;
 
 const UserInfoCardArea = styled.div`
@@ -126,18 +124,30 @@ const StyledCloseIcon = styled(CloseIcon)`
   cursor: pointer;
 `;
 
+const StyledUserBlockIcon = styled(UserBlockIcon)`
+  width: 20px;
+  height: 20px;
+`;
+
 const NoticeMessage = styled.p`
   line-height: 20px;
-  margin-top: 10px;
   max-height: 170px;
   overflow-y: auto;
   ${({ theme }) => theme.tokenTypographys['display-bold14']}
 `;
 
 const BanBtn = styled.button`
-  background-color: pink;
-  line-height: 20px;
-  margin-top: 10px;
-  max-height: 170px;
-  ${({ theme }) => theme.tokenTypographys['display-bold14']}
+  &:hover {
+    background-color: #313131;
+  }
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  gap: 3px;
+  border-radius: 7px;
+  background-color: #101010;
+  color: ${({ theme }) => theme.tokenColors['text-bold']};
+  ${({ theme }) => theme.tokenTypographys['display-bold14']};
+  cursor: pointer;
 `;

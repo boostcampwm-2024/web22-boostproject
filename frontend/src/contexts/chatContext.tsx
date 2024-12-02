@@ -1,3 +1,4 @@
+import { UserInfoData, WhoAmI } from '@type/chat';
 import { createContext, useReducer, ReactNode, useContext } from 'react';
 
 type SettingOption = 'chat_notice' | 'ai_summary' | null;
@@ -7,7 +8,7 @@ interface ChatState {
   settingOption: SettingOption;
   isNoticePopupOpen: boolean;
   isUserInfoPopupOpen: boolean;
-  selectedUser: { nickname: string; socketId: string; entryTime: string } | null;
+  selectedUser: UserInfoData | null;
 }
 
 type Action =
@@ -16,7 +17,10 @@ type Action =
   | { type: 'SET_SETTING'; payload: SettingOption }
   | { type: 'TOGGLE_ANNOUNCEMENT_POPUP' }
   | { type: 'CLOSE_USER_INFO_POPUP' }
-  | { type: 'SET_SELECTED_USER'; payload: { nickname: string; socketId: string; entryTime: string } | null }
+  | {
+      type: 'SET_SELECTED_USER';
+      payload: UserInfoData | null;
+    }
   | { type: 'CLOSE_ALL' };
 
 const chatReducer = (state: ChatState, action: Action): ChatState => {

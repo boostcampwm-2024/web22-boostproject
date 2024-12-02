@@ -1,0 +1,24 @@
+{
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "modules": false
+      }
+    ],
+    "@babel/preset-typescript"
+  ],
+  "plugins": [
+    ["module-resolver", {
+      "extensions": [".js", ".ts"],
+      "root": ["./dist"],
+      "alias": {
+        "@app": "./src"
+      }
+    }],
+    ["babel-plugin-add-import-extension", {
+      "extension": "js"
+    }]
+  ],
+  "sourceType": "module"
+}

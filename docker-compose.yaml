@@ -12,6 +12,7 @@ services:
       - "443:443"
       - "8000:8000"
       - "1935:1935"
+      - "3000:3000"
     volumes:
       - /etc/letsencrypt/live/test.liboo.kr:/etc/letsencrypt/live/test.liboo.kr:ro
       - /etc/letsencrypt/archive/test.liboo.kr:/etc/letsencrypt/archive/test.liboo.kr:ro
@@ -26,6 +27,17 @@ services:
       context: backend/rtmpServer
       dockerfile: dockerfile
     image: liboost/backend-rtmp-server:latest
+    env_file: backend/.env
+    networks:
+      - default-network
+      - backend-bridge
+
+  backend-main-server:
+    container_name: main-container
+    build:
+      context: backend/mainServer
+      dockerfile: dockerfile
+    image: liboost/backend-main-server:latest
     env_file: backend/.env
     networks:
       - default-network

@@ -1,6 +1,6 @@
 import { useForm, FormProvider } from 'react-hook-form';
 import styled from 'styled-components';
-import useUpdateHost from '@apis/queries/host/useUpdateHost';
+import useUpdateHost from '@queries/host/useUpdateHost';
 import { getStoredId } from '@utils/id';
 import { CategoryField, HostNameField, ImageField, LiveTitleField, NoticeField, TagField } from './Form';
 import { Button } from './Form/style';

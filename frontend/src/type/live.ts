@@ -1,8 +1,4 @@
-type ChannelInfo = {
-  channelId: string | null;
-  channelName: string;
-};
-
+import { ChannelInfo } from './channel';
 export interface MainLive {
   id: number;
   liveId: string;
@@ -12,16 +8,30 @@ export interface MainLive {
   defaultThumbnailImageUrl: string;
   concurrentUserCount: number;
   channel: ChannelInfo;
+  streamUrl: string;
 }
 
 export interface RecentLive extends MainLive {
   tags: string[];
-  startDate: Date;
-  endDate: Date;
+  startDate: string;
+  endDate: string;
 }
 
 export interface ClientLive extends MainLive {
   tags: string[];
-  startDate: Date;
-  endDate: Date;
+  startDate: string;
+  endDate: string;
 }
+
+export type RecentLiveResponse = {
+  info: RecentLive[];
+  appendInfo: RecentLive[];
+};
+
+export type ClientLiveResponse = {
+  info: ClientLive;
+};
+
+export type LiveExistenceResponse = {
+  existed: boolean;
+};

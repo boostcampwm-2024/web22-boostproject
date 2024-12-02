@@ -1,61 +1,25 @@
-import { useState, useEffect, useRef } from 'react';
-import Hls from 'hls.js';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
-import CustomPlayIcon from '@assets/icons/custom_play_icon.svg';
 import PauseIcon from '@assets/icons/pause_icon.svg';
 import PlayIcon from '@assets/icons/play_icon.svg';
-import { ASSETS } from '@constants/assets';
+import usePlayer from '@hooks/usePlayer';
+// import VideoPlayer from './video/VideoPlayer';
+import VideoPlayer from './VideoPlayer';
 
 const Player = ({ videoUrl }: { videoUrl: string }) => {
-  const [onHLSReady, setOnHLSReady] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [showIcon, setShowIcon] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  useEffect(() => {
-    if (videoRef.current && Hls.isSupported()) {
-      const hls = new Hls();
-      hls.loadSource(videoUrl);
-      hls.attachMedia(videoRef.current);
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        setOnHLSReady(true);
-        videoRef.current?.play();
-      });
-
-      return () => {
-        hls.destroy();
-      };
-    } else if (videoRef.current) {
-      videoRef.current.src = videoUrl;
-      videoRef.current.play();
-      setOnHLSReady(true);
-    }
-  }, [onHLSReady, videoUrl]);
-
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(document.fullscreenElement === videoRef.current);
-    };
-
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-
-    return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-    };
-  }, []);
+  const videoRef = usePlayer(videoUrl);
 
   const handlePlayPause = () => {
-    if (videoRef.current) {
-      if (videoRef.current.paused) {
-        setIsPaused(false);
-      } else {
-        setIsPaused(true);
-      }
-      setShowIcon(true);
-      setTimeout(() => setShowIcon(false), 1000);
-    }
+    const videoElement = videoRef.current;
+    if (!videoElement) return;
+
+    setIsPaused(!videoElement.paused);
+    setShowIcon(true);
+    setTimeout(() => setShowIcon(false), 1000);
   };
 
   useEffect(() => {
@@ -72,28 +36,13 @@ const Player = ({ videoUrl }: { videoUrl: string }) => {
     return () => {
       videoElement?.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [handlePlayPause]);
 
   return (
-    <PlayerContainer $onHLSReady={onHLSReady}>
+    <PlayerContainer>
       <LivePlayerInner>
-        {onHLSReady ? (
-          <>
-            <Video
-              ref={videoRef}
-              controls
-              onClick={handlePlayPause}
-              tabIndex={0} // Video 요소가 포커스를 받을 수 있도록 설정
-            />
-            {showIcon && (
-              <IconOverlay $isFullscreen={isFullscreen}>{isPaused ? <PlayIcon /> : <PauseIcon />}</IconOverlay>
-            )}
-          </>
-        ) : (
-          <PlayButton onClick={() => setOnHLSReady(true)}>
-            <CustomPlayIcon />
-          </PlayButton>
-        )}
+        <VideoPlayer url={videoUrl} isLive={false} />
+        {showIcon && <IconOverlay>{isPaused ? <PlayIcon /> : <PauseIcon />}</IconOverlay>}
       </LivePlayerInner>
     </PlayerContainer>
   );
@@ -101,11 +50,8 @@ const Player = ({ videoUrl }: { videoUrl: string }) => {
 
 export default Player;
 
-const PlayerContainer = styled.div<{ $onHLSReady: boolean }>`
-  background: ${({ $onHLSReady, theme }) =>
-    $onHLSReady
-      ? theme.tokenColors['surface-default']
-      : `url(${ASSETS.IMAGES.PLAYER.LOADING}) no-repeat center / cover`};
+const PlayerContainer = styled.div`
+  background: ${({ theme }) => theme.tokenColors['surface-default']};
   padding-top: 56.25%;
   position: relative;
 `;
@@ -122,20 +68,8 @@ const LivePlayerInner = styled.div`
   justify-content: center;
 `;
 
-const PlayButton = styled.button`
-  width: 55px;
-  height: 55px;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const IconOverlay = styled.div<{ $isFullscreen: boolean }>`
-  position: ${({ $isFullscreen }) => ($isFullscreen ? 'fixed' : 'absolute')};
+const IconOverlay = styled.div`
+  position: absolute;
   width: 75px;
   height: 75px;
   top: 50%;
@@ -150,7 +84,7 @@ const IconOverlay = styled.div<{ $isFullscreen: boolean }>`
   transition: opacity 0.3s;
 `;
 
-const Video = styled.video`
-  width: 100%;
-  height: 100%;
-`;
+// const Video = styled.video`
+//   width: 100%;
+//   height: 100%;
+// `;

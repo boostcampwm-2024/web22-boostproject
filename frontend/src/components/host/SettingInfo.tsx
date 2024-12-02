@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import OBSIcon from '@assets/img_studio_obs.png';
 import DownloadIcon from '@assets/download.svg';
 import { getStoredId } from '@utils/id';
-import useFetchStreamKey from '@apis/queries/host/useFetchStreamKey';
+import useFetchStreamKey from '@queries/host/useFetchStreamKey';
 import { useEffect } from 'react';
 import { setSessionKey, setStreamKey } from '@utils/streamKey';
 

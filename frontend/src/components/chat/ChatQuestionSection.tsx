@@ -1,46 +1,61 @@
-import { useState } from 'react';
+import { memo, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import QuestionCard from './QuestionCard';
-import { MessageReceiveData, MessageSendData } from '@type/chat';
-import { Socket } from 'socket.io-client';
+import { MessageReceiveData, MessageSendData, UserInfoData } from '@type/chat';
 import { CHATTING_SOCKET_SEND_EVENT } from '@constants/chat';
-import { useParams } from 'react-router-dom';
 import { getStoredId } from '@utils/id';
 import { UserType } from '@type/user';
+import { useChat } from '@contexts/chatContext';
 
 export interface ChatQuestionSectionProps {
   questions: MessageReceiveData[];
-  socket: Socket | null;
+  worker: MessagePort | null;
   userType: UserType;
-  roomId?: string;
+  roomId: string;
 }
 
-export const ChatQuestionSection = ({ questions, socket, userType, roomId }: ChatQuestionSectionProps) => {
+const ChatQuestionSection = ({ questions, worker, userType, roomId }: ChatQuestionSectionProps) => {
   const [expanded, setExpanded] = useState(false);
-
-  const { id } = useParams();
 
   const userId = getStoredId();
 
-  const toggleSection = () => {
+  const toggleSection = useCallback(() => {
     setExpanded((prev) => !prev);
-  };
+  }, []);
 
-  const handleQuestionDone = (questionId: number) => {
-    if (!socket) return;
+  const handleQuestionDone = useCallback(
+    (questionId: number) => {
+      if (!worker) return;
 
-    socket.emit(CHATTING_SOCKET_SEND_EVENT.QUESTION_DONE, {
-      roomId: userType === 'client' ? id : roomId,
-      userId,
-      questionId
-    } as MessageSendData);
-  };
+      worker.postMessage({
+        type: CHATTING_SOCKET_SEND_EVENT.QUESTION_DONE,
+        payload: {
+          roomId,
+          userId,
+          questionId
+        } as MessageSendData
+      });
+    },
+    [worker, roomId, userId]
+  );
+
+  const { dispatch } = useChat();
+
+  const onNicknameClick = useCallback(
+    (data: UserInfoData) => {
+      dispatch({
+        type: 'SET_SELECTED_USER',
+        payload: data
+      });
+    },
+    [dispatch]
+  );
 
   return (
     <SectionWrapper>
       <SectionContainer>
         {questions.length === 0 ? (
-          <NoQuestionMessage>아직 질문이 없어요</NoQuestionMessage>
+          <NoQuestionMessage>아직 질문이 없어요 ( °ᗝ° ).ᐟ.ᐟ</NoQuestionMessage>
         ) : (
           <>
             <QuestionCard
@@ -48,18 +63,33 @@ export const ChatQuestionSection = ({ questions, socket, userType, roomId }: Cha
               type={userType}
               question={questions[0]}
               handleQuestionDone={handleQuestionDone}
+              ellipsis={!expanded}
+              onNicknameClick={() =>
+                onNicknameClick({
+                  nickname: questions[0].nickname,
+                  socketId: questions[0].socketId,
+                  entryTime: questions[0].entryTime,
+                  owner: questions[0].owner
+                })
+              }
             />
             {expanded &&
-              questions
-                .slice(1)
-                .map((question) => (
-                  <QuestionCard
-                    key={question.questionId}
-                    type={userType}
-                    question={question}
-                    handleQuestionDone={handleQuestionDone}
-                  />
-                ))}
+              questions.slice(1).map((question) => (
+                <QuestionCard
+                  key={question.questionId}
+                  type={userType}
+                  question={question}
+                  handleQuestionDone={handleQuestionDone}
+                  onNicknameClick={() =>
+                    onNicknameClick({
+                      nickname: question.nickname,
+                      socketId: question.socketId,
+                      entryTime: question.entryTime,
+                      owner: question.owner
+                    })
+                  }
+                />
+              ))}
             <SwipeBtn onClick={toggleSection} />
           </>
         )}
@@ -67,12 +97,16 @@ export const ChatQuestionSection = ({ questions, socket, userType, roomId }: Cha
     </SectionWrapper>
   );
 };
-export default ChatQuestionSection;
+
+export default memo(ChatQuestionSection);
 
 const SectionWrapper = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
+  background-color: #090909;
+  border-top: 1px solid ${({ theme }) => theme.tokenColors['surface-alt']};
+  border-bottom: 1px solid ${({ theme }) => theme.tokenColors['surface-alt']};
 `;
 
 const SectionContainer = styled.div`
@@ -84,35 +118,32 @@ const SectionContainer = styled.div`
   scrollbar-width: none;
   padding: 13px 20px 25px 20px;
   gap: 10px;
-  border-top: 1px solid ${({ theme }) => theme.tokenColors['surface-alt']};
-  border-bottom: 1px solid ${({ theme }) => theme.tokenColors['surface-alt']};
 `;
 
-const SwipeBtn = styled.button`
+const SwipeBtn = memo(styled.button`
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 25px;
+  height: 20px;
   cursor: pointer;
-  background-color: ${({ theme }) => theme.tokenColors['surface-default']};
-
+  background-color: #090909;
   &::before {
     content: '';
     position: absolute;
-    top: 35%;
+    top: 40%;
     left: 50%;
     background-color: ${({ theme }) => theme.tokenColors['text-weak']};
     border-radius: 2px;
-    height: 5px;
-    width: 50px;
+    height: 4px;
+    width: 60px;
     transform: translate(-50%, -50%);
   }
-`;
+`);
 
 const NoQuestionMessage = styled.div`
   text-align: center;
   ${({ theme }) => theme.tokenTypographys['display-medium14']};
   color: ${({ theme }) => theme.tokenColors['text-weak']};
-  padding: 20px 0;
+  padding: 15px 0 0 0;
 `;

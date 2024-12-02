@@ -1,18 +1,26 @@
 import { styled } from 'styled-components';
 
+import { AsyncBoundary } from '@common/AsyncBoundary';
 import Footer from '@common/Footer';
 import ServiceBanner from '@common/ServiceBanner';
-import { MainHeader, MainLiveSection, RecommendLive } from '@components/main';
+import { RecommendLiveError } from '@components/error';
+import { MainHeader, MainLiveSection, MainReplaySection, RecommendLive } from '@components/main';
+import { RecommendLiveSkeleton } from '@components/skeleton';
 
 export default function MainPage() {
   return (
     <>
       <MainHeader />
       <MainPageContainer>
-        <RecommendLive />
+        <AsyncBoundary
+          pendingFallback={<RecommendLiveSkeleton />}
+          rejectedFallback={(error) => <RecommendLiveError error={error} />}
+        >
+          <RecommendLive />
+        </AsyncBoundary>
         <ServiceBanner />
-        <MainLiveSection title="🚀 라이브 중인 컨퍼런스" type="live" />
-        <MainLiveSection title="컨퍼런스 다시보기 👀" type="replay" />
+        <MainLiveSection title="🚀 라이브 중인 컨퍼런스" />
+        <MainReplaySection title="컨퍼런스 다시보기 👀" />
         <Footer />
       </MainPageContainer>
     </>

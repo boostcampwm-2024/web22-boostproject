@@ -1,29 +1,37 @@
 import styled from 'styled-components';
 import ThreePointIcon from '@assets/icons/three-point.svg';
 import OutIcon from '@assets/icons/out.svg';
-import { useCallback, useContext, useEffect, useRef } from 'react';
+import { memo, useCallback, useContext, useEffect, useRef } from 'react';
 import LayerPopup from './LayerPopup';
 import { ChatContext } from 'src/contexts/chatContext';
 
 interface ChatHeaderProps {
-  outBtnHandler?: () => void;
+  outBtnHandler: () => void;
 }
+
+const MemoizedHeaderBtn = memo(({ onClick, icon }: { onClick: () => void; icon: string }) => (
+  <HeaderBtn onClick={onClick}>
+    <StyledIcon as={icon} />
+  </HeaderBtn>
+));
+
+MemoizedHeaderBtn.displayName = 'MemoizedHeaderBtn';
 
 export const ChatHeader = ({ outBtnHandler }: ChatHeaderProps) => {
   const { state, dispatch } = useContext(ChatContext);
   const headerRef = useRef<HTMLDivElement>(null);
 
-  const toggleSettings = () => {
+  const toggleSettings = useCallback(() => {
     dispatch({ type: 'TOGGLE_SETTINGS' });
-  };
+  }, [dispatch]);
 
   const handleClickOutside = useCallback(
     (event: MouseEvent) => {
-      if (headerRef.current && !headerRef.current.contains(event.target as Node)) {
+      if (headerRef.current && !headerRef.current.contains(event.target as Node) && state.isSettingsOpen) {
         dispatch({ type: 'CLOSE_SETTINGS' });
       }
     },
-    [dispatch]
+    [dispatch, state.isSettingsOpen]
   );
 
   useEffect(() => {
@@ -35,13 +43,10 @@ export const ChatHeader = ({ outBtnHandler }: ChatHeaderProps) => {
 
   return (
     <ChatHeaderContainer ref={headerRef}>
-      <HeaderBtn onClick={outBtnHandler}>
-        <StyledIcon as={OutIcon} />
-      </HeaderBtn>
+      <MemoizedHeaderBtn onClick={outBtnHandler} icon={OutIcon} />
       <h2>채팅</h2>
-      <HeaderBtn onClick={toggleSettings}>
-        <StyledIcon as={ThreePointIcon} />
-      </HeaderBtn>
+      <MemoizedHeaderBtn onClick={toggleSettings} icon={ThreePointIcon} />
+
       <PopupWrapper>{state.isSettingsOpen && <LayerPopup />}</PopupWrapper>
     </ChatHeaderContainer>
   );
@@ -54,10 +59,10 @@ const ChatHeaderContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 15px;
+  padding: 10px 10px;
   border-top: 1px solid ${({ theme }) => theme.tokenColors['surface-alt']};
   color: ${({ theme }) => theme.tokenColors['color-white']};
-  ${({ theme }) => theme.tokenTypographys['display-bold20']};
+  ${({ theme }) => theme.tokenTypographys['display-bold16']};
 `;
 
 const HeaderBtn = styled.button`
@@ -67,8 +72,8 @@ const HeaderBtn = styled.button`
 `;
 
 const StyledIcon = styled.svg`
-  width: 25px;
-  height: 25px;
+  width: 22px;
+  height: 22px;
   cursor: pointer;
 `;
 

@@ -6,7 +6,7 @@ import StreamingView from './StreamingView';
 import StreamingStatus from './StreamingStatus';
 import { ASSETS } from '@constants/assets';
 
-interface PlayerProps {
+interface StreamingDisplayProps {
   onStreaming: boolean;
 }
 
@@ -14,7 +14,7 @@ interface ContainerProps {
   $onStreaming: boolean;
 }
 
-export default function Player({ onStreaming }: PlayerProps) {
+export default function StreamingDisplay({ onStreaming }: StreamingDisplayProps) {
   const { isOpen, closeModal, openModal } = useModal();
   const createPortal = usePortal();
 

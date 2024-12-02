@@ -1,23 +1,32 @@
 import styled from 'styled-components';
 
+import { ClientChatRoom } from '@components/chat';
 import { ClientView, Header } from '@components/client';
-import { ChatRoom } from '@components/chat';
+import { AsyncBoundary } from '@components/common/AsyncBoundary';
+import { PlayerStreamError } from '@components/error';
+import withLiveExistCheck from '@hocs/withLiveExistCheck';
 
-export default function ClientPage() {
+function ClientPageComponent() {
   return (
     <>
       <Header />
       <ClientContainer>
-        <ClientView />
-        <ChatRoom userType="client" />
+        <AsyncBoundary pendingFallback={<></>} rejectedFallback={() => <PlayerStreamError />}>
+          <ClientView />
+          <ClientChatRoom />
+        </AsyncBoundary>
       </ClientContainer>
     </>
   );
 }
 
+const ClientPage = withLiveExistCheck(ClientPageComponent);
+
+export default ClientPage;
+
 const ClientContainer = styled.div`
   box-sizing: border-box;
-  padding: 60px 10px 0 10px;
+  padding-top: 70px;
   height: 100%;
   display: flex;
   background-color: ${({ theme }) => theme.tokenColors['susrface-default']};

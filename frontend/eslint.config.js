@@ -40,7 +40,8 @@ export default tseslint.config({ ignores: ['.*'] }, js.configs.recommended, ...t
     quotes: ['error', 'single'],
     semi: ['error', 'always'],
     '@typescript-eslint/no-unused-vars': ['error'],
-    '@typescript-eslint/no-explicit-any': 'off'
+    '@typescript-eslint/no-explicit-any': 'off',
+    'react/prop-types': 'off'
   },
   settings: {
     ...reactRecommended.settings

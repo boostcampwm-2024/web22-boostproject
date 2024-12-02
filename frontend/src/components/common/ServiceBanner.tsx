@@ -1,23 +1,6 @@
+import { KEYWORDS } from '@constants/bannerKeywords';
 import { motion } from 'framer-motion';
 import styled from 'styled-components';
-
-const keywords = [
-  { text: 'Conference', gradient: 'linear-gradient(90deg, #FF0066, #FF9999)' },
-  { text: 'Development', gradient: 'linear-gradient(90deg, #FF6B00, #FFD700)' },
-  { text: 'Growth', gradient: 'linear-gradient(90deg, #FFD700, #FFFF66)' },
-  { text: 'Innovation', gradient: 'linear-gradient(90deg, #6600FF, #CC99FF)' },
-  { text: 'Technology', gradient: 'linear-gradient(90deg, #FF00CC, #FFCCFF)' },
-  { text: 'Workshop', gradient: 'linear-gradient(90deg, #00FFCC, #66FFE6)' },
-  { text: 'Networking', gradient: 'linear-gradient(90deg, #FF3366, #FF99CC)' },
-  { text: 'Leadership', gradient: 'linear-gradient(90deg, #9933FF, #CC99FF)' },
-  { text: 'Creativity', gradient: 'linear-gradient(90deg, #FF9900, #FFCC66)' },
-  { text: 'Learning', gradient: 'linear-gradient(90deg, #33CC33, #99FF99)' },
-  { text: 'Strategy', gradient: 'linear-gradient(90deg, #3366FF, #99CCFF)' },
-  { text: 'Mentoring', gradient: 'linear-gradient(90deg, #FF6699, #FFCCCC)' },
-  { text: 'Agile', gradient: 'linear-gradient(90deg, #00CC99, #66FFB2)' },
-  { text: 'Scaling', gradient: 'linear-gradient(90deg, #FF9933, #FFCC99)' },
-  { text: 'Community', gradient: 'linear-gradient(90deg, #6633FF, #CC99FF)' }
-];
 
 interface GradientTextProps {
   gradient: string;
@@ -41,7 +24,7 @@ const ServiceBanner = () => {
             }}
           >
             {[...Array(4)].map((_, setIndex) =>
-              keywords.map(({ text, gradient }, index) => (
+              KEYWORDS.map(({ text, gradient }, index) => (
                 <GradientText key={`set-${setIndex}-keyword-${index}`} gradient={gradient}>
                   {text}
                 </GradientText>

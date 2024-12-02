@@ -1,17 +1,18 @@
 import { AxiosResponse } from 'axios';
 import { fetchInstance } from '.';
-import { ClientLive } from '@type/live';
+import { ClientLiveResponse } from '@type/live';
 
-type ClientLiveResponse = {
-  info: ClientLive;
-};
-
-export const fetchLive = async ({ liveId }: { liveId: string }): Promise<ClientLive> => {
-  const response: AxiosResponse<ClientLiveResponse> = await fetchInstance().get('/streams/live', {
-    params: {
-      liveId
+export const fetchLive = async ({ liveId }: { liveId: string }): Promise<ClientLiveResponse> => {
+  try {
+    const response: AxiosResponse = await fetchInstance().get('/streams/live', {
+      params: { liveId }
+    });
+    return response.data;
+  } catch (error: any) {
+    if (error.response && error.response.status === 400) {
+      console.log('error', error);
+      throw error;
     }
-  });
-
-  return response.data.info;
+    throw error;
+  }
 };

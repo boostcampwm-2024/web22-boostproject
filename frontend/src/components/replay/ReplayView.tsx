@@ -6,21 +6,20 @@ import PlayerInfo from './PlayerInfo';
 import Footer from '@common/Footer';
 import Header from '@common/Header';
 import { useClientReplay } from '@queries/replay/useFetchReplay';
+import { getReplayURL } from '@utils/getVideoURL';
 
 const ReplayView = () => {
   const { id: videoId } = useParams();
   const { data: clientReplayData } = useClientReplay({ videoId: videoId as string });
 
-  if (!clientReplayData) {
-    return <div>로딩 중...</div>;
-  }
+  const { info } = clientReplayData;
 
   return (
     <ReplayViewContainer>
       <Header />
       <h1 className="hidden">다시보기 페이지</h1>
-      <Player videoUrl={clientReplayData.replayUrl} />
-      <PlayerInfo clientReplayData={clientReplayData} />
+      <Player videoUrl={getReplayURL(videoId as string)} />
+      <PlayerInfo clientReplayData={info} />
       <Footer />
     </ReplayViewContainer>
   );

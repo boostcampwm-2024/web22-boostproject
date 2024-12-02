@@ -18,7 +18,7 @@ const ChatItemWrapper = memo(
     if (chat.msgType === CHATTING_TYPES.QUESTION) {
       return (
         <ChatItem>
-          <QuestionCard type="client" question={chat} />
+          <QuestionCard type="client" question={chat} onNicknameClick={handleNicknameClick} />
         </ChatItem>
       );
     } else if (chat.msgType === CHATTING_TYPES.NOTICE) {
@@ -43,12 +43,8 @@ const ChatItemWrapper = memo(
       return (
         <ChatItem>
           <NormalChat $isHost={chat.owner === 'host'} $pointColor={chat.owner === 'host' ? '#0ADD91' : chat.color}>
-            {chat.owner === 'me' ? (
-              <span className="text_point">🧀</span>
-            ) : chat.owner === 'host' ? (
-              <StyledIcon as={HostIconGreen} />
-            ) : null}
-            <span className="text_point" onClick={handleNicknameClick}>
+            <span className="text_point user_name" onClick={handleNicknameClick}>
+              {chat.owner === 'me' ? '🧀' : chat.owner === 'host' ? <StyledIcon as={HostIconGreen} /> : null}
               {chat.nickname}
             </span>
             <span className="chat_message">{chat.msg}</span>
@@ -169,6 +165,15 @@ const NormalChat = styled.div<{ $isHost: boolean; $pointColor: string }>`
   .chat_message {
     color: ${({ $isHost }) => $isHost && '#82e3c4'};
     line-height: 1.5;
+  }
+
+  .user_name {
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 5px;
+    &:hover {
+      background-color: #393939;
+    }
   }
 
   overflow-wrap: break-word;

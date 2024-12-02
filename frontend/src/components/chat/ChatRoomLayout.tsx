@@ -49,7 +49,7 @@ const ChatRoomLayout = ({ userType, roomId }: ChatRoomLayoutProps) => {
 
         {state.isNoticePopupOpen && (
           <PopupWrapper>
-            <NoticeCard />
+            <NoticeCard sessionKey={roomId} />
           </PopupWrapper>
         )}
 

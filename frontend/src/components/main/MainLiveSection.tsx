@@ -16,7 +16,7 @@ const MainLiveSection = ({ title }: MainLiveSectionProps) => {
   const { data: liveData } = useRecentLive();
 
   const { info, appendInfo } = liveData;
-  const displayedData = textStatus === VIDEO_VIEW.FOLD ? [...info, ...appendInfo] : info;
+  const displayedData = [...info, ...appendInfo];
 
   const handleTextChange = () => {
     setTextStatus(textStatus === VIDEO_VIEW.MORE_VIEW ? VIDEO_VIEW.FOLD : VIDEO_VIEW.MORE_VIEW);

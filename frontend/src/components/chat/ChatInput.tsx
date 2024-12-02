@@ -5,7 +5,7 @@ import SpeakerIcon from '@assets/icons/speaker.svg';
 import SendIcon from '@assets/icons/send.svg';
 import { useRef, useEffect, useState, ChangeEvent, KeyboardEvent, memo } from 'react';
 import { CHATTING_SOCKET_SEND_EVENT, CHATTING_TYPES } from '@constants/chat';
-import { ChattingTypes } from '@type/chat';
+import { ChattingSendTypes } from '@type/chat';
 import { getStoredId } from '@utils/id';
 import { UserType } from '@type/user';
 
@@ -20,7 +20,7 @@ const INITIAL_TEXTAREA_HEIGHT = 20;
 export const ChatInput = ({ worker, userType, roomId }: ChatInputProps) => {
   const [hasInput, setHasInput] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
-  const [msgType, setMsgType] = useState<ChattingTypes>(CHATTING_TYPES.NORMAL);
+  const [msgType, setMsgType] = useState<ChattingSendTypes>(CHATTING_TYPES.NORMAL);
   const [message, setMessage] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 

@@ -40,23 +40,34 @@ export class RoomRepository {
   private async lindex<T>(key: string, index: number){
     const result = await this.redisClient.lindex(key, index);
     if(!result) return undefined;
-
-    const l = typeof result === 'string' ? result : JSON.parse(result);
-    return l as T;
+    try {
+      return JSON.parse(result) as T;
+    } catch {
+      return result as T;
+    }
   }
 
   private async lrange<T>(key: string, start: number, end: number){
     const result = await this.redisClient.lrange(key, start, end);
     if(!result) return undefined;
-    const arrayT = result.map((r) => typeof r === 'string' ? r : JSON.parse(r));
+    const arrayT = result.map((r) => {
+      try {
+        return JSON.parse(r);
+      } catch {
+        return r;
+      }
+    });
     return arrayT as T;
   }
 
   private async getData<T>(key: string) {
     const result = await this.redisClient.get(key);
     if(!result) return undefined;
-    const data = result === 'string' ? result : JSON.parse(result);
-    return data as T;
+    try {
+      return JSON.parse(result) as T;
+    } catch {
+      return result as T;
+    }
   }
 
   async isRoomExisted(roomId: string) {

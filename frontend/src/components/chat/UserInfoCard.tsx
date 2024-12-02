@@ -145,13 +145,6 @@ const StyledUserBlockIcon = styled(UserBlockIcon)`
   height: 20px;
 `;
 
-const NoticeMessage = styled.p`
-  line-height: 20px;
-  max-height: 170px;
-  overflow-y: auto;
-  ${({ theme }) => theme.tokenTypographys['display-bold14']}
-`;
-
 const BanBtn = styled.button`
   &:hover {
     background-color: #313131;

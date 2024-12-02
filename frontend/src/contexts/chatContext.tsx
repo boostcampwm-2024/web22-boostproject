@@ -1,4 +1,4 @@
-import { UserInfoData, WhoAmI } from '@type/chat';
+import { UserInfoData } from '@type/chat';
 import { createContext, useReducer, ReactNode, useContext } from 'react';
 
 type SettingOption = 'chat_notice' | 'ai_summary' | null;

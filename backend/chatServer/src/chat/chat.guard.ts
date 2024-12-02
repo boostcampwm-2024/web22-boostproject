@@ -10,7 +10,8 @@ export class MessageGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const payload = context.switchToWs().getData();
     const { msg } = payload;
-    return !!msg && msg.length <= 150;
+    if(!!msg && msg.length <= 150) return true;
+    throw new ChatException(CHATTING_SOCKET_ERROR.MSG_TOO_LONG);
   }
 }
 
@@ -22,7 +23,8 @@ export class HostGuard implements CanActivate {
     const { roomId, userId } = payload;
     const hostId = await this.roomService.getHostOfRoom(roomId);
     console.log('hostGuard:', hostId, userId);
-    return hostId === userId;
+    if (hostId === userId) return true;
+    throw new ChatException(CHATTING_SOCKET_ERROR.UNAUTHORIZED, roomId);
   }
 }
 

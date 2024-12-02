@@ -11,16 +11,14 @@ const ReplayView = () => {
   const { id: videoId } = useParams();
   const { data: clientReplayData } = useClientReplay({ videoId: videoId as string });
 
-  if (!clientReplayData) {
-    return <div>로딩 중...</div>;
-  }
+  const { info } = clientReplayData;
 
   return (
     <ReplayViewContainer>
       <Header />
       <h1 className="hidden">다시보기 페이지</h1>
-      <Player videoUrl={clientReplayData.replayUrl} />
-      <PlayerInfo clientReplayData={clientReplayData} />
+      <Player videoUrl={info.replayUrl} />
+      <PlayerInfo clientReplayData={info} />
       <Footer />
     </ReplayViewContainer>
   );

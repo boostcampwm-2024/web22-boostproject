@@ -27,3 +27,11 @@ export type RecentLiveResponse = {
   info: RecentLive[];
   appendInfo: RecentLive[];
 };
+
+export type ClientLiveResponse = {
+  info: ClientLive;
+};
+
+export type LiveExistenceResponse = {
+  existed: boolean;
+};

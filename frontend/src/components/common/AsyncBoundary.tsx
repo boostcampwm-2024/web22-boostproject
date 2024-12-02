@@ -18,9 +18,8 @@ export const AsyncBoundary = forwardRef<any, AsyncBoundaryProps>(
       reset: () => setError(null)
     }));
 
-    const handleError = (error: Error, errorInfo: React.ErrorInfo) => {
+    const handleError = (error: Error) => {
       setError(error);
-      console.error('ErrorBoundary caught an error', error, errorInfo);
     };
 
     return (

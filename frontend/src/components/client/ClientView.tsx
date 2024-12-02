@@ -9,18 +9,18 @@ import { useClientLive } from '@queries/client/useFetchLive';
 
 const ClientView = () => {
   const { id: liveId } = useParams();
-  const { data: clientLiveData } = useClientLive({ liveId: liveId as string });
+  const { data: clientLiveData } = useClientLive({
+    liveId: liveId as string
+  });
 
-  if (!clientLiveData) {
-    return <div>로딩 중...</div>;
-  }
+  const { info } = clientLiveData;
 
   return (
     <ClientViewContainer>
       <Header />
       <h1 className="hidden">클라이언트 페이지</h1>
-      <Player videoUrl={clientLiveData.streamUrl} />
-      <PlayerInfo clientLiveData={clientLiveData} />
+      <Player videoUrl={info.streamUrl} />
+      <PlayerInfo clientLiveData={info} />
       <Footer />
     </ClientViewContainer>
   );

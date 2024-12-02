@@ -35,8 +35,11 @@ const transformationConfig = {
     {
       app: 'live',
       hls: true,
-      hlsFlags: '[hls_time=2:hls_list_size=3:hls_flags=delete_segments]',
-      hlsKeep: false
+      hlsFlags: '[hls_time=10:hls_list_size=3:hls_flags=delete_segments]',
+      vc: 'libx264',
+      vcParam: ['-g', '60', '-keyint_min', '60', '-sc_threshold', '0'],
+      ac: 'copy',
+      ffmpegLogLevel: 'verbose'
     }
   ],
   //package.json 기준

@@ -1,10 +1,11 @@
 {
   "name": "backend",
   "private": true,
-  "packageManager": "yarn@4.5.1",
+  "packageManager": "yarn@4.5.3",
   "workspaces": [
     "mainServer",
-    "rtmpServer"
+    "rtmpServer",
+    "chatServer"
   ],
   "devDependencies": {
     "@eslint/js": "^9.14.0",
@@ -19,12 +20,14 @@
     "typescript-eslint": "^8.14.0"
   },
   "scripts": {
+    "start": "yarn start_rtmp & yarn start_main & yarn start_chat",
+    "build": "yarn build_rtmp & yarn build_main & yarn build_chat",
     "start_rtmp": "yarn workspace rtmpServer run start",
     "start_main": "yarn workspace mainServer run start",
+    "start_chat": "yarn workspace chatServer run start",
     "build_rtmp": "yarn workspace rtmpServer run build",
     "build_main": "yarn workspace mainServer run build",
-    "start": "yarn start_rtmp & yarn start_main",
-    "build": "yarn build_rtmp & yarn build_main",
+    "build_chat": "yarn workspace chatServer run build",
     "lint": "eslint ."
   }
 }

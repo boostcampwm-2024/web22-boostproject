@@ -7,6 +7,6 @@ export const useMainLive = () => {
   return useSuspenseQuery<MainLive[], Error>({
     queryKey: ['mainLive'],
     queryFn: fetchMainLive,
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: false
   });
 };

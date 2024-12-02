@@ -1,14 +1,17 @@
 import styled from 'styled-components';
 import CloseIcon from '@assets/icons/close.svg';
-import { useContext } from 'react';
+import { memo, useCallback, useContext } from 'react';
 import { ChatContext } from 'src/contexts/chatContext';
+import { useFetchChatRule } from '@apis/queries/chat/useFetchChatRule';
 
-export const NoticeCard = () => {
+export const NoticeCard = ({ sessionKey }: { sessionKey: string }) => {
   const { dispatch } = useContext(ChatContext);
 
-  const toggleSettings = () => {
+  const toggleSettings = useCallback(() => {
     dispatch({ type: 'TOGGLE_ANNOUNCEMENT_POPUP' });
-  };
+  }, [dispatch]);
+
+  const { data: noticeInfo } = useFetchChatRule({ sessionKey });
 
   return (
     <NoticeCardContainer>
@@ -17,10 +20,10 @@ export const NoticeCard = () => {
           <NoticeCardProfile></NoticeCardProfile>
           <NoticeCardArea>
             <div className="text_info">
-              <span className="text_point">네이버 부스트 캠프</span>
+              <span className="text_point">{noticeInfo?.channelName}</span>
               <span>님의</span>
             </div>
-            <div className="text_strong">컨퍼런스 공지 📢</div>
+            <div className="text_strong">채팅 규칙 📢</div>
           </NoticeCardArea>
         </NoticeCardWrapper>
         <CloseBtn onClick={toggleSettings}>
@@ -28,17 +31,11 @@ export const NoticeCard = () => {
         </CloseBtn>
       </NoticeCardHeader>
 
-      <NoticeMessage>
-        - 질문은 질문 채팅으로 부탁드립니다
-        <br /> - 컨퍼런스 보러와주셔서 감사합니다
-        <br /> - 컨퍼런스 보러와주셔서 감사합니다
-        <br /> - 컨퍼런스 보러와주셔서 감사합니다
-        <br /> - 컨퍼런스 보러와주셔서 감사합니다
-      </NoticeMessage>
+      <NoticeMessage>{noticeInfo?.notice}</NoticeMessage>
     </NoticeCardContainer>
   );
 };
-export default NoticeCard;
+export default memo(NoticeCard);
 
 const NoticeCardContainer = styled.div`
   display: flex;
@@ -113,5 +110,7 @@ const NoticeMessage = styled.p`
   margin-top: 10px;
   max-height: 170px;
   overflow-y: auto;
-  ${({ theme }) => theme.tokenTypographys['display-bold14']}
+  ${({ theme }) => theme.tokenTypographys['display-bold14']};
+  white-space: pre-line;
+  word-break: keep-all;
 `;

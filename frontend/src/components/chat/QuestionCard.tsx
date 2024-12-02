@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useRef } from 'react';
+import { memo, useEffect, useMemo, useRef, useCallback } from 'react';
 import styled from 'styled-components';
 import CheckIcon from '@assets/icons/check.svg';
 import { MessageReceiveData } from '@type/chat';
@@ -10,9 +10,10 @@ interface QuestionCardProps {
   question: MessageReceiveData;
   handleQuestionDone?: (questionId: number) => void;
   ellipsis?: boolean;
+  onNicknameClick: () => void;
 }
 
-export const QuestionCard = ({ type, question, handleQuestionDone, ellipsis = false }: QuestionCardProps) => {
+const QuestionCard = ({ type, question, handleQuestionDone, onNicknameClick, ellipsis = false }: QuestionCardProps) => {
   const startDateFormat = useMemo(() => new Date(question.msgTime), [question.msgTime]);
   const nowRef = useRef<Date>(new Date());
 
@@ -36,11 +37,21 @@ export const QuestionCard = ({ type, question, handleQuestionDone, ellipsis = fa
 
   const timeElement = useRef<HTMLSpanElement>(null);
 
+  const handleQuestionDoneMemoized = useCallback(() => {
+    if (handleQuestionDone) {
+      handleQuestionDone(question.questionId as number);
+    }
+  }, [handleQuestionDone, question.questionId]);
+
+  const onNicknameClickMemoized = useCallback(() => {
+    onNicknameClick();
+  }, [onNicknameClick]);
+
   return (
     <QuestionCardContainer>
       <QuestionCardTop>
         <QuestionInfo>
-          <span className="name_info">
+          <span className="name_info" onClick={onNicknameClickMemoized}>
             <StyledIcon as={QuestionUserIcon} /> {question.nickname}
           </span>
           <span className="time_info" ref={timeElement}>
@@ -48,7 +59,7 @@ export const QuestionCard = ({ type, question, handleQuestionDone, ellipsis = fa
           </span>
         </QuestionInfo>
         {type === 'host' && handleQuestionDone && (
-          <CheckBtn onClick={() => handleQuestionDone(question.questionId as number)}>
+          <CheckBtn onClick={handleQuestionDoneMemoized}>
             <StyledCheckIcon />
           </CheckBtn>
         )}
@@ -59,7 +70,14 @@ export const QuestionCard = ({ type, question, handleQuestionDone, ellipsis = fa
   );
 };
 
-export default memo(QuestionCard);
+// shouldComponentUpdate를 내부에서 사용할 수 있도록 memo 사용
+export default memo(QuestionCard, (prevProps, nextProps) => {
+  return (
+    prevProps.question.questionId === nextProps.question.questionId &&
+    prevProps.type === nextProps.type &&
+    prevProps.ellipsis === nextProps.ellipsis
+  );
+});
 
 const QuestionCardContainer = styled.div`
   display: flex;
@@ -86,7 +104,12 @@ const QuestionInfo = styled.div`
   align-items: end;
   gap: 12px;
   .name_info {
-    ${({ theme }) => theme.tokenTypographys['display-bold12']}
+    border-radius: 7px;
+    ${({ theme }) => theme.tokenTypographys['display-bold12']};
+    cursor: pointer;
+    &:hover {
+      color: #bbbbbb;
+    }
   }
   .time_info {
     ${({ theme }) => theme.tokenTypographys['display-medium12']}

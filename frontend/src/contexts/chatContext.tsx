@@ -70,7 +70,7 @@ const chatReducer = (state: ChatState, action: Action): ChatState => {
 const initialState: ChatState = {
   isSettingsOpen: false,
   settingOption: null,
-  isNoticePopupOpen: false,
+  isNoticePopupOpen: true,
   isUserInfoPopupOpen: false,
   selectedUser: null
 };

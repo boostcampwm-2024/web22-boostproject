@@ -1,62 +1,20 @@
-import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+
+import sampleProfile from '@assets/sample_profile.png';
+import { RECOMMEND_LIVE } from '@constants/recommendLive';
+import { useMainLive } from '@queries/main/useFetchMainLive';
+import useMainLiveRotation from '@hooks/useMainLiveRotation';
 
 import AnimatedProfileSection from './AnimatedProfileSection';
 import AnimatedLiveHeader from './AnimatedLiveHeader';
 import RecommendList from './RecommendList';
-import sampleProfile from '@assets/sample_profile.png';
-import { RECOMMEND_LIVE } from '@constants/recommendLive';
-import useRotatingPlayer from '@hooks/useRotatePlayer';
-import { useMainLive } from '@queries/main/useFetchMainLive';
 
 const RecommendLive = () => {
   const navigate = useNavigate();
-  const { videoRef, initPlayer } = useRotatingPlayer();
+
   const { data: mainLiveData } = useMainLive();
-  const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
-  const recommendListRef = useRef<HTMLDivElement>(null);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const prevUrlIndexRef = useRef(currentUrlIndex);
-  const isInitialMount = useRef(true);
-
-  useEffect(() => {
-    if (!mainLiveData) return;
-    if (!mainLiveData[currentUrlIndex]) return;
-
-    const handleTransition = async () => {
-      const videoUrl = mainLiveData[currentUrlIndex].streamUrl;
-
-      if (isInitialMount.current) {
-        initPlayer(videoUrl);
-        setTimeout(() => {
-          isInitialMount.current = false;
-        }, 100);
-        return;
-      }
-
-      if (prevUrlIndexRef.current !== currentUrlIndex) {
-        setIsTransitioning(true);
-        await new Promise((resolve) => setTimeout(resolve, 200));
-
-        initPlayer(videoUrl);
-        prevUrlIndexRef.current = currentUrlIndex;
-
-        setTimeout(() => {
-          setIsTransitioning(false);
-        }, 100);
-      }
-    };
-
-    handleTransition();
-  }, [mainLiveData, currentUrlIndex, initPlayer]);
-
-  const onSelect = useCallback((index: number) => {
-    setCurrentUrlIndex(index);
-  }, []);
-
-  const currentLiveData = useMemo(() => mainLiveData?.[currentUrlIndex], [mainLiveData, currentUrlIndex]);
-  
+  const { currentLiveData, isTransitioning, videoRef, onSelect } = useMainLiveRotation(mainLiveData);
   const { liveId, liveTitle, concurrentUserCount, channel, category } = currentLiveData;
 
   return (
@@ -68,12 +26,7 @@ const RecommendLive = () => {
         <AnimatedLiveHeader concurrentUserCount={concurrentUserCount} liveTitle={liveTitle} />
         <RecommendLiveInformation>
           <AnimatedProfileSection channel={channel} category={category} profileImage={sampleProfile} />
-          <RecommendList
-            ref={recommendListRef}
-            mainLiveData={mainLiveData}
-            onSelect={onSelect}
-            currentLiveId={liveId}
-          />
+          <RecommendList mainLiveData={mainLiveData} onSelect={onSelect} currentLiveId={liveId} />
         </RecommendLiveInformation>
       </RecommendLiveWrapper>
     </RecommendLiveContainer>

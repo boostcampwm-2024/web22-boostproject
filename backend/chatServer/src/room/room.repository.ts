@@ -3,7 +3,7 @@ import { Cluster } from 'ioredis';
 import { QuestionDto } from '../event/dto/Question.dto';
 import { ChatException, CHATTING_SOCKET_ERROR } from '../chat/chat.error';
 
-type FORWARDED = string;
+type USER_AGENT = string;
 
 @Injectable()
 export class RoomRepository {
@@ -128,16 +128,16 @@ export class RoomRepository {
   }
 
 
-  async getUserBlacklist(roomId: string, address: string): Promise<FORWARDED[]> {
-    const userBlacklist = await this.lrange<FORWARDED[]>(this.getUserBlacklistInRoomWithPrefix(roomId, address), 0, -1);
+  async getUserBlacklist(roomId: string, address: string): Promise<USER_AGENT[]> {
+    const userBlacklist = await this.lrange<USER_AGENT[]>(this.getUserBlacklistInRoomWithPrefix(roomId, address), 0, -1);
     console.log('blacklist', userBlacklist);
     if (!userBlacklist) return [];
     return userBlacklist;
   }
 
-  async addUserBlacklistToRoom(roomId: string, address: string, forwarded: string){
-    console.log(roomId, address, forwarded);
+  async addUserBlacklistToRoom(roomId: string, address: string, userAgent: string){
+    console.log(roomId, address, userAgent);
     console.log(this.getUserBlacklistInRoomWithPrefix(roomId, address));
-    return this.redisClient.rpush(this.getUserBlacklistInRoomWithPrefix(roomId, address), forwarded);
+    return this.redisClient.rpush(this.getUserBlacklistInRoomWithPrefix(roomId, address), userAgent);
   }
 }

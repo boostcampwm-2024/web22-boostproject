@@ -85,13 +85,13 @@ export class RoomService implements OnModuleInit, OnModuleDestroy {
   // 방 삭제
   async deleteRoom(roomId: string) {
     const roomExists = await this.redisRepository.isRoomExisted(roomId);
-    if (!roomExists) throw new ChatException(CHATTING_SOCKET_ERROR.ROOM_EMPTY);
+    if (!roomExists) throw new ChatException(CHATTING_SOCKET_ERROR.ROOM_EMPTY, roomId);
     await this.redisRepository.deleteRoom(roomId);
   }
 
   async addQuestion(roomId: string, question: Omit<QuestionDto, 'questionId'>){
     const roomExists = await this.redisRepository.isRoomExisted(roomId);
-    if (!roomExists) throw new ChatException(CHATTING_SOCKET_ERROR.ROOM_EMPTY);
+    if (!roomExists) throw new ChatException(CHATTING_SOCKET_ERROR.ROOM_EMPTY, roomId);
 
     return await this.redisRepository.addQuestionToRoom(roomId, question);
   }
@@ -102,7 +102,7 @@ export class RoomService implements OnModuleInit, OnModuleDestroy {
     question: Omit<QuestionDto, 'questionId'>,
   ): Promise<QuestionDto> {
     const roomExists = await this.redisRepository.isRoomExisted(roomId);
-    if (!roomExists) throw new ChatException(CHATTING_SOCKET_ERROR.ROOM_EMPTY);
+    if (!roomExists) throw new ChatException(CHATTING_SOCKET_ERROR.ROOM_EMPTY, roomId);
 
     return await this.redisRepository.addQuestionToRoom(roomId, question);
   }
@@ -110,24 +110,24 @@ export class RoomService implements OnModuleInit, OnModuleDestroy {
   // 특정 질문 완료 처리
   async markQuestionAsDone(roomId: string, questionId: number) {
     const roomExists = await this.redisRepository.isRoomExisted(roomId);
-    if (!roomExists) throw new ChatException(CHATTING_SOCKET_ERROR.ROOM_EMPTY);
+    if (!roomExists) throw new ChatException(CHATTING_SOCKET_ERROR.ROOM_EMPTY, roomId);
 
     const markedQuestion = await this.redisRepository.markQuestionAsDone(roomId, questionId);
-    if (!markedQuestion) throw new ChatException(CHATTING_SOCKET_ERROR.QUESTION_EMPTY);
+    if (!markedQuestion) throw new ChatException(CHATTING_SOCKET_ERROR.QUESTION_EMPTY, roomId);
     return markedQuestion;
   }
 
   // 방에 속한 모든 질문 조회
   async getQuestions(roomId: string): Promise<QuestionDto[]> {
     const roomExists = await this.redisRepository.isRoomExisted(roomId);
-    if (!roomExists) throw new ChatException(CHATTING_SOCKET_ERROR.ROOM_EMPTY);
+    if (!roomExists) throw new ChatException(CHATTING_SOCKET_ERROR.ROOM_EMPTY, roomId);
 
     return this.redisRepository.getQuestionsAll(roomId);
   }
 
   async getQuestionsNotDone(roomId: string): Promise<QuestionDto[]> {
     const roomExists = await this.redisRepository.isRoomExisted(roomId);
-    if (!roomExists) throw new ChatException(CHATTING_SOCKET_ERROR.ROOM_EMPTY);
+    if (!roomExists) throw new ChatException(CHATTING_SOCKET_ERROR.ROOM_EMPTY, roomId);
 
     return this.redisRepository.getQuestionsUnmarked(roomId);
   }
@@ -135,7 +135,7 @@ export class RoomService implements OnModuleInit, OnModuleDestroy {
   // 특정 질문 조회
   async getQuestion(roomId: string, questionId: number): Promise<QuestionDto> {
     const roomExists = await this.redisRepository.isRoomExisted(roomId);
-    if (!roomExists) throw new ChatException(CHATTING_SOCKET_ERROR.ROOM_EMPTY);
+    if (!roomExists) throw new ChatException(CHATTING_SOCKET_ERROR.ROOM_EMPTY, roomId);
     return this.redisRepository.getQuestion(roomId, questionId);
   }
 
@@ -163,7 +163,7 @@ export class RoomService implements OnModuleInit, OnModuleDestroy {
 
   async getHostOfRoom(roomId: string) {
     const roomExists = await this.redisRepository.isRoomExisted(roomId);
-    if (!roomExists) throw new ChatException(CHATTING_SOCKET_ERROR.ROOM_EMPTY);
+    if (!roomExists) throw new ChatException(CHATTING_SOCKET_ERROR.ROOM_EMPTY, roomId);
     return await this.redisRepository.getHost(roomId);
   }
 

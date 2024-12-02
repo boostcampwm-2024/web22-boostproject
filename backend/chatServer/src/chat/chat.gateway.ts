@@ -176,7 +176,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const banUser = this.server.sockets.sockets.get(socketId);
     const address = banUser?.handshake.address.replaceAll('::ffff:', '');
 
-    if(!address) throw new ChatException(CHATTING_SOCKET_ERROR.INVALID_USER);
+    if(!address) throw new ChatException(CHATTING_SOCKET_ERROR.INVALID_USER, roomId);
 
     const forwarded = banUser?.handshake.headers.forwarded ?? address;
     console.log('ban:', roomId, address, forwarded);

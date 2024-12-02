@@ -1,12 +1,14 @@
 export const CHATTING_TYPES = {
   NORMAL: 'normal',
   QUESTION: 'question',
-  NOTICE: 'notice'
+  NOTICE: 'notice',
+  EXCEPTION: 'exception'
 } as const;
 
 export const CHATTING_SOCKET_DEFAULT_EVENT = {
   JOIN_ROOM: 'join_room',
-  BAN_USER: 'ban_user'
+  BAN_USER: 'ban_user',
+  EXCEPTION: 'exception'
 } as const;
 
 export const CHATTING_SOCKET_RECEIVE_EVENT = {

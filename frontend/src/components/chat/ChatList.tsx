@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import QuestionCard from './QuestionCard';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { MessageReceiveData } from '@type/chat';
+import { UserInfoData, MessageReceiveData } from '@type/chat';
 import { CHATTING_TYPES } from '@constants/chat';
 import ChatAutoScroll from './ChatAutoScroll';
 import HostIconGreen from '@assets/icons/host_icon_green.svg';
@@ -12,14 +12,9 @@ export interface ChatListProps {
 }
 
 const ChatItemWrapper = memo(
-  ({
-    chat,
-    onNicknameClick
-  }: {
-    chat: MessageReceiveData;
-    onNicknameClick: (nickname: string, socketId: string, entryTime: string) => void;
-  }) => {
-    const handleNicknameClick = () => onNicknameClick(chat.nickname, chat.socketId, chat.entryTime);
+  ({ chat, onNicknameClick }: { chat: MessageReceiveData; onNicknameClick: (data: UserInfoData) => void }) => {
+    const { nickname, socketId, entryTime, owner } = chat;
+    const handleNicknameClick = () => onNicknameClick({ nickname, socketId, entryTime, owner });
     if (chat.msgType === CHATTING_TYPES.QUESTION) {
       return (
         <ChatItem>
@@ -31,6 +26,15 @@ const ChatItemWrapper = memo(
         <ChatItem>
           <NoticeChat>
             <span>📢</span>
+            <span>{chat.msg}</span>
+          </NoticeChat>
+        </ChatItem>
+      );
+    } else if (chat.msgType === CHATTING_TYPES.EXCEPTION) {
+      return (
+        <ChatItem>
+          <NoticeChat>
+            <span>🚨</span>
             <span>{chat.msg}</span>
           </NoticeChat>
         </ChatItem>
@@ -66,10 +70,10 @@ const ChatList = ({ messages }: ChatListProps) => {
   const { dispatch } = useChat();
 
   const onNicknameClick = useCallback(
-    (nickname: string, socketId: string, entryTime: string) => {
+    (data: UserInfoData) => {
       dispatch({
         type: 'SET_SELECTED_USER',
-        payload: { nickname, socketId, entryTime }
+        payload: data
       });
     },
     [dispatch]

@@ -147,10 +147,10 @@ export class MemoryDbDto {
     readCount: number = 0;
 
   @ApiProperty({
-    description: '라이브 우선 순위',
+    description: '라이브 당시 시청횟수',
     example: 0,
   })
-    livePr: number = 0;
+    livePr: number = Math.floor(Math.random() * 1000) + 100;
 
   constructor(data?: Partial<MemoryDbDto>) {
     if (data) {

@@ -45,6 +45,14 @@ export class MockDataController {
     this.memoryDbService.create(newData);
   }
 
+  @Post('/update')
+  @ApiOperation({ summary: 'Delete Session Info', description: '방송 정보를 삭제합니다. (start만 적으면 단일, start, end 범위를 적으면 범위 삭제)' })
+  async updateMemodyData(@Query('id') id: number, @Body() newData: MemoryDbDto) {
+    console.log(id);
+    console.log(newData);
+    this.memoryDbService.updateById(id, newData);
+  }
+
   @Get('/chzzk/switch')
   @ApiOperation({summary: 'Change Curation Data', description: '메인 랜덤 영상을 치지직 영상으로 대체합니다. (true: mode On, false: mode off 전환 시 기존 치지직 데이터 초기화)'})
   async changeCurationData(@Res() res: Response) {

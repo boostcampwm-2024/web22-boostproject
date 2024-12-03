@@ -3,7 +3,7 @@
   "private": true,
   "packageManager": "yarn@4.5.1",
   "dependencies": {
-    "@hoeeeeeh/node-media-server": "3.0.2",
+    "@hoeeeeeh/node-media-server": "3.0.7",
     "@types/node": "^22.9.0",
     "dotenv": "^16.4.5",
     "path": "0.12.7"

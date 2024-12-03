@@ -3,10 +3,10 @@ version: '3.8'
 
 services:
   nginx:
-    build:
+    build: s
       context: nginx
       dockerfile: dockerfile
-    image: liboost/test-nginx:latest
+    image: liboost/nginx:latest
     ports:
       - "80:80"
       - "443:443"

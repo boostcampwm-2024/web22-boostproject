@@ -14,8 +14,8 @@ services:
       - "1935:1935"
       - "3000:3000"
     volumes:
-      - /etc/letsencrypt/live/test.liboo.kr:/etc/letsencrypt/live/test.liboo.kr:ro
-      - /etc/letsencrypt/archive/test.liboo.kr:/etc/letsencrypt/archive/test.liboo.kr:ro
+      - /etc/letsencrypt/live/liboo.kr:/etc/letsencrypt/live/liboo.kr:ro
+      - /etc/letsencrypt/archive/liboo.kr:/etc/letsencrypt/archive/liboo.kr:ro
       - /etc/nginx/ssl/dhparams.pem:/etc/nginx/ssl/dhparams.pem:ro
 
     networks:

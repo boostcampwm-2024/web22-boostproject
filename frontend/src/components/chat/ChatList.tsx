@@ -44,7 +44,7 @@ const ChatItemWrapper = memo(
         <ChatItem>
           <NormalChat $isHost={chat.owner === 'host'} $pointColor={chat.owner === 'host' ? '#0ADD91' : chat.color}>
             <span className="text_point user_name" onClick={handleNicknameClick}>
-              {chat.owner === 'me' ? '🧀' : chat.owner === 'host' ? <StyledIcon as={HostIconGreen} /> : null}
+              {chat.owner === 'me' ? '🧀 ' : chat.owner === 'host' ? <StyledIcon as={HostIconGreen} /> : null}
               {chat.nickname}
             </span>
             <span className="chat_message">{chat.msg}</span>

@@ -6,7 +6,7 @@ services:
     build:
       context: nginx
       dockerfile: dockerfile
-    image: liboost/test-nginx:latest
+    image: liboost/nginx:latest
     ports:
       - "80:80"
       - "443:443"

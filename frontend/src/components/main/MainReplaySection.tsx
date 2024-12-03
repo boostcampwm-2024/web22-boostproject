@@ -23,10 +23,14 @@ const MainReplaySection = ({ title }: MainReplaySectionProps) => {
     const updateRenderCount = () => {
       const width = window.innerWidth;
 
-      if (width <= 1095) setRenderCount(4);
-      else if (width <= 1434) setRenderCount(6);
-      else if (width <= 1770) setRenderCount(8);
-      else setRenderCount(10);
+      if (textStatus === VIDEO_VIEW.FOLD) {
+        setRenderCount(allData.length);
+      } else {
+        if (width <= 1095) setRenderCount(4);
+        else if (width <= 1434) setRenderCount(6);
+        else if (width <= 1770) setRenderCount(8);
+        else setRenderCount(10);
+      }
     };
 
     updateRenderCount();
@@ -36,7 +40,7 @@ const MainReplaySection = ({ title }: MainReplaySectionProps) => {
     return () => {
       window.removeEventListener('resize', updateRenderCount);
     };
-  }, []);
+  }, [textStatus]);
 
   const handleTextChange = () => {
     setTextStatus(textStatus === VIDEO_VIEW.MORE_VIEW ? VIDEO_VIEW.FOLD : VIDEO_VIEW.MORE_VIEW);

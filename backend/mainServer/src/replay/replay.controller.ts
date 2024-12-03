@@ -17,7 +17,12 @@ export class ReplayController {
   async getLatestReplay(@Res() res: Response) {
     try {
       const replayChecker = (item: MemoryDbDto) => { return item.replay && !item.state; };
-      const [serchedData, appendData] = this.memoryDBService.getBroadcastInfo<ReplayVideoDto>(8, memoryDbDtoToReplayVideoDto, replayChecker, 8);
+      const compare = (a: MemoryDbDto, b: MemoryDbDto) => {
+        const aTime = a.startDate ? a.startDate.getTime() : 0;
+        const bTime = b.startDate ? b.startDate.getTime() : 0;
+        return aTime - bTime;
+      };      
+      const [serchedData, appendData] = this.memoryDBService.getBroadcastInfo<ReplayVideoDto>(8, memoryDbDtoToReplayVideoDto, replayChecker, compare, 8);
       res.status(HttpStatus.OK).json({info: serchedData, appendInfo: appendData});
     } catch (error) {
       if ((error as { status: number }).status === 400) {

@@ -67,12 +67,8 @@ export class MemoryDBService {
     return getRandomElementsFromArray(liveSession, count);
   }
 
-  getBroadcastInfo<T>(size: number, dtoTransformer: (info: MemoryDbDto) => T, checker: (item: MemoryDbDto) => boolean, appender: number = 0) {
-    const findSession = this.db.filter(item => checker(item)).sort((a: MemoryDbDto, b: MemoryDbDto) => {
-      const aDate = a.endDate ? a.endDate.getTime() : 0;
-      const bDate = b.endDate ? b.endDate.getTime() : 0;
-      return aDate - bDate;
-    });
+  getBroadcastInfo<T>(size: number, dtoTransformer: (info: MemoryDbDto) => T, checker: (item: MemoryDbDto) => boolean, compare: (a: MemoryDbDto, b: MemoryDbDto) => number, appender: number = 0) {
+    const findSession = this.db.filter(item => checker(item)).sort((a: MemoryDbDto, b: MemoryDbDto) => compare(a, b));
     if (findSession.length < size) {
       const findSessionRev = findSession.reverse().map((info) => dtoTransformer(info));
       return [[...findSessionRev], []];

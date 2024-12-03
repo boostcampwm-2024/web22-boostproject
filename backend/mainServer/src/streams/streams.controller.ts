@@ -37,7 +37,12 @@ export class StreamsController {
   async getLatestSession(@Res() res: Response) {
     try {
       const streamChecker = (item: MemoryDbDto) => item.state;
-      const [serchedData, appendData] = this.memoryDBService.getBroadcastInfo<LiveSessionResponseDto>(8, fromLiveSessionDto, streamChecker, 8);
+      const compare = (a: MemoryDbDto, b: MemoryDbDto) => {
+        const aTime = a.startDate ? a.startDate.getTime() : 0;
+        const bTime = b.startDate ? b.startDate.getTime() : 0;
+        return aTime - bTime;
+      };
+      const [serchedData, appendData] = this.memoryDBService.getBroadcastInfo<LiveSessionResponseDto>(8, fromLiveSessionDto, streamChecker, compare, 8);
       res.status(HttpStatus.OK).json({info: serchedData, appendInfo: appendData});
     } catch (error) {
       if ((error as { status: number }).status === 400) {

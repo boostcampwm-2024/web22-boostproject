@@ -103,6 +103,14 @@ export class MemoryDBService {
     return true;
   }
 
+  updateById(id: number, updatedItem: Partial<MemoryDbDto>): boolean {
+    const index = this.db.findIndex(item => Number(item.id) === Number(id));
+    if (index === -1) return false;
+    console.log(this.db[index]);
+    this.db[index] = new MemoryDbDto({ ...this.db[index], ...updatedItem });
+    return true;
+  }
+
   updateBySessionKey(sessionKey: string, updatedItem: Partial<MemoryDbDto>): boolean {
     const index = this.db.findIndex(item => item.sessionKey === sessionKey);
     if (index === -1) return false;

@@ -101,7 +101,7 @@ const ChatInputContainer = styled.div`
 
 const PopupWrapper = styled.div`
   position: absolute;
-  bottom: 60px;
+  bottom: 80px;
   left: 5%;
   right: 5%;
   z-index: 1000;

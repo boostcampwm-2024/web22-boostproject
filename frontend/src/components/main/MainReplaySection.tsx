@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import ReplayVideoCard from './ReplayVideoCard';
@@ -12,11 +12,31 @@ interface MainReplaySectionProps {
 
 const MainReplaySection = ({ title }: MainReplaySectionProps) => {
   const [textStatus, setTextStatus] = useState(VIDEO_VIEW.MORE_VIEW);
-
+  const [renderCount, setRenderCount] = useState(10);
   const { data: replayData } = useRecentReplay();
 
   const { info, appendInfo } = replayData;
-  const displayedData = [...info, ...appendInfo];
+  const allData = [...info, ...appendInfo];
+  const displayedData = allData.slice(0, renderCount);
+
+  useEffect(() => {
+    const updateRenderCount = () => {
+      const width = window.innerWidth;
+
+      if (width <= 1095) setRenderCount(4);
+      else if (width <= 1434) setRenderCount(6);
+      else if (width <= 1770) setRenderCount(8);
+      else setRenderCount(10);
+    };
+
+    updateRenderCount();
+
+    window.addEventListener('resize', updateRenderCount);
+
+    return () => {
+      window.removeEventListener('resize', updateRenderCount);
+    };
+  }, []);
 
   const handleTextChange = () => {
     setTextStatus(textStatus === VIDEO_VIEW.MORE_VIEW ? VIDEO_VIEW.FOLD : VIDEO_VIEW.MORE_VIEW);
@@ -52,6 +72,7 @@ const MainSectionHeader = styled.div`
   justify-content: space-between;
   align-items: end;
   margin-bottom: 25px;
+
   .live_section_title {
     ${({ theme }) => theme.tokenTypographys['display-bold20']}
     color: ${({ theme }) => theme.tokenColors['color-white']};
@@ -66,22 +87,8 @@ const MainSectionContentList = styled.div<{ $textStatus: string }>`
 
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   overflow: ${({ $textStatus }) => ($textStatus === VIDEO_VIEW.MORE_VIEW ? 'hidden' : 'visible')};
-  max-height: ${({ $textStatus }) =>
-    $textStatus === VIDEO_VIEW.MORE_VIEW ? 'calc(2 * (320px + 30px) - 30px)' : 'none'};
 
   > div {
     max-width: 100%;
-  }
-
-  @media (max-width: 1700px) {
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    max-height: ${({ $textStatus }) =>
-    $textStatus === VIDEO_VIEW.MORE_VIEW ? 'calc(2 * (320px + 30px) - 30px)' : 'none'};
-  }
-
-  @media (max-width: 1500px) {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    max-height: ${({ $textStatus }) =>
-    $textStatus === VIDEO_VIEW.MORE_VIEW ? 'calc(2 * (300px + 30px) - 30px)' : 'none'};
   }
 `;

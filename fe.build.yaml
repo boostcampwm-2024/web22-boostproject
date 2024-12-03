@@ -3,7 +3,7 @@ version: '3.8'
 
 services:
   nginx:
-    build: s
+    build:
       context: nginx
       dockerfile: dockerfile
     image: liboost/nginx:latest

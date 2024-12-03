@@ -68,7 +68,7 @@ export class MemoryDBService {
   }
 
   getBroadcastInfo<T>(size: number, dtoTransformer: (info: MemoryDbDto) => T, checker: (item: MemoryDbDto) => boolean, appender: number = 0) {
-    const findSession = this.db.filter(item => checker(item));
+    const findSession = this.db.filter(item => checker(item)).sort((a: MemoryDbDto, b: MemoryDbDto) => a.endDate.getTime() - b.endDate.getTime());
     if (findSession.length < size) {
       const findSessionRev = findSession.reverse().map((info) => dtoTransformer(info));
       return [[...findSessionRev], []];

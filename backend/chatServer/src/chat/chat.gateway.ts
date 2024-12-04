@@ -47,7 +47,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   async handleConnection(client: Socket) {
     console.log(`Client connected: ${client.id}`);
-    const user = await this.roomService.createUser(client.id);
+    const user = await this.roomService.createUser(client);
     console.log(user);
 
     /*
@@ -102,7 +102,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const user = await this.roomService.getUserByClientId(client.id);
     const normalOutgoingMessage: Omit<NormalOutgoingMessageDto, 'owner'> = {
       roomId,
-      ...user,
+      nickname: user.nickname,
+      color: user.color,
+      entryTime: user.entryTime,
       msg,
       msgTime: new Date().toISOString(),
       msgType: 'normal',
@@ -131,7 +133,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const user = await this.roomService.getUserByClientId(client.id);
     const questionWithoutId: Omit<QuestionDto, 'questionId'> = {
       roomId,
-      ...user,
+      nickname: user.nickname,
+      color: user.color,
+      entryTime: user.entryTime,
       msg,
       msgTime: new Date().toISOString(),
       msgType: 'question',
@@ -161,7 +165,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const user = await this.roomService.getUserByClientId(client.id);
     const noticeOutgoingMessage: NoticeOutgoingMessageDto = {
       roomId,
-      ...user,
+      nickname: user.nickname,
+      color: user.color,
+      entryTime: user.entryTime,
       msg,
       msgTime: new Date().toISOString(),
       msgType: 'notice'
@@ -173,12 +179,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage(CHATTING_SOCKET_DEFAULT_EVENT.BAN_USER)
   async handleBanUserMessage(@ConnectedSocket() client: Socket, @MessageBody() payload: BanUserIncomingMessageDto) {
     const { roomId, socketId } = payload;
-    const banUser = this.server.sockets.sockets.get(socketId);
-    const address = banUser?.handshake.address.replaceAll('::ffff:', '');
-
-    if(!address) throw new ChatException(CHATTING_SOCKET_ERROR.INVALID_USER, roomId);
-
-    const userAgent = banUser?.handshake.headers['user-agent'];
+    const banUser = await this.roomService.getUserByClientId(socketId);
+    console.log('banUSer = ', banUser);
+    if(!banUser) throw new ChatException(CHATTING_SOCKET_ERROR.INVALID_USER, roomId);
+    const { address, userAgent } = banUser;
     if(!userAgent) throw new ChatException(CHATTING_SOCKET_ERROR.INVALID_USER, roomId);
 
     await this.roomService.addUserToBlacklist(roomId, address, userAgent);

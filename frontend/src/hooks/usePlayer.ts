@@ -1,81 +1,72 @@
-import Hls, {
-  Loader,
-  LoaderCallbacks,
-  LoaderConfiguration,
-  LoaderContext,
-  LoaderResponse,
-  LoaderStats,
-  HlsConfig
-} from 'hls.js';
+import Hls, { Loader, LoaderCallbacks, LoaderConfiguration, LoaderContext, HlsConfig } from 'hls.js';
 import { useEffect, useRef } from 'react';
 
 class CustomLoader implements Loader<LoaderContext> {
   private loader: Loader<LoaderContext>;
+  private retryCount: number = 0;
+  private maxRetries: number = 6;
+  private retryDelay: number = 3000;
+  private DefaultLoader: new (config: HlsConfig) => Loader<LoaderContext>;
 
   constructor(config: HlsConfig) {
-    const DefaultLoader = Hls.DefaultConfig.loader as new (config: HlsConfig) => Loader<LoaderContext>;
-    this.loader = new DefaultLoader(config);
+    this.DefaultLoader = Hls.DefaultConfig.loader as new (config: HlsConfig) => Loader<LoaderContext>;
+    this.loader = new this.DefaultLoader(config);
+  }
+
+  private createNewLoader(): Loader<LoaderContext> {
+    return new this.DefaultLoader({
+      ...Hls.DefaultConfig,
+      enableWorker: true,
+      lowLatencyMode: true
+    });
+  }
+
+  private retryLoad(context: LoaderContext, config: LoaderConfiguration, callbacks: LoaderCallbacks<LoaderContext>) {
+    this.loader = this.createNewLoader();
+
+    setTimeout(() => {
+      const retryCallbacks: LoaderCallbacks<LoaderContext> = {
+        ...callbacks,
+        onError: (error, context, networkDetails, stats) => {
+          if (error.code === 404 && this.retryCount < this.maxRetries) {
+            this.retryCount++;
+            this.retryLoad(context, config, callbacks);
+          } else {
+            this.retryCount = 0;
+            if (callbacks.onError) {
+              callbacks.onError(error, context, networkDetails, stats);
+            }
+          }
+        }
+      };
+
+      this.loader.load(context, config, retryCallbacks);
+    }, this.retryDelay);
   }
 
   load(context: LoaderContext, config: LoaderConfiguration, callbacks: LoaderCallbacks<LoaderContext>) {
-    const { onSuccess, onError, onTimeout, onAbort, onProgress } = callbacks;
-
-    const newCallbacks: LoaderCallbacks<LoaderContext> = {
-      onSuccess: (response: LoaderResponse, stats: LoaderStats, context: LoaderContext, networkDetails: any = null) => {
-        onSuccess(response, stats, context, networkDetails);
+    const modifiedCallbacks: LoaderCallbacks<LoaderContext> = {
+      ...callbacks,
+      onSuccess: (response, stats, context, networkDetails) => {
+        this.retryCount = 0;
+        if (callbacks.onSuccess) {
+          callbacks.onSuccess(response, stats, context, networkDetails);
+        }
       },
-      onError: (
-        error: { code: number; text: string },
-        context: LoaderContext,
-        networkDetails: any = null,
-        stats: LoaderStats
-      ) => {
-        if (error.code === 404) {
-          const emptyData = new ArrayBuffer(0);
-          onSuccess(
-            {
-              url: context.url,
-              data: emptyData
-            },
-            {
-              trequest: performance.now(),
-              tfirst: performance.now(),
-              tload: performance.now(),
-              loaded: 0,
-              total: 0
-            } as unknown as LoaderStats,
-            context,
-            networkDetails
-          );
+      onError: (error, context, networkDetails, stats) => {
+        if (error.code === 404 && this.retryCount < this.maxRetries) {
+          this.retryCount++;
+          this.retryLoad(context, config, callbacks);
         } else {
-          if (onError) {
-            onError(error, context, networkDetails, stats);
+          this.retryCount = 0;
+          if (callbacks.onError) {
+            callbacks.onError(error, context, networkDetails, stats);
           }
-        }
-      },
-      onTimeout: (stats: LoaderStats, context: LoaderContext, networkDetails: any = null) => {
-        if (onTimeout) {
-          onTimeout(stats, context, networkDetails);
-        }
-      },
-      onAbort: (stats: LoaderStats, context: LoaderContext, networkDetails: any = null) => {
-        if (onAbort) {
-          onAbort(stats, context, networkDetails);
-        }
-      },
-      onProgress: (
-        stats: LoaderStats,
-        context: LoaderContext,
-        data: string | ArrayBuffer,
-        networkDetails: any = null
-      ) => {
-        if (onProgress) {
-          onProgress(stats, context, data, networkDetails);
         }
       }
     };
 
-    this.loader.load(context, config, newCallbacks);
+    this.loader.load(context, config, modifiedCallbacks);
   }
 
   abort() {
@@ -122,6 +113,22 @@ export default function usePlayer(url: string) {
 
     hls.on(Hls.Events.MANIFEST_PARSED, () => {
       videoElement.play();
+    });
+
+    hls.on(Hls.Events.ERROR, (event, data) => {
+      if (data.fatal) {
+        switch (data.type) {
+          case Hls.ErrorTypes.NETWORK_ERROR:
+            hls.startLoad();
+            break;
+          case Hls.ErrorTypes.MEDIA_ERROR:
+            hls.recoverMediaError();
+            break;
+          default:
+            hls.destroy();
+            break;
+        }
+      }
     });
 
     return () => {

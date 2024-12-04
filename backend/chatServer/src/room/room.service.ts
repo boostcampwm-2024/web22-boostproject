@@ -11,6 +11,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { ChatException, CHATTING_SOCKET_ERROR } from '../chat/chat.error';
+import { Socket } from 'socket.io';
 
 // 현재 파일의 URL을 파일 경로로 변환
 const __filename = fileURLToPath(import.meta.url);
@@ -24,8 +25,10 @@ function createRandomNickname(){
   return `${getRandomAdjective()} ${getRandomNoun()}`;
 }
 
-function createRandomUserInstance(): User {
+function createRandomUserInstance(address: string, userAgent: string): User {
   return {
+    address,
+    userAgent,
     nickname: createRandomNickname(),
     color: getRandomBrightColor(),
     entryTime: new Date().toISOString()
@@ -139,10 +142,17 @@ export class RoomService implements OnModuleInit, OnModuleDestroy {
   }
 
   // 유저 생성
-  async createUser(clientId: string) {
-    const newUser = createRandomUserInstance();
+  async createUser(socket: Socket) {
+    const clientId = socket.id;
+    const address = socket.handshake.address.replaceAll('::ffff:', '');
+    const userAgent = socket.handshake.headers['user-agent'];
+
+    if(!address || !userAgent) throw new ChatException(CHATTING_SOCKET_ERROR.INVALID_USER);
+
+    const newUser = createRandomUserInstance(address, userAgent);
     const isCreatedDone = await this.redisRepository.createUser(clientId, newUser);
     if(!isCreatedDone) throw new ChatException(CHATTING_SOCKET_ERROR.INVALID_USER);
+    console.log(newUser);
     return newUser;
   }
 

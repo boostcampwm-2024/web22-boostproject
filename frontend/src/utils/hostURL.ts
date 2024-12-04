@@ -1,8 +1,7 @@
-import { BASE_URL, RTMP_HTTP_PORT } from '@apis/index';
-import { getStreamKey } from './streamKey';
+import { getSessionKey } from './streamKey';
 
 export function getHostURL() {
-  const streamKey = getStreamKey();
+  const sessionKey = getSessionKey();
 
-  return `${BASE_URL}:${RTMP_HTTP_PORT}/live/${streamKey}/index.m3u8`;
+  return `https://kr.object.ncloudstorage.com/web22/live/${sessionKey}/index.m3u8`;
 }

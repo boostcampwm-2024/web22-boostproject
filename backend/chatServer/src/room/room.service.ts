@@ -36,7 +36,6 @@ function createRandomUserInstance(): User {
 export class RoomService implements OnModuleInit, OnModuleDestroy {
   redisAdapter: ReturnType<typeof createAdapter>;
   redisClient: Cluster;
-  users: Map<string, User> = new Map();
 
   constructor(private redisRepository: RoomRepository) {
     this.redisClient = new Redis.Cluster(REDIS_CONFIG);
@@ -142,22 +141,19 @@ export class RoomService implements OnModuleInit, OnModuleDestroy {
   // 유저 생성
   async createUser(clientId: string) {
     const newUser = createRandomUserInstance();
-    this.users.set(clientId, newUser);
+    const isCreatedDone = await this.redisRepository.createUser(clientId, newUser);
+    if(!isCreatedDone) throw new ChatException(CHATTING_SOCKET_ERROR.INVALID_USER);
     return newUser;
   }
 
   // 유저 삭제
   async deleteUser(clientId: string) {
-    const user = this.users.get(clientId);
-    if (!user) throw new ChatException(CHATTING_SOCKET_ERROR.INVALID_USER);
-    this.users.delete(clientId);
-    return user;
+    return await this.redisRepository.deleteUser(clientId);
   }
 
   // 특정 유저 조회
   async getUserByClientId(clientId: string) {
-    const user = this.users.get(clientId);
-    if (!user) throw new ChatException(CHATTING_SOCKET_ERROR.INVALID_USER);
+    const user = this.redisRepository.getUser(clientId);
     return user;
   }
 

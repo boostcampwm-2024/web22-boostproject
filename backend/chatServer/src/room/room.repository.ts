@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Cluster } from 'ioredis';
 import { QuestionDto } from '../event/dto/Question.dto';
 import { ChatException, CHATTING_SOCKET_ERROR } from '../chat/chat.error';
+import { User } from './user.interface';
 
 type USER_AGENT = string;
 
@@ -12,9 +13,14 @@ export class RoomRepository {
   questionPrefix = 'question';
   questionIdPrefix = 'id';
   blacklistPrefix = 'blacklist';
+  userPrefix = 'user';
 
   injectClient(redisClient: Cluster){
     this.redisClient = redisClient;
+  }
+
+  private getUserStringWithPrefix(clientId: string){
+    return `${this.userPrefix}:${clientId}`;
   }
 
   private getRoomStringWithPrefix(roomId: string) {
@@ -68,6 +74,20 @@ export class RoomRepository {
     } catch {
       return result as T;
     }
+  }
+
+  async createUser(clientId: string, user: User){
+    return !! await this.redisClient.set(this.getUserStringWithPrefix(clientId), JSON.stringify(user));
+  }
+
+  async getUser(clientId: string) {
+    const user = await this.getData<User>(this.getUserStringWithPrefix(clientId));
+    if(!user) throw new ChatException(CHATTING_SOCKET_ERROR.INVALID_USER);
+    return user;
+  }
+
+  async deleteUser(clientId: string){
+    return !! await this.redisClient.del(this.getUserStringWithPrefix(clientId));
   }
 
   async isRoomExisted(roomId: string) {

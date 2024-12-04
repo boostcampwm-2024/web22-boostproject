@@ -30,7 +30,11 @@ import {
 import { QuestionDto } from '../event/dto/Question.dto';
 import { ChatException, CHATTING_SOCKET_ERROR } from './chat.error';
 
-@WebSocketGateway({ cors: true })
+@WebSocketGateway({
+  cors: true,
+  pingInterval: 30000,
+  pingTimeout: 10000,
+})
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   constructor(private roomService: RoomService) {};
 

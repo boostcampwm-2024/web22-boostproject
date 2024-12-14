@@ -1,4 +1,4 @@
-import { User } from './user.interface';
+import { User } from '../user/user.interface';
 
 interface Room {
   hostId: string;

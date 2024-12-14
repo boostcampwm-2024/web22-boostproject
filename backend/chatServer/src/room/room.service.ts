@@ -1,8 +1,6 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { Cluster, Redis } from 'ioredis';
 import { createAdapter } from '@socket.io/redis-adapter';
-import { User } from './user.interface';
-import { getRandomAdjective, getRandomBrightColor, getRandomNoun } from '../utils/random';
 import { RoomRepository } from './room.repository';
 import { QuestionDto } from '../event/dto/Question.dto';
 
@@ -12,6 +10,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { ChatException, CHATTING_SOCKET_ERROR } from '../chat/chat.error';
 import { Socket } from 'socket.io';
+import { UserFactory } from '../user/user.factory';
 
 // 현재 파일의 URL을 파일 경로로 변환
 const __filename = fileURLToPath(import.meta.url);
@@ -21,26 +20,12 @@ const __dirname = dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 const REDIS_CONFIG = JSON.parse(process.env.REDIS_CONFIG!);
 
-function createRandomNickname(){
-  return `${getRandomAdjective()} ${getRandomNoun()}`;
-}
-
-function createRandomUserInstance(address: string, userAgent: string): User {
-  return {
-    address,
-    userAgent,
-    nickname: createRandomNickname(),
-    color: getRandomBrightColor(),
-    entryTime: new Date().toISOString()
-  };
-}
-
 @Injectable()
 export class RoomService implements OnModuleInit, OnModuleDestroy {
   redisAdapter: ReturnType<typeof createAdapter>;
   redisClient: Cluster;
 
-  constructor(private redisRepository: RoomRepository) {
+  constructor(private redisRepository: RoomRepository, private userFactory: UserFactory) {
     this.redisClient = new Redis.Cluster(REDIS_CONFIG);
     this.redisAdapter = createAdapter(this.redisClient, this.redisClient);
   }
@@ -149,7 +134,7 @@ export class RoomService implements OnModuleInit, OnModuleDestroy {
 
     if(!address || !userAgent) throw new ChatException(CHATTING_SOCKET_ERROR.INVALID_USER);
 
-    const newUser = createRandomUserInstance(address, userAgent);
+    const newUser = this.userFactory.createUserInstance(address, userAgent);
     const isCreatedDone = await this.redisRepository.createUser(clientId, newUser);
     if(!isCreatedDone) throw new ChatException(CHATTING_SOCKET_ERROR.INVALID_USER);
     console.log(newUser);

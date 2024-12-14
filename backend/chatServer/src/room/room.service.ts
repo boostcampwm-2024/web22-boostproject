@@ -127,7 +127,7 @@ export class RoomService implements OnModuleInit, OnModuleDestroy {
   }
 
   // 유저 생성
-  async createUser(socket: Socket) {
+  async addUser(socket: Socket) {
     const clientId = socket.id;
     const address = socket.handshake.address.replaceAll('::ffff:', '');
     const userAgent = socket.handshake.headers['user-agent'];

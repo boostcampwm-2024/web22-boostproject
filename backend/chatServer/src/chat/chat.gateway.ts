@@ -51,7 +51,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   async handleConnection(client: Socket) {
     console.log(`Client connected: ${client.id}`);
-    const user = await this.roomService.createUser(client);
+    const user = await this.roomService.addUser(client);
     console.log(user);
 
     /*

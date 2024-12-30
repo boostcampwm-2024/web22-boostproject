@@ -21,3 +21,11 @@ export type RecentReplayResponse = {
   info: ReplayStream[];
   appendInfo: ReplayStream[];
 };
+
+export type ClientReplayResponse = {
+  info: ReplayStream;
+};
+
+export type ReplayExistenceResponse = {
+  existed: boolean;
+};

@@ -3,9 +3,9 @@ import SpeechBubbleIcon from '@assets/icons/speech-bubble.svg';
 import QuestionIcon from '@assets/icons/question.svg';
 import SpeakerIcon from '@assets/icons/speaker.svg';
 import SendIcon from '@assets/icons/send.svg';
-import { useRef, useEffect, useState, ChangeEvent, KeyboardEvent, memo } from 'react';
+import { useRef, useEffect, useState, KeyboardEvent, memo } from 'react';
 import { CHATTING_SOCKET_SEND_EVENT, CHATTING_TYPES } from '@constants/chat';
-import { ChattingTypes } from '@type/chat';
+import { ChattingSendTypes } from '@type/chat';
 import { getStoredId } from '@utils/id';
 import { UserType } from '@type/user';
 
@@ -17,11 +17,10 @@ interface ChatInputProps {
 
 const INITIAL_TEXTAREA_HEIGHT = 20;
 
-export const ChatInput = ({ worker, userType, roomId }: ChatInputProps) => {
+const ChatInput = ({ worker, userType, roomId }: ChatInputProps) => {
   const [hasInput, setHasInput] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
-  const [msgType, setMsgType] = useState<ChattingTypes>(CHATTING_TYPES.NORMAL);
-  const [message, setMessage] = useState('');
+  const [msgType, setMsgType] = useState<ChattingSendTypes>(CHATTING_TYPES.NORMAL);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const userId = getStoredId();
@@ -38,8 +37,9 @@ export const ChatInput = ({ worker, userType, roomId }: ChatInputProps) => {
   };
 
   const handleMessageSend = () => {
-    if (!worker || !message.trim()) return;
+    if (!worker || !textareaRef.current || !textareaRef.current.value.trim()) return;
 
+    const message = textareaRef.current.value.trim();
     const eventMap = {
       [CHATTING_TYPES.NORMAL]: CHATTING_SOCKET_SEND_EVENT.NORMAL,
       [CHATTING_TYPES.QUESTION]: CHATTING_SOCKET_SEND_EVENT.QUESTION,
@@ -58,19 +58,21 @@ export const ChatInput = ({ worker, userType, roomId }: ChatInputProps) => {
     });
 
     resetTextareaHeight();
-    setMessage('');
+    textareaRef.current.value = '';
     setHasInput(false);
   };
 
-  const handleInputChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    const inputValue = e.target.value;
+  const handleInputChange = () => {
+    if (!textareaRef.current) return;
 
-    if (inputValue.length > 150) {
+    const value = textareaRef.current.value;
+
+    if (value.length > 150) {
+      textareaRef.current.value = value.slice(0, 150);
       return;
     }
 
-    setMessage(e.target.value);
-    setHasInput(e.target.value.length > 0);
+    setHasInput(value.length > 0);
   };
 
   const resetTextareaHeight = () => {
@@ -146,11 +148,10 @@ export const ChatInput = ({ worker, userType, roomId }: ChatInputProps) => {
 
       <ChatInputArea
         ref={textareaRef}
-        value={message}
-        onChange={handleInputChange}
         placeholder={`${
           msgType === CHATTING_TYPES.NORMAL ? '채팅을' : msgType === CHATTING_TYPES.QUESTION ? '질문을' : '공지를'
         } 입력해주세요`}
+        onInput={handleInputChange}
         onBlur={handleBlur}
         onFocus={handleFocus}
         onKeyDown={handleKeyDown}
@@ -185,6 +186,7 @@ const ChatInputWrapper = styled.div<{ $hasInput: boolean; $isFocused: boolean }>
 const ChatInputArea = styled.textarea`
   width: 100%;
   min-height: 20px;
+  max-height: 40px;
   scrollbar-width: none;
   resize: none;
   border: none;
@@ -193,7 +195,7 @@ const ChatInputArea = styled.textarea`
   ${({ theme }) => theme.tokenTypographys['display-medium16']};
   background-color: transparent;
   white-space: normal;
-  line-height: 20px;
+  line-height: 23px;
 `;
 
 const InputBtn = styled.button`

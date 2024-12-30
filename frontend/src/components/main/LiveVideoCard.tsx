@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 
 import sampleProfile from '@assets/sample_profile.png';
@@ -7,7 +6,7 @@ import ShowInfoBadge from '@common/ShowInfoBadge';
 import { ASSETS } from '@constants/assets';
 import { RecentLive } from '@type/live';
 import { LiveBadge, LiveViewCountBadge } from './ThumbnailBadge';
-import usePlayer from '@hooks/usePlayer';
+import { useVideoPreview } from '@hooks/useVideoPreview';
 
 interface LiveVideoCardProps {
   videoData: RecentLive;
@@ -15,72 +14,33 @@ interface LiveVideoCardProps {
 
 const LiveVideoCard = ({ videoData }: LiveVideoCardProps) => {
   const navigate = useNavigate();
-  const [isHovered, setIsHovered] = useState(false);
-  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const thumbnailRef = useRef<HTMLDivElement>(null);
 
-  const { concurrentUserCount, category, channel, tags, defaultThumbnailImageUrl, liveId, liveImageUrl, liveTitle, streamUrl } =
-    videoData;
+  const {
+    concurrentUserCount,
+    category,
+    channel,
+    tags,
+    defaultThumbnailImageUrl,
+    liveId,
+    liveImageUrl,
+    liveTitle,
+    streamUrl
+  } = videoData;
 
-  const videoRef = usePlayer(streamUrl);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const resetVideo = () => {
-      video.pause();
-      video.currentTime = 0;
-    };
-
-    const playVideo = () => {
-      video.currentTime = 0;
-      video.play();
-    };
-
-    const clearHoverTimeout = () => {
-      if (hoverTimeoutRef.current) {
-        clearTimeout(hoverTimeoutRef.current);
-        hoverTimeoutRef.current = null;
-      }
-    };
-
-    if (isHovered) {
-      hoverTimeoutRef.current = setTimeout(playVideo, 500);
-      return;
-    }
-    
-    clearHoverTimeout();
-    resetVideo();
-
-    return clearHoverTimeout;
-  }, [isHovered]);
+  const { isHovered, isVideoLoaded, videoRef, handleMouseEnter, handleMouseLeave } = useVideoPreview(streamUrl);
 
   const handleLiveClick = () => {
     navigate(`/live/${liveId}`);
   };
 
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-  };
-
   return (
     <VideoCardContainer>
-      <ThumbnailContainer
-        ref={thumbnailRef}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        onClick={handleLiveClick}
-      >
-        <VideoBox $isVisible={isHovered}>
-          <video ref={videoRef} muted playsInline />
+      <ThumbnailContainer onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} onClick={handleLiveClick}>
+        <VideoBox $isVisible={isHovered && isVideoLoaded}>
+          <video ref={videoRef} muted playsInline preload="none" />
         </VideoBox>
-        <VideoCardThumbnail $isVideoVisible={isHovered}>
-          <VideoCardImage src={defaultThumbnailImageUrl ?? liveImageUrl} />
+        <VideoCardThumbnail $isVideoVisible={isHovered && isVideoLoaded}>
+          <VideoCardImage src={liveImageUrl ?? defaultThumbnailImageUrl} />
         </VideoCardThumbnail>
         <VideoCardDescription>
           <LiveBadge />
@@ -132,7 +92,7 @@ const VideoBox = styled.div<{ $isVisible: boolean }>`
   width: 100%;
   height: 100%;
   opacity: ${(props) => (props.$isVisible ? 1 : 0)};
-  transition: opacity 0.3s ease-in-out;
+  transition: opacity 0.3s ease-in-out 0.6s;
   z-index: 1;
 
   video {
@@ -203,6 +163,7 @@ const VideoCardArea = styled.div`
     ${({ theme }) => theme.tokenTypographys['display-bold16']}
     color: ${({ theme }) => theme.tokenColors['text-strong']};
     margin-bottom: 8px;
+    cursor: pointer;
   }
   .video_card_name {
     ${({ theme }) => theme.tokenTypographys['display-medium14']}

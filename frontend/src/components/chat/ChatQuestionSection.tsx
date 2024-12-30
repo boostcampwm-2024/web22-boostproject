@@ -1,10 +1,11 @@
 import { memo, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import QuestionCard from './QuestionCard';
-import { MessageReceiveData, MessageSendData } from '@type/chat';
+import { MessageReceiveData, MessageSendData, UserInfoData } from '@type/chat';
 import { CHATTING_SOCKET_SEND_EVENT } from '@constants/chat';
 import { getStoredId } from '@utils/id';
 import { UserType } from '@type/user';
+import { useChat } from '@contexts/chatContext';
 
 export interface ChatQuestionSectionProps {
   questions: MessageReceiveData[];
@@ -38,6 +39,18 @@ const ChatQuestionSection = ({ questions, worker, userType, roomId }: ChatQuesti
     [worker, roomId, userId]
   );
 
+  const { dispatch } = useChat();
+
+  const onNicknameClick = useCallback(
+    (data: UserInfoData) => {
+      dispatch({
+        type: 'SET_SELECTED_USER',
+        payload: data
+      });
+    },
+    [dispatch]
+  );
+
   return (
     <SectionWrapper>
       <SectionContainer>
@@ -51,18 +64,32 @@ const ChatQuestionSection = ({ questions, worker, userType, roomId }: ChatQuesti
               question={questions[0]}
               handleQuestionDone={handleQuestionDone}
               ellipsis={!expanded}
+              onNicknameClick={() =>
+                onNicknameClick({
+                  nickname: questions[0].nickname,
+                  socketId: questions[0].socketId,
+                  entryTime: questions[0].entryTime,
+                  owner: questions[0].owner
+                })
+              }
             />
             {expanded &&
-              questions
-                .slice(1)
-                .map((question) => (
-                  <QuestionCard
-                    key={question.questionId}
-                    type={userType}
-                    question={question}
-                    handleQuestionDone={handleQuestionDone}
-                  />
-                ))}
+              questions.slice(1).map((question) => (
+                <QuestionCard
+                  key={question.questionId}
+                  type={userType}
+                  question={question}
+                  handleQuestionDone={handleQuestionDone}
+                  onNicknameClick={() =>
+                    onNicknameClick({
+                      nickname: question.nickname,
+                      socketId: question.socketId,
+                      entryTime: question.entryTime,
+                      owner: question.owner
+                    })
+                  }
+                />
+              ))}
             <SwipeBtn onClick={toggleSection} />
           </>
         )}

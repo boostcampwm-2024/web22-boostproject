@@ -1,58 +1,79 @@
 import styled from 'styled-components';
 import QuestionCard from './QuestionCard';
-import { memo, useContext, useEffect, useRef, useState } from 'react';
-import { MessageReceiveData } from '@type/chat';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { UserInfoData, MessageReceiveData } from '@type/chat';
 import { CHATTING_TYPES } from '@constants/chat';
-import { ChatContext } from 'src/contexts/chatContext';
-import NoticeCard from './NoticeCard';
 import ChatAutoScroll from './ChatAutoScroll';
 import HostIconGreen from '@assets/icons/host_icon_green.svg';
+import { useChat } from '@contexts/chatContext';
 
 export interface ChatListProps {
   messages: MessageReceiveData[];
 }
 
-const ChatItemWrapper = memo(({ chat }: { chat: MessageReceiveData }) => {
-  if (chat.msgType === CHATTING_TYPES.QUESTION) {
-    return (
-      <ChatItem>
-        <QuestionCard type="client" question={chat} />
-      </ChatItem>
-    );
-  } else if (chat.msgType === CHATTING_TYPES.NOTICE) {
-    return (
-      <ChatItem>
-        <NoticeChat>
-          <span>📢</span>
-          <span>{chat.msg}</span>
-        </NoticeChat>
-      </ChatItem>
-    );
-  } else {
-    return (
-      <ChatItem>
-        <NormalChat $isHost={chat.owner === 'host'} $pointColor={chat.owner === 'host' ? '#0ADD91' : chat.color}>
-          {chat.owner === 'me' ? (
-            <span className="text_point">🧀</span>
-          ) : chat.owner === 'host' ? (
-            <StyledIcon as={HostIconGreen} />
-          ) : null}
-          <span className="text_point">{chat.nickname}</span>
-          <span className="chat_message">{chat.msg}</span>
-        </NormalChat>
-      </ChatItem>
-    );
+const ChatItemWrapper = memo(
+  ({ chat, onNicknameClick }: { chat: MessageReceiveData; onNicknameClick: (data: UserInfoData) => void }) => {
+    const { nickname, socketId, entryTime, owner } = chat;
+    const handleNicknameClick = () => onNicknameClick({ nickname, socketId, entryTime, owner });
+    if (chat.msgType === CHATTING_TYPES.QUESTION) {
+      return (
+        <ChatItem>
+          <QuestionCard type="client" question={chat} onNicknameClick={handleNicknameClick} />
+        </ChatItem>
+      );
+    } else if (chat.msgType === CHATTING_TYPES.NOTICE) {
+      return (
+        <ChatItem>
+          <NoticeChat>
+            <span>📢</span>
+            <span>{chat.msg}</span>
+          </NoticeChat>
+        </ChatItem>
+      );
+    } else if (chat.msgType === CHATTING_TYPES.EXCEPTION) {
+      return (
+        <ChatItem>
+          <NoticeChat>
+            <span>🚨</span>
+            <span>{chat.msg}</span>
+          </NoticeChat>
+        </ChatItem>
+      );
+    } else {
+      return (
+        <ChatItem>
+          <NormalChat $isHost={chat.owner === 'host'} $pointColor={chat.owner === 'host' ? '#0ADD91' : chat.color}>
+            <span className="text_point user_name" onClick={handleNicknameClick}>
+              {chat.owner === 'me' ? '🧀 ' : chat.owner === 'host' ? <StyledIcon as={HostIconGreen} /> : null}
+              {chat.nickname}
+            </span>
+            <span className="chat_message">{chat.msg}</span>
+          </NormalChat>
+        </ChatItem>
+      );
+    }
   }
-});
+);
 
 ChatItemWrapper.displayName = 'ChatItemWrapper';
 
 const ChatList = ({ messages }: ChatListProps) => {
-  const { state } = useContext(ChatContext);
   const [isAtBottom, setIsAtBottom] = useState(true);
   const [currentChat, setCurrentChat] = useState<MessageReceiveData | null>(null);
 
   const chatListRef = useRef<HTMLDivElement | null>(null);
+
+  const { dispatch } = useChat();
+
+  const onNicknameClick = useCallback(
+    (data: UserInfoData) => {
+      dispatch({
+        type: 'SET_SELECTED_USER',
+        payload: data
+      });
+    },
+    [dispatch]
+  );
 
   const checkIfAtBottom = () => {
     if (!chatListRef.current) return;
@@ -83,15 +104,10 @@ const ChatList = ({ messages }: ChatListProps) => {
     <ChatListSection>
       <ChatListWrapper ref={chatListRef} onScroll={checkIfAtBottom}>
         {messages.map((chat, index) => (
-          <ChatItemWrapper chat={chat} key={index} />
+          <ChatItemWrapper chat={chat} key={index} onNicknameClick={onNicknameClick} />
         ))}
       </ChatListWrapper>
       <ChatAutoScroll currentChat={currentChat} isAtBottom={isAtBottom} scrollToBottom={scrollToBottom} />
-      {state.isNoticePopupOpen && (
-        <PopupWrapper>
-          <NoticeCard />
-        </PopupWrapper>
-      )}
     </ChatListSection>
   );
 };
@@ -99,24 +115,23 @@ const ChatList = ({ messages }: ChatListProps) => {
 export default ChatList;
 
 const ChatListSection = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  position: relative;
   height: 100%;
+  overflow-y: hidden;
 `;
 
 const ChatListWrapper = styled.div`
   box-sizing: border-box;
-  position: absolute;
   max-height: 100%;
   width: 100%;
   display: flex;
   flex-direction: column;
-  padding: 50px 20px 0 20px;
   overflow-y: auto;
+  padding: 50px 20px 0 20px;
   scrollbar-width: none;
-  z-index: 100;
 `;
 
 const ChatItem = styled.div`
@@ -144,6 +159,7 @@ const NormalChat = styled.div<{ $isHost: boolean; $pointColor: string }>`
     ${({ theme }) => theme.tokenTypographys['display-bold14']};
     color: ${({ $pointColor }) => $pointColor};
     margin-right: 8px;
+    cursor: pointer;
   }
 
   .chat_message {
@@ -151,16 +167,17 @@ const NormalChat = styled.div<{ $isHost: boolean; $pointColor: string }>`
     line-height: 1.5;
   }
 
+  .user_name {
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 5px;
+    &:hover {
+      background-color: #393939;
+    }
+  }
+
   overflow-wrap: break-word;
   word-break: break-word;
-`;
-
-const PopupWrapper = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 5%;
-  right: 5%;
-  z-index: 1000;
 `;
 
 const StyledIcon = styled.svg`

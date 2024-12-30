@@ -19,7 +19,6 @@ import {
 } from '../event/dto/IncomingMessage.dto';
 import { JoiningRoomDto } from '../event/dto/JoiningRoom.dto';
 import { RoomService } from '../room/room.service';
-import { createAdapter } from '@socket.io/redis-adapter';
 import { BlacklistGuard, HostGuard, MessageGuard } from './chat.guard';
 import { LeavingRoomDto } from '../event/dto/LeavingRoom.dto';
 import {
@@ -29,6 +28,7 @@ import {
 } from '../event/dto/OutgoingMessage.dto';
 import { QuestionDto } from '../event/dto/Question.dto';
 import { ChatException, CHATTING_SOCKET_ERROR } from './chat.error';
+import { RedisAdapterFactory } from '../redis/redis-adapter.factory';
 
 @WebSocketGateway({
   cors: true,
@@ -36,11 +36,13 @@ import { ChatException, CHATTING_SOCKET_ERROR } from './chat.error';
   pingTimeout: 10000,
 })
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private roomService: RoomService) {};
+  constructor(
+    private roomService: RoomService,
+    private adapterFactory: RedisAdapterFactory) {};
 
-  async afterInit() {
-    const { pubClient, subClient } = this.roomService.getPubSubClients();
-    const redisAdapter = createAdapter(pubClient, subClient);
+  afterInit() {
+    // const adapterConstructor = this.adapterFactory.createAdapter();
+    const redisAdapter = this.adapterFactory.createAdapter();
     this.server.adapter(redisAdapter);
     console.log('Redis adapter set');
   }
@@ -121,6 +123,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     } else {
       // 나를 제외한, 방에 있는 모든 사람에게는 owner : user 로 보내고
       console.log('people', this.server.sockets.adapter.rooms.get(roomId));
+
+      // TODO: redis-adapter + redis-cluster 특성 상,
+      //  redis 모든 노드에게 이벤트가 전파될 것이므로 이벤트를 두 번에 나누어서 보내는 것은 부하가 2배가 될 것 같다.
+
       client.emit(CHATTING_SOCKET_RECEIVE_EVENT.NORMAL, { ...normalOutgoingMessage, owner: 'me' });
       client.broadcast.to(roomId).emit(CHATTING_SOCKET_RECEIVE_EVENT.NORMAL, {
         ...normalOutgoingMessage,

@@ -33,6 +33,7 @@ export class LiveSessionResponseDto {
   liveTitle: string = '';
   liveImageUrl: string = '';
   defaultThumbnailImageUrl: string = '';
+  streamUrl: string = '';
   concurrentUserCount: number = 0;
   channel : ChannelDto = {
     channelId: '',
@@ -58,6 +59,7 @@ export function fromLiveSessionDto(memoryDbDto: MemoryDbDto): LiveSessionRespons
     tags,
     startDate,
     endDate,
+    streamUrl,
   } = memoryDbDto;
 
   return {
@@ -72,5 +74,6 @@ export function fromLiveSessionDto(memoryDbDto: MemoryDbDto): LiveSessionRespons
     tags,
     startDate,
     endDate,
+    streamUrl
   };
 }

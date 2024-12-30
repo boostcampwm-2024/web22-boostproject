@@ -1,8 +1,7 @@
-import { HttpStatus } from '@nestjs/common';
-
 const CHATTING_SOCKET_DEFAULT_EVENT = {
   JOIN_ROOM: 'join_room',
   LEAVE_ROOM: 'leave_room',
+  BAN_USER: 'ban_user',
 };
 
 const CHATTING_SOCKET_RECEIVE_EVENT = {
@@ -20,28 +19,4 @@ const CHATTING_SOCKET_SEND_EVENT = {
   NOTICE: 'send_notice'
 };
 
-const CHATTING_SOCKET_ERROR = {
-  ROOM_EMPTY : {
-    statusCode: HttpStatus.BAD_REQUEST,
-    message: '유저가 참여하고 있는 채팅방이 없습니다.'
-  },
-
-  ROOM_EXISTED: {
-    statusCode: HttpStatus.BAD_REQUEST,
-    message: '이미 존재하는 방입니다.'
-  },
-
-  INVALID_USER: {
-    statusCode: HttpStatus.UNAUTHORIZED,
-    message: '유효하지 않는 유저입니다.'
-  },
-
-  QUESTION_EMPTY: {
-    statusCode: HttpStatus.BAD_REQUEST,
-    message: '유효하지 않은 질문입니다.'
-  },
-
-
-};
-
-export { CHATTING_SOCKET_DEFAULT_EVENT, CHATTING_SOCKET_SEND_EVENT, CHATTING_SOCKET_RECEIVE_EVENT, CHATTING_SOCKET_ERROR};
+export { CHATTING_SOCKET_DEFAULT_EVENT, CHATTING_SOCKET_SEND_EVENT, CHATTING_SOCKET_RECEIVE_EVENT};

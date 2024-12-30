@@ -17,7 +17,12 @@ export class ReplayController {
   async getLatestReplay(@Res() res: Response) {
     try {
       const replayChecker = (item: MemoryDbDto) => { return item.replay && !item.state; };
-      const [serchedData, appendData] = this.memoryDBService.getBroadcastInfo<ReplayVideoDto>(8, memoryDbDtoToReplayVideoDto, replayChecker, 8);
+      const compare = (a: MemoryDbDto, b: MemoryDbDto) => {
+        const aTime = a.startDate ? a.startDate.getTime() : 0;
+        const bTime = b.startDate ? b.startDate.getTime() : 0;
+        return aTime - bTime;
+      };      
+      const [serchedData, appendData] = this.memoryDBService.getBroadcastInfo<ReplayVideoDto>(8, memoryDbDtoToReplayVideoDto, replayChecker, compare, 8);
       res.status(HttpStatus.OK).json({info: serchedData, appendInfo: appendData});
     } catch (error) {
       if ((error as { status: number }).status === 400) {
@@ -41,6 +46,8 @@ export class ReplayController {
       if (!sessionInfo || !sessionInfo.replay) {
         throw new HttpException('No Available Session', HttpStatus.BAD_REQUEST);
       }
+      sessionInfo.readCount = sessionInfo.readCount + 1;
+      this.memoryDBService.updateBySessionKey(sessionKey, sessionInfo);
       res.status(HttpStatus.OK).json({info : memoryDbDtoToReplayVideoDto(sessionInfo)});
     } catch (error) {
       if ((error as { status: number }).status === 400) {
@@ -56,4 +63,20 @@ export class ReplayController {
     }
   }
 
+  @Get('/existence')
+  @ApiOperation({summary: 'Get replay exited', description: '다시보기에 대한 존재 여부를 반환 받습니다.'})
+  async getExistence(@Query('videoId') videoId: string, @Res() res: Response) {
+    try {
+      const replaySessions = this.memoryDBService.findAll().filter((info) => info.replay);
+      if (replaySessions.some((info) => info.sessionKey === videoId)) {
+        res.status(HttpStatus.OK).json({existed: true}); 
+      }
+      else {
+        res.status(HttpStatus.OK).json({existed: false});
+      }
+    } catch (err) {
+      console.log(err);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send();
+    }
+  }
 }

@@ -6,8 +6,9 @@ import { ApiCreatedResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/
 import { MemoryDBService } from '../memory-db/memory-db.service.js';
 import { memoryDbDtoFromLiveVideoRequestDto } from '../dto/memoryDbDto.js';
 import { LiveVideoRequestDto } from '../dto/liveSessionDto.js';
-import { DEFAULT_VALUE, REPLAY_VIDEO_LATENCY } from '../common/constants.js';
-import { calculateSecondsBetweenDates, generatePlaylist } from '../common/util.js';
+import { DEFAULT_VALUE } from '../common/constants.js';
+import { generatePlaylist } from '../common/util.js';
+import { getLastSegment } from '../common/crawler.js';
 
 @Controller('host')
 @ApiTags('Host API')
@@ -32,6 +33,8 @@ export class HostController {
       sessionInfo.state = true;
       sessionInfo.replay = false;
       sessionInfo.startDate = new Date();
+      sessionInfo.streamUrl = `https://kr.object.ncloudstorage.com/web22/live/${sessionInfo.sessionKey}/index.m3u8`;
+      sessionInfo.liveImageUrl = `https://kr.object.ncloudstorage.com/web22/live/${sessionInfo.sessionKey}/thumbnail.png`;
       this.memoryDBService.updateBySessionKey(streamKey, sessionInfo);
       res.status(HttpStatus.OK).json({ 'session-key': sessionInfo.sessionKey });
     } catch (error) {
@@ -145,11 +148,15 @@ export class HostController {
       sessionInfo.state = false;
       sessionInfo.endDate = new Date();
       if (sessionInfo.startDate) {
-        const liveTime = calculateSecondsBetweenDates(sessionInfo.startDate, sessionInfo.endDate);
-        const m3u8Data = generatePlaylist(Math.floor(liveTime / 2) - REPLAY_VIDEO_LATENCY);
+        const sessionSegmentInfo = await getLastSegment(`https://kr.object.ncloudstorage.com/web22/live/${sessionInfo.sessionKey}/index.m3u8`);
+        if (!sessionSegmentInfo) {
+          throw new HttpException('생방송 세그먼트를 불러오는 과정에서 문제가 발생하였습니다.', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        const m3u8Data = generatePlaylist(sessionSegmentInfo[0], sessionSegmentInfo[1]);
         this.hostService.uploadToS3(m3u8Data, sessionInfo.sessionKey, 'replay', 'm3u8');
 
         sessionInfo.replay = true;
+        sessionInfo.replayUrl = `https://kr.object.ncloudstorage.com/web22/live/${sessionInfo.sessionKey}/replay.m3u8`;
       }
       this.memoryDBService.updateBySessionKey(streamKey, sessionInfo);
       res.status(HttpStatus.OK).send();
@@ -160,7 +167,7 @@ export class HostController {
         });
       } else {
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-          error: 'Server logic error'
+          error:  (error as { response: Response }).response
         });
       }
     }

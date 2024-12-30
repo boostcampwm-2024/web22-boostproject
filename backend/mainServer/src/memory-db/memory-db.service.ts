@@ -1,12 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { MemoryDbDto } from '../dto/memoryDbDto.js';
 import { getRandomElementsFromArray } from '../common/util.js';
+import { chzzkMainFetch } from '../common/crawler.js';
+import { fromLiveCurationDto } from '../dto/liveCurationDto.js';
 
 @Injectable()
 export class MemoryDBService {
   private db: MemoryDbDto[] = [];
   private currentId = 0;
-
+  chzzkSwitch: boolean = false;
+  chzzkDb: {[key: string]: MemoryDbDto} = {};
+  
   findAll(): MemoryDbDto[] {
     return this.db;
   }
@@ -24,16 +28,47 @@ export class MemoryDBService {
   }
 
   findBySessionKey(sessionKey: string): MemoryDbDto | undefined {
+    if (this.chzzkSwitch && this.chzzkDb[sessionKey]) {
+      return this.chzzkDb[sessionKey];
+    }
     return this.db.find(item => item.sessionKey === sessionKey);
   }
   
-  getRandomBroadcastInfo(count: number) {
+  async getRandomBroadcastInfo(count: number) {
+    if (this.chzzkSwitch) {
+      const chzzkMain = await chzzkMainFetch();
+      if (chzzkMain !== null) {
+        return chzzkMain.map((info) => {
+          const liveInfo = new MemoryDbDto({
+            id: info.liveId,
+            userId: info.channel.channelId,
+            streamKey: info.channel.channelId,
+            sessionKey: info.channel.channelId,
+            liveId: info.channel.channelId,
+            liveTitle: info.liveTitle,
+            defaultThumbnailImageUrl: info.liveImageUrl.replace('image_{type}.jpg', 'image_480.jpg'),
+            liveImageUrl: info.liveImageUrl.replace('image_{type}.jpg', 'image_480.jpg'),
+            streamUrl: info.m3u8,
+            channel: {
+              channelId: info.channel.channelId,
+              channelName: info.channel.channelName
+            },
+            category: info.liveCategory,
+            state: true,
+            startDate: new Date(info.openDate.replace(' ', 'T')),
+            concurrentUserCount: info.concurrentUserCount
+          });
+          this.chzzkDb[liveInfo.userId] = liveInfo;
+          return fromLiveCurationDto(liveInfo);
+        });
+      }
+    }
     const liveSession = this.db.filter(item => item.state);
     return getRandomElementsFromArray(liveSession, count);
   }
 
-  getBroadcastInfo<T>(size: number, dtoTransformer: (info: MemoryDbDto) => T, checker: (item: MemoryDbDto) => boolean, appender: number = 0) {
-    const findSession = this.db.filter(item => checker(item));
+  getBroadcastInfo<T>(size: number, dtoTransformer: (info: MemoryDbDto) => T, checker: (item: MemoryDbDto) => boolean, compare: (a: MemoryDbDto, b: MemoryDbDto) => number, appender: number = 0) {
+    const findSession = this.db.filter(item => checker(item)).sort((a: MemoryDbDto, b: MemoryDbDto) => compare(a, b));
     if (findSession.length < size) {
       const findSessionRev = findSession.reverse().map((info) => dtoTransformer(info));
       return [[...findSessionRev], []];
@@ -64,6 +99,14 @@ export class MemoryDBService {
     return true;
   }
 
+  updateById(id: number, updatedItem: Partial<MemoryDbDto>): boolean {
+    const index = this.db.findIndex(item => Number(item.id) === Number(id));
+    if (index === -1) return false;
+    console.log(this.db[index]);
+    this.db[index] = new MemoryDbDto({ ...this.db[index], ...updatedItem });
+    return true;
+  }
+
   updateBySessionKey(sessionKey: string, updatedItem: Partial<MemoryDbDto>): boolean {
     const index = this.db.findIndex(item => item.sessionKey === sessionKey);
     if (index === -1) return false;
@@ -77,6 +120,19 @@ export class MemoryDBService {
     this.db.splice(index, 1);
     return true;
   }
+  
+  rangeDelete(startId: number, endId: number): boolean {
+    const startIndex = this.db.findIndex(item => item.id >= startId);
+    const endIndex = this.db.findIndex(item => item.id > endId);
+
+    if (startIndex === -1) return false;  
+    if (endIndex === -1) {
+      this.db = this.db.slice(0, startIndex);
+    } else {
+      this.db = [...this.db.slice(0, startIndex), ...this.db.slice(endIndex)];
+    }
+    return true;
+  }  
 }
 
 @Injectable()

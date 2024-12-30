@@ -67,8 +67,8 @@ export class MemoryDBService {
     return getRandomElementsFromArray(liveSession, count);
   }
 
-  getBroadcastInfo<T>(size: number, dtoTransformer: (info: MemoryDbDto) => T, checker: (item: MemoryDbDto) => boolean, appender: number = 0) {
-    const findSession = this.db.filter(item => checker(item));
+  getBroadcastInfo<T>(size: number, dtoTransformer: (info: MemoryDbDto) => T, checker: (item: MemoryDbDto) => boolean, compare: (a: MemoryDbDto, b: MemoryDbDto) => number, appender: number = 0) {
+    const findSession = this.db.filter(item => checker(item)).sort((a: MemoryDbDto, b: MemoryDbDto) => compare(a, b));
     if (findSession.length < size) {
       const findSessionRev = findSession.reverse().map((info) => dtoTransformer(info));
       return [[...findSessionRev], []];
@@ -96,6 +96,14 @@ export class MemoryDBService {
     const index = this.db.findIndex(item => item.userId === userId);
     if (index === -1) return false;
     this.db[index] = { ...this.db[index], ...updatedItem } as MemoryDbDto;
+    return true;
+  }
+
+  updateById(id: number, updatedItem: Partial<MemoryDbDto>): boolean {
+    const index = this.db.findIndex(item => Number(item.id) === Number(id));
+    if (index === -1) return false;
+    console.log(this.db[index]);
+    this.db[index] = new MemoryDbDto({ ...this.db[index], ...updatedItem });
     return true;
   }
 

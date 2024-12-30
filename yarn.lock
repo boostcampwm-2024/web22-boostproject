@@ -2602,16 +2602,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hoeeeeeh/node-media-server@npm:3.0.2":
-  version: 3.0.2
-  resolution: "@hoeeeeeh/node-media-server@npm:3.0.2"
+"@hoeeeeeh/node-media-server@npm:3.0.10":
+  version: 3.0.10
+  resolution: "@hoeeeeeh/node-media-server@npm:3.0.10"
   dependencies:
     "@aws-sdk/client-s3": "npm:^3.688.0"
     "@types/node": "npm:^22.9.0"
     basic-auth-connect: "npm:^1.0.0"
     body-parser: "npm:1.20.3"
     chalk: "npm:^4.1.0"
+    chokidar: "npm:^4.0.1"
     dateformat: "npm:^4.6.3"
+    dotenv: "npm:^16.4.5"
     express: "npm:^4.19.2"
     http2-express-bridge: "npm:^1.0.7"
     lodash: "npm:^4.17.21"
@@ -2620,7 +2622,7 @@ __metadata:
     ws: "npm:^8.13.0"
   bin:
     node-media-server: bin/app.js
-  checksum: 10c0/45b6c240e825e1e72a1100347c99b29bdb1462fb556a8af4337f6d134a5ab99eabb9e722056b314880e1f679d8609abfd866516f2f7bd7b7838880ce0ae0da22
+  checksum: 10c0/ac5a520a8465d735dc6dcd7c9152da33f4a21d9db18447939df410c5797666f2b14c84675f53b75f7c22841063c205f52d24092b25a69c062e0537e41a37e4d4
   languageName: node
   linkType: hard
 
@@ -6135,6 +6137,15 @@ __metadata:
     fsevents:
       optional: true
   checksum: 10c0/8361dcd013f2ddbe260eacb1f3cb2f2c6f2b0ad118708a343a5ed8158941a39cb8fb1d272e0f389712e74ee90ce8ba864eece9e0e62b9705cb468a2f6d917462
+  languageName: node
+  linkType: hard
+
+"chokidar@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "chokidar@npm:4.0.1"
+  dependencies:
+    readdirp: "npm:^4.0.1"
+  checksum: 10c0/4bb7a3adc304059810bb6c420c43261a15bb44f610d77c35547addc84faa0374265c3adc67f25d06f363d9a4571962b02679268c40de07676d260de1986efea9
   languageName: node
   linkType: hard
 
@@ -11400,6 +11411,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"readdirp@npm:^4.0.1":
+  version: 4.0.2
+  resolution: "readdirp@npm:4.0.2"
+  checksum: 10c0/a16ecd8ef3286dcd90648c3b103e3826db2b766cdb4a988752c43a83f683d01c7059158d623cbcd8bdfb39e65d302d285be2d208e7d9f34d022d912b929217dd
+  languageName: node
+  linkType: hard
+
 "readdirp@npm:~3.6.0":
   version: 3.6.0
   resolution: "readdirp@npm:3.6.0"
@@ -11784,7 +11802,7 @@ __metadata:
   resolution: "rtmpServer@workspace:backend/rtmpServer"
   dependencies:
     "@eslint/js": "npm:^9.13.0"
-    "@hoeeeeeh/node-media-server": "npm:3.0.2"
+    "@hoeeeeeh/node-media-server": "npm:3.0.10"
     "@types/node": "npm:^22.9.0"
     "@typescript-eslint/eslint-plugin": "npm:^8.14.0"
     "@typescript-eslint/parser": "npm:^8.14.0"

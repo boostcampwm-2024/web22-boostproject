@@ -34,6 +34,7 @@ export class HostController {
       sessionInfo.replay = false;
       sessionInfo.startDate = new Date();
       sessionInfo.streamUrl = `https://kr.object.ncloudstorage.com/web22/live/${sessionInfo.sessionKey}/index.m3u8`;
+      sessionInfo.liveImageUrl = `https://kr.object.ncloudstorage.com/web22/live/${sessionInfo.sessionKey}/thumbnail.png`;
       this.memoryDBService.updateBySessionKey(streamKey, sessionInfo);
       res.status(HttpStatus.OK).json({ 'session-key': sessionInfo.sessionKey });
     } catch (error) {

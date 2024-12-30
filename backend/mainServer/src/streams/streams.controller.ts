@@ -37,7 +37,12 @@ export class StreamsController {
   async getLatestSession(@Res() res: Response) {
     try {
       const streamChecker = (item: MemoryDbDto) => item.state;
-      const [serchedData, appendData] = this.memoryDBService.getBroadcastInfo<LiveSessionResponseDto>(8, fromLiveSessionDto, streamChecker, 8);
+      const compare = (a: MemoryDbDto, b: MemoryDbDto) => {
+        const aTime = a.startDate ? a.startDate.getTime() : 0;
+        const bTime = b.startDate ? b.startDate.getTime() : 0;
+        return aTime - bTime;
+      };
+      const [serchedData, appendData] = this.memoryDBService.getBroadcastInfo<LiveSessionResponseDto>(8, fromLiveSessionDto, streamChecker, compare, 8);
       res.status(HttpStatus.OK).json({info: serchedData, appendInfo: appendData});
     } catch (error) {
       if ((error as { status: number }).status === 400) {
@@ -85,7 +90,7 @@ export class StreamsController {
       if (!sessionInfo) {
         throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
       }
-      res.status(HttpStatus.OK).json({notice: sessionInfo.notice});
+      res.status(HttpStatus.OK).json({notice: sessionInfo.notice, channelName: sessionInfo.channel.channelName});
     } catch (error) {
       if ((error as { status: number }).status === 400) {
         res.status(HttpStatus.BAD_REQUEST).json({
@@ -97,6 +102,27 @@ export class StreamsController {
           error: 'Server logic error',
         });
       }
+    }
+  }
+
+  @Get('/existence')
+  @ApiOperation({summary: 'Get Session exited', description: '방송 세션에 대한 존재 여부를 반환 받습니다.'})
+  async getExistence(@Query('sessionKey') sessionKey: string, @Res() res: Response) {
+    try {
+      if (this.memoryDBService.chzzkSwitch && sessionKey in this.memoryDBService.chzzkDb) {
+        res.status(HttpStatus.OK).json({existed: true});
+        return;
+      }
+      const liveSessions = this.memoryDBService.findAll().filter((info) => info.state);
+      if (liveSessions.some((info) => info.sessionKey === sessionKey)) {
+        res.status(HttpStatus.OK).json({existed: true}); 
+      }
+      else {
+        res.status(HttpStatus.OK).json({existed: false});
+      }
+    } catch (err) {
+      console.log(err);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send();
     }
   }
 }

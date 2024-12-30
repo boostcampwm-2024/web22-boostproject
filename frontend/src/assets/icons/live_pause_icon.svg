@@ -1,0 +1,12 @@
+<svg focusable="false" xmlns="http://www.w3.org/2000/svg" width="95" height="95" viewBox="0 0 95 95" class="pzp-ui-icon__svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g fill="none" fill-rule="evenodd" stroke="none" stroke-width="1">
+    <g transform="translate(-181.000000, -81.000000)">
+      <g transform="translate(181.000000, 81.000000)">
+        <circle fill="#000000" cx="47.5" cy="47.5" r="47.5"></circle>
+        <g fill="#FFFFFF" transform="translate(29.785714, 29.785714)">
+          <rect x="0.0714285714" y="0.0714285714" width="35.2857143" height="35.2857143" rx="2"></rect>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

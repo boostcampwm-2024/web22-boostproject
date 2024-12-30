@@ -1,0 +1,18 @@
+FROM node:20-alpine
+
+RUN corepack enable
+
+WORKDIR /app
+
+COPY . .
+
+RUN yarn workspaces focus
+
+RUN apk add --no-cache ffmpeg
+
+RUN cp /usr/bin/ffmpeg ./
+
+EXPOSE 8000
+EXPOSE 1935
+
+CMD ["yarn", "prod"]

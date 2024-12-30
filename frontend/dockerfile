@@ -1,0 +1,20 @@
+# 1. 베이스 이미지 설정
+FROM node:20-alpine
+
+# 2. 작업 디렉토리 생성 및 이동
+WORKDIR /app
+
+RUN mkdir .dist
+
+COPY yarn.lock ./
+
+# 3. package.json 및 yarn.lock 파일 복사
+COPY ./frontend/package.json ./
+
+# 4. 의존성 설치
+RUN yarn install --production
+
+# 5. 소스 코드 복사 및 빌드
+COPY ./frontend .
+
+# RUN yarn build --mode production

@@ -1,0 +1,54 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - dev
+      - dev-fe
+      - dev-be
+  pull_request:
+    branches:
+      - dev
+      - dev-fe
+      - dev-be
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        workspace: [frontend, backend]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: .env setting
+        run: |
+          touch ../.env
+          echo "GITHUB_REGISTRY_TOKEN:${{ secrets.REGISTRY_TOKEN }}" > ../.env
+        
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build ${{ matrix.workspace }}
+        run: |
+          cd ${{ matrix.workspace }}
+          yarn build
+
+      - name: Lint ${{ matrix.workspace }}
+        run: |
+          cd ${{ matrix.workspace }}
+          yarn lint || exit 1  # Lint 실패 시 종료
+
+      - name: TypeScript Check ${{ matrix.workspace }}
+        run: |
+          cd ${{ matrix.workspace }}
+          yarn tsc --noEmit || exit 1  # 빌드하지 않고 타입 오류만 체크

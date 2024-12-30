@@ -1,0 +1,24 @@
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+!.yarn/plugin-env-npm.js
+
+.DS_Store
+.idea
+
+backend/rtmpServer/.env
+backend/rtmpServer/.env
+# Swap the comments on the following lines if you wish to use zero-installs
+# In that case, don't forget to run `yarn config set enableGlobalCache false`!
+# Documentation here: https://yarnpkg.com/features/caching#zero-installs
+
+#!.yarn/cache
+.pnp.*
+
+frontend-dist
+
+.dist
+.env

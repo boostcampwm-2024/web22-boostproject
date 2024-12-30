@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "jsx": "react-jsx",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "composite": true,
+    "baseUrl": ".",
+    "paths": {
+      "@components/*": ["src/components/*"],
+      "@hooks/*": ["src/hooks/*"],
+      "@pages/*": ["src/pages/*"],
+      "@utils/*": ["src/utils/*"],
+      "@assets/*": ["src/assets/*"],
+      "@styles/*": ["src/styles/*"],
+      "@type/*": ["src/type/*"],
+      "@apis/*": ["src/apis/*"],
+      "@queries/*": ["src/apis/queries/*"],
+      "@constants/*": ["src/constants/*"],
+      "@hocs/*": ["src/hocs/*"],
+      "@common/*": ["src/components/common/*"],
+      "@reducers/*": ["src/reducers/*"],
+      "@contexts/*": ["src/contexts/*"]
+    },
+    "types": ["vite/client"]
+  },
+  "include": ["src"]
+}

@@ -1,0 +1,110 @@
+name: PR Slack Notification
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set reviewers based on branch
+        id: set-reviewers
+        run: |
+          TARGET_BRANCH="${{ github.event.pull_request.base.ref }}"
+          if [[ $TARGET_BRANCH == "dev-fe" ]]; then
+            echo "team=FE" >> $GITHUB_OUTPUT
+            echo "reviewers=<@U07GSBHPCPR> <@U07H6QLFPBM> <@U07H9CTPC9J>" >> $GITHUB_OUTPUT
+            echo "reviewer_names=김지수, 고민지, 홍창현" >> $GITHUB_OUTPUT
+          elif [[ $TARGET_BRANCH == "dev-be" ]]; then
+            echo "team=BE" >> $GITHUB_OUTPUT
+            echo "reviewers=<@U07GSBPT9ST> <@U07H0978N14>" >> $GITHUB_OUTPUT
+            echo "reviewer_names=김영길, 김준서" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Process PR title and body
+        id: pr_process
+        run: |
+          # PR 제목 처리
+          title='${{ github.event.pull_request.title }}'
+          title="${title//'"'/'\\"'}"
+          echo "title=${title}" >> $GITHUB_OUTPUT
+
+          # PR 내용 처리
+          body='${{ github.event.pull_request.body }}'
+          # Remove HTML comments and their content
+          body=$(echo "$body" | sed 's/<!--.*-->//g')
+          # Remove image markdown
+          body=$(echo "$body" | sed 's/<img[^>]*>//g')
+          # Remove issue numbers
+          body=$(echo "$body" | sed 's/#[0-9]*//g')
+          # Clean up markdown headers and special characters
+          body=$(echo "$body" | sed 's/##/*/g' | tr -d '\r')
+          # Escape quotes and backslashes
+          body="${body//\\/\\\\}"
+          body="${body//\"/\\\"}"
+          # Convert newlines to spaces
+          body=$(echo "$body" | tr '\n' ' ' | sed 's/  */ /g')
+          echo "body=${body}" >> $GITHUB_OUTPUT
+
+      - name: Send Slack notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          custom_payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "🔍 *새로운 ${{ steps.set-reviewers.outputs.team }} PR이 등록되었습니다*"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Repository:*\n${{ github.repository }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*작성자:*\n<@${{ github.event.pull_request.user.login }}>"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*PR 제목:*\n<${{ github.event.pull_request.html_url }}|${{ steps.pr_process.outputs.title }}>"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*PR 설명:*\n${{ steps.pr_process.outputs.body }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "👉 ${{ steps.set-reviewers.outputs.reviewers }} 리뷰 부탁드립니다!"
+                  }
+                },
+                {
+                  "type": "context",
+                  "elements": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "✨ 리뷰어: ${{ steps.set-reviewers.outputs.reviewer_names }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

@@ -1,0 +1,53 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  nginx:
+    build:
+      context: nginx
+      dockerfile: dockerfile
+    image: liboost/nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8000:8000"
+      - "1935:1935"
+      - "3000:3000"
+    volumes:
+      - /etc/letsencrypt/live/liboo.kr:/etc/letsencrypt/live/liboo.kr:ro
+      - /etc/letsencrypt/archive/liboo.kr:/etc/letsencrypt/archive/liboo.kr:ro
+      - /etc/nginx/ssl/dhparams.pem:/etc/nginx/ssl/dhparams.pem:ro
+
+    networks:
+      - default-network
+
+  backend-rtmp-server:
+    container_name: rtmp-container
+    build:
+      context: backend/rtmpServer
+      dockerfile: dockerfile
+    image: liboost/backend-rtmp-server:latest
+    env_file: backend/.env
+    networks:
+      - default-network
+      - backend-bridge
+
+  backend-main-server:
+    container_name: main-container
+    build:
+      context: backend/mainServer
+      dockerfile: dockerfile
+    image: liboost/backend-main-server:latest
+    env_file: backend/.env
+    networks:
+      - default-network
+      - backend-bridge
+
+
+networks:
+  backend-bridge:
+    driver: bridge
+    name: media-server
+
+  default-network:
+    driver: bridge

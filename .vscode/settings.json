@@ -1,0 +1,11 @@
+{
+  "typescript.tsdk": ".yarn/sdks/typescript/lib",
+  "eslint.nodePath": ".yarn/sdks",
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "search.exclude": {
+    "**/.yarn": true,
+    "**/.pnp.*": true
+  }
+}

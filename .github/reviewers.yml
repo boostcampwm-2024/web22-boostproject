@@ -1,0 +1,21 @@
+repositories:
+  dev-fe:
+    reviewers:
+      - githubName: jsk3342
+        slackId: U07GSBHPCPR
+        name: 김지수
+      - githubName: gominzip
+        slackId: U07H6QLFPBM
+        name: 고민지
+      - githubName: spearStr
+        slackId: U07H9CTPC9J
+        name: 홍창현
+  
+  dev-be:
+    reviewers:
+      - githubName: hoeeeeeh
+        slackId: U07GSBPT9ST
+        name: 김영길
+      - githubName: i3kae
+        slackId: U07H0978N14
+        name: 김준서

@@ -1,0 +1,31 @@
+@import url(https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@2.0/nanumsquare.css);
+@font-face {
+  font-family: 'NanumGothic';
+  src: url('./assets/fonts/NanumGothic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'NanumGothic';
+  src: url('./assets/fonts/NanumGothicBold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  background-color: #141517;
+}
+
+body {
+  font-family: 'NanumGothic', sans-serif;
+  font-weight: 400;
+}
+
+.hidden {
+  display: none;
+}

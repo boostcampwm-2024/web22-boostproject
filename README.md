@@ -11,7 +11,8 @@
     <a href="https://gominzip.notion.site/TEAM-127673f3719e803faf63c70322560d3b?pvs=4"> Notion </a> &nbsp; ｜ &nbsp; 
     <a href="https://www.figma.com/design/op5Ui6oZ4Zx2D8VUgWOKM0/LiBoo-%F0%9F%9A%80?node-id=1-2&node-type=canvas&t=zcYYT1qCtckcUdcs-0"> Figma </a> &nbsp; ｜ &nbsp;
     <a href="https://github.com/boostcampwm-2024/web22-LiBoo/wiki"> Wiki </a> &nbsp; ｜ &nbsp;
-    <a href="https://github.com/orgs/boostcampwm-2024/projects/17"> BackLog </a>
+    <a href="https://github.com/orgs/boostcampwm-2024/projects/17"> BackLog </a> &nbsp; ｜ &nbsp;
+    <a href="https://blog.liboo.kr"> Blog </a>
   </p>
 </div>
 

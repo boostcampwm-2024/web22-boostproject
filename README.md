@@ -1,89 +1,149 @@
+![thumbnail](https://github.com/user-attachments/assets/cd7e8ab6-4d94-465d-8817-6ecd18f61125)
+
 <div align="center">
-  <h1> 라이부 LiBoo </h1>
+    <a href="https://liboo.kr" target="_blank">
+      <img src="https://github.com/user-attachments/assets/ad322787-ad07-4405-b526-112c882e66ab" width="20%" />
+    </a>
   <h3> 컨퍼런스를 더 가까이, LiBoo 에서 라이브로 🚀 </h3>
-  <br/>
+</div>
+<div align="center">
   <p align=center>
-  <a href="https://gominzip.notion.site/TEAM-127673f3719e803faf63c70322560d3b?pvs=4"> Notion </a> &nbsp; ｜ &nbsp; 
-  <a href="https://www.figma.com/design/op5Ui6oZ4Zx2D8VUgWOKM0/LiBoo-%F0%9F%9A%80?node-id=1-2&node-type=canvas&t=zcYYT1qCtckcUdcs-0"> Figma </a> &nbsp; ｜ &nbsp;
-  <a href="https://github.com/boostcampwm-2024/web22-LiBoo/wiki"> Wiki </a> &nbsp; ｜ &nbsp;
-  <a href="https://github.com/orgs/boostcampwm-2024/projects/17"> BackLog </a>
-</p>
+    <a href="https://gominzip.notion.site/TEAM-127673f3719e803faf63c70322560d3b?pvs=4"> Notion </a> &nbsp; ｜ &nbsp; 
+    <a href="https://www.figma.com/design/op5Ui6oZ4Zx2D8VUgWOKM0/LiBoo-%F0%9F%9A%80?node-id=1-2&node-type=canvas&t=zcYYT1qCtckcUdcs-0"> Figma </a> &nbsp; ｜ &nbsp;
+    <a href="https://github.com/boostcampwm-2024/web22-LiBoo/wiki"> Wiki </a> &nbsp; ｜ &nbsp;
+    <a href="https://github.com/orgs/boostcampwm-2024/projects/17"> BackLog </a> &nbsp; ｜ &nbsp;
+    <a href="https://blog.liboo.kr"> Blog </a>
+  </p>
 </div>
 
 <br/>
 
-## 프로젝트 개요
+> ### 목차
+> [1. 💻 데모 및 배포 링크](#-데모-및-배포-링크) <br>
+> [2. 🎯 기획 배경](#-기획-배경) <br>
+> [3. 📺 핵심 기능](#-핵심-기능) <br>
+> [4. ⚙️ 서비스 아키텍처](#%EF%B8%8F-서비스-아키텍처) <br>
+> &nbsp;&nbsp;&nbsp;&nbsp;[4.1. 호스트](#-호스트) <br>
+> &nbsp;&nbsp;&nbsp;&nbsp;[4.2. 클라이언트](#-클라이언트) <br>
+> &nbsp;&nbsp;&nbsp;&nbsp;[4.3. CI/CD](#-cicd) <br>
+> [5. 📝 핵심 기술 정리](#-핵심-기술-정리) <br>
+> &nbsp;&nbsp;&nbsp;&nbsp;[5.1. 전체](#전체) <br>
+> &nbsp;&nbsp;&nbsp;&nbsp;[5.2. 프론트엔드의 기술적 도전](#프론트엔드의-기술적-도전) <br>
+> &nbsp;&nbsp;&nbsp;&nbsp;[5.3. 백엔드의 기술적 도전](#백엔드의-기술적-도전) <br>
+> [6. 🛠️ 기술 스택](#%EF%B8%8F-기술-스택) <br>
+> [7. 👊 팀 소개](#team-정권지르기-) <br>
 
-> 토스, 배달의 민족, 카카오 등 다양한 컨퍼런스들이 있지만 실제로 신청해서 당첨되는 것은 쉬운 일이 아닙니다.
-> <br>저희는 이러한 컨퍼런스 문화가 더욱 활발해지고, 더 많은 사람들이 기회를 얻을 수 있기를 바라는 마음으로 LiBoo 프로젝트를 기획하게 되었습니다.
-> <br>작게는 팀원 간 소규모 기술 공유부터, 크게는 네이버 부스트캠프 발표나 기업의 컨퍼런스과도 함께할 수 있는 서비스를 만들고자 합니다!
+<br/>
+
+# 💻 데모 및 배포 링크
+
+- **서비스 링크**: [https://liboo.kr](https://liboo.kr/)
+
+<br/>
+
+
+# 🎯 기획 배경
+
+네이버 DAN, 토스 Slash, 카카오 If, 인프콘 등 다양한 컨퍼런스가 열리고 있지만, 참여는 여전히 쉽지 않습니다.
+
+높은 경쟁률과 제한된 참가 인원 대신, **더 많은 사람들이 기회를 얻고 컨퍼런스 문화가 더욱 활발**해지기를 바라는 마음으로 LiBoo 프로젝트를 기획했습니다.
+
+### **LiBoo가 만드는 변화와 목표**
+
+- **누구나** 쉽게 기술을 공유하고 배울 수 있는 열린 플랫폼
+- **팀원 간 소규모 공유**부터 **기업 컨퍼런스 협업**까지 지원
+- 더 많은 사람들이 참여할 수 있는 **기술 공유 기회 확대**
 
 <br/>
 
 # 📺 핵심 기능
 
-### 실시간 컨퍼런스 스트리밍
-
-실시간 컨퍼런스를 시청하거나 호스트가 되어 컨퍼런스를 직접 스트리밍 할 수 있습니다.
-
-### 실시간 채팅
-
-컨퍼런스를 보며 채팅으로 소통할 수 있습니다. 질문이 있다면 질문 채팅으로 전송이 가능합니다.
-
-### 메인 대시보드
-
-동영상 미리보기, 카테고리 등을 통해 원하는 컨퍼런스를 탐색해 볼 수 있습니다.
-
-### 컨퍼런스 다시보기
-
-실시간으로 방송되었던 컨퍼런스를 다시 돌려볼 수 있습니다.
+![feature-main](https://github.com/user-attachments/assets/36f6b53e-10ac-47c8-bc71-e7e15596ff1b)
+![feature-host](https://github.com/user-attachments/assets/a4092bc8-84eb-4a47-ada6-b135de0e3e85)
+![feature-client](https://github.com/user-attachments/assets/340cd919-0c99-4285-8426-7e6329e97360)
+![feature-chat-client](https://github.com/user-attachments/assets/f0cc9bc0-0d1a-41da-a348-4e2d2f908c7b)
+![feature-chat-host](https://github.com/user-attachments/assets/84fe4260-a12e-48c4-94b1-401022793f12)
 
 <br/>
 
 # ⚙️ 서비스 아키텍처
-![라이부아키텍처 drawio (1)](https://github.com/user-attachments/assets/8867cbf9-99b6-4b24-a02b-a35952c5bf0d)
+
 ![Streaming Data Architecture](https://github.com/user-attachments/assets/02e854c4-4512-482d-bda2-719b7ceabea6)
-```mermaid
-sequenceDiagram
-    participant H as Host/OBS
-    participant HP as Host Page
-    participant MS as Main Server
-    participant RTMP as RTMP Server
-    participant OS as Object Storage
-    participant V as Viewer
 
-    Note over H,V: 방송 시작 전 (OBS 시작됨)
+### 🎥 호스트
 
-    HP->>MS: HTTP: Stream Key 요청
-    MS->>MS: Unique Stream Key 생성
-    MS->>HP: Stream Key 반환
-    HP->>H: Stream Key 전달
+| **단계**                     | **설명**                                                                                                                      |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| **1. 방송 시작**             | 호스트는 **OBS**를 통해 방송을 시작합니다.                                                                                    |
+| **2. 스트림 전송**           | OBS에서 생성된 **RTMP 스트림**을 **RTMP 서버**로 전송합니다.                                                                  |
+| **3. 스트림 변환 및 업로드** | RTMP 서버는 스트림을 **HLS 세그먼트**(`.ts` 파일)와 **`index.m3u8`** 파일로 변환하고, 이를 **Object Storage**에 업로드합니다. |
+| **4. 방송 정보 관리**        | **API 서버**와 방송 정보를 주고받아 클라이언트 대시보드에 방송을 노출시킵니다.                                                |
+| **5. 실시간 시청**           | 클라이언트는 **Object Storage**에 직접 접근하여 **HLS 세그먼트**와 **`index.m3u8`** 파일을 통해 실시간 영상을 시청합니다.     |
 
-    H->>RTMP: RTMP: 스트림 전송 (Stream Key 포함)
+<br />
 
-    RTMP->>RTMP: HLS 변환 (m3u8, segment 생성)
-    RTMP->>H: HTTP: HLS 스트림 전송
-    Note right of H: 호스트가 자신의 방송을<br/>모니터링 할 수 있음
+### 💬 클라이언트
 
-    Note over H,V: 방송 시작 후 (호스트 페이지에서 시작 버튼 클릭)
+| **기능**           | **설명**                                                                                           |
+| ------------------ | -------------------------------------------------------------------------------------------------- |
+| **채팅 기능**      | 호스트를 포함한 모든 클라이언트는 **채팅 서버**와 통신하여 실시간으로 채팅을 주고받을 수 있습니다. |
+| **채팅 종류**      | 채팅은 **질문**, **일반**, **공지**로 구분됩니다.                                                  |
+| **질문 채팅 처리** | **질문 채팅**은 1차적으로 **Redis**에 캐싱되며, 방송 종료 후 **MySQL**에 영구 저장됩니다.          |
 
-    HP->>MS: 방송 시작 신호
-    MS->>RTMP: 방송 시작 알림
+<br />
 
-    loop HLS 스트리밍
-        RTMP->>OS: HLS 파일 업로드 (m3u8, segment)
-    end
+### 🚀 CI/CD
 
-    V->>MS: 컨퍼런스 선택 (대시보드에서)
-    MS->>V: Object Storage URL 반환
+| **구성**      | **설명**                                                                                                        |
+| ------------- | --------------------------------------------------------------------------------------------------------------- |
+| **배포 도구** | **프론트엔드**와 **백엔드**는 **GitHub Actions**, **Docker**, **Docker Swarm**을 활용하여 **NCP**에 배포됩니다. |
 
-    loop 스트리밍 시청
-        V->>OS: m3u8 요청
-        OS->>V: m3u8 파일 전송
-        V->>OS: segment 요청
-        OS->>V: segment 파일 전송
-    end
-```
+<br/>
+
+# 📝 핵심 기술 정리
+프로젝트를 진행하면서 겪은 다양한 경험과 학습 내용을 꾸준히 문서화하며 지식을 공유하고, 깊이 있는 기술적 도전을 이어나가고자 합니다.
+
+## 전체
+### [📹 동영상 스트리밍 처리 프로토콜을 알아보자](https://gominzip.notion.site/b987e92eb6c84eef9af1301877eb7c91?pvs=4)
+- 처음 접하는 동영상 스트리밍 서비스의 동작 원리를 팀원들과 함께 이해하기
+- 다양한 스트리밍 프로토콜(RTMP, WebRTC, HLS 등)을 검토한 결과, 실시간 단방향 스트리밍에 적합한 RTMP와 HLS 조합으로 결정
+
+### [🚀 웹 소켓의 실시간 양방향 통신 (feat. WS vs Socket.io)](https://gominzip.notion.site/feat-WS-vs-Socket-io-13b673f3719e8037b430ff7b6af397b7?pvs=4)
+- 채팅 구현을 위해 실시간 양방향 통신 구현 방식에 대한 학습 진행
+- 생산성을 고려해 broadcast, namespace, 자동 재연결이 구현되어 있는 socket.io 라이브러리를 사용하기로 결정
+
+## 프론트엔드의 기술적 도전
+### [👷‍♀️ Shared Worker로 클라이언트의 소켓 통신 개선하기](https://gominzip.notion.site/Shared-Worker-14c673f3719e80379344fd026b1109a1?pvs=4)
+- socket.io를 통한 채팅 기능을 구현했으나, 컴포넌트 마운트 시 매번 새로운 소켓이 생성되는 이슈
+- shared worker thread를 도입해 다중 탭에서도 하나의 소켓을 공유할 수 있도록 개선
+
+### [🚨 React-Query로 안정적인 스트리밍을 위한 로딩 및 에러 관리](https://gominzip.notion.site/React-Query-04ce24ffdb68478699c61b557625a843?pvs=4)
+- HLS 영상을 받아오는 비동기 데이터 페칭에서의 에러 핸들링
+- 각각의 컴포넌트에서 로딩과 에러처리를 독립적으로 진행한 방식에서부터 AsyncBoundary를 활용하여 효율적인 비동기 데이터 페칭관리와 ErrorPage 라우팅까지 처리
+
+### [🐊 리액트 훅 폼 딥다이브](https://gominzip.notion.site/38fb796bb3034277885637e54f8747bb?pvs=4)
+- 호스트 페이지에 사용되는 많은 인풋을 리액트 훅 폼을 활용해 효율적으로 관리
+- 훅 폼의 개념과 핵심 기능을 이해하고, controlled vs uncontrolled 컴포넌트, 폼 상태 관리 최적화 및 검증 로직 구현 방법을 탐구
+
+## 백엔드의 기술적 도전
+### [☕️ NestJS를 통한 일관적인 시스템 설계](https://gominzip.notion.site/NestJS-ccb02a5403cd489ab1529799f17570b1?pvs=4)
+- 서비스 별로 분리하여 확장이 쉽고, 유지 보수에 우수한 서버를 구축하고자 계획
+- NestJS의 모듈화와 DI를 통해 각 도메인 간의 종속되지 않는 DDD 서비스 설계
+
+### [🏛️ 확장성을 고려한 초반 구조 설계](https://gominzip.notion.site/f5f09f3143bf492e87c654ecbebec9a7?pvs=4)
+- 각각의 서버가 intensive 한 부분을 고려해서 계획
+- 서버를 분리해서 확장성을 고려
+
+### [📮 채팅 서버에 Redis 를 쓴 이유](https://gominzip.notion.site/Redis-9be68c7746044d938a0dc65f9cdf47b1?pvs=4)
+- 채팅 서버가 확장될 수 있음을 고려
+- 채팅 서버 간, 데이터 공유를 위해 Redis 사용
+- Redis 도 단일로 동작하지 않도록 redis-cluster 활용
+
+### [🐬 서버를 docker swarm 으로 관리해보자](https://gominzip.notion.site/docker-swarm-80b228b59cf54d0e9221fc6c150e07bf?pvs=4)
+- 서버를 도커 컨테이너로 올려서 docker-compose 로 관리
+- docker swarm 으로 서버 인스턴스를 축소/확장할 수 있도록 관리
+
+#### [👉 더 많은 기술정리 보러 가기 👈](https://gominzip.notion.site/12d673f3719e8098ad94ed6b71b10ac0?pvs=4)
 
 <br/>
 
@@ -91,35 +151,9 @@ sequenceDiagram
 
 | Part       | Stack                                                                                           |
 | ---------- | ----------------------------------------------------------------------------------------------- |
-| 공통       | ![fullstack 2](https://github.com/user-attachments/assets/1a7f6b03-9d59-4ecc-adc9-39ad17ac67a4) |
-| 프론트엔드 | ![fullstack 1](https://github.com/user-attachments/assets/64fdaa86-289d-42f0-80ce-4f01df4bfe75) |
-| 백엔드     | ![fullstack 3](https://github.com/user-attachments/assets/8a01cd0b-f324-4c6e-85f6-f75c74239bdb) |
-
-<br/>
-
-# 🏃 주차별 진행 상황
-
-| 주차  | 내용 요약                                                | 발표자료                                                                                          |
-| ----- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| 1주차 | 기획 공유 및 팀 목표 설정                                | [보러가기](https://gominzip.notion.site/Week1-Web22-LiBoo-56af3bb7b2314f878667bdbbf99e791f?pvs=4) |
-| 2주차 | 백로그 작성, 퍼블리싱, 동영상 스트리밍 아키텍처 설계     | [보러가기](https://gominzip.notion.site/Week2-Web22-LiBoo-137673f3719e805baab4e0a9855ed885?pvs=4) |
-| 3주차 | CI/CD, 메인 api 서버 개발, 플레이어 커스텀, 웹소켓 학습 | [보러가기](https://gominzip.notion.site/Week3-Web22-LiBoo-a09dcec3adea4b289d22603df59f24be?pvs=4) |
-| 4주차 | 채팅 구현, 서비스 시연 | [보러가기](https://gominzip.notion.site/Week4-Web22-LiBoo-13e673f3719e80e2a6b0cf5fe10d603a) |
-| 5주차 | 채팅 고도화, 플레이어 고도화, 다시보기 api 설계 | [보러가기](https://gominzip.notion.site/Week5-Web22-LiBoo-14c673f3719e80eeb14fe3f1f668e1fc?pvs=4) |
-
-<br/>
-
-# 🔥 기술적 도전
-
-꾸준한 문서화를 통해 지식을 공유하고, 깊이 있는 기술적 도전을 이어나가고자 합니다.
-
-- [[학습] 동영상 스트리밍 처리 프로토콜을 알아보자](https://gominzip.notion.site/b987e92eb6c84eef9af1301877eb7c91?pvs=4)
-- [[학습] 웹 소켓의 실시간 양방향 통신](https://gominzip.notion.site/13b673f3719e8037b430ff7b6af397b7?pvs=4)
-- [[과정/근거] 패키지 매니저 및 모노레포 정하기](https://gominzip.notion.site/7677c9cf96464b1d9e9c1d8afd4ab0b6?pvs=4)
-- [[트러블슈팅] 외부의 사용자가 Object Storage에 접근하지 못하는 권한 제어](https://gominzip.notion.site/Object-Storage-1cf0c1bde758437ea595c57cf704a029?pvs=4)
-- [[트러블슈팅] Docker yarn-berry workspace 를 찾지 못하는 오류](https://gominzip.notion.site/docker-yarn-berry-workspace-eff32ce3f695470a8a2d9ef4d02be1e0?pvs=4)
-
-[더 많은 기술정리 보러 가기](https://gominzip.notion.site/12d673f3719e8098ad94ed6b71b10ac0?pvs=4)
+| 공통       | ![Group 15](https://github.com/user-attachments/assets/82b2beac-df23-48f4-814d-b46ec79d755e)   |
+| 프론트엔드 |![Group 17](https://github.com/user-attachments/assets/9c57bf4e-df45-4319-9fb2-e5ffa58440b7)|
+| 백엔드     | ![Group 16](https://github.com/user-attachments/assets/fa4933ca-0e46-4aab-ba3d-76614c332f73)|
 
 <br/>
 

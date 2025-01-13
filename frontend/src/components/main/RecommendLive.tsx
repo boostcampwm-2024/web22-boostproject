@@ -1,28 +1,32 @@
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { LiveBadgeLarge } from './ThumbnailBadge';
+
+import sampleProfile from '@assets/sample_profile.png';
+import { RECOMMEND_LIVE } from '@constants/recommendLive';
+import { useMainLive } from '@queries/main/useFetchMainLive';
+import useMainLiveRotation from '@hooks/useMainLiveRotation';
+
+import AnimatedProfileSection from './AnimatedProfileSection';
+import AnimatedLiveHeader from './AnimatedLiveHeader';
+import RecommendList from './RecommendList';
 
 const RecommendLive = () => {
+  const navigate = useNavigate();
+
+  const { data: mainLiveData } = useMainLive();
+  const { currentLiveData, isTransitioning, videoRef, onSelect } = useMainLiveRotation(mainLiveData);
+  const { liveId, liveTitle, concurrentUserCount, channel, category } = currentLiveData;
+
   return (
-    <RecommendLiveContainer>
-      <RecommendLiveBox></RecommendLiveBox>
-
-      <RecommendLiveWrapper>
-        <RecommendLiveHeader>
-          <div className="recommend_live_status">
-            <LiveBadgeLarge />
-            <span>1,204명 시청</span>
-          </div>
-          <p className="recommend_live_title">라이부로 배우는 동영상 스트리밍 서비스</p>
-        </RecommendLiveHeader>
-
+    <RecommendLiveContainer $height={RECOMMEND_LIVE.HEIGHT}>
+      <RecommendLiveBox $isTransitioning={isTransitioning}>
+        <video ref={videoRef} autoPlay muted />
+      </RecommendLiveBox>
+      <RecommendLiveWrapper onClick={() => navigate(`/live/${liveId}`)}>
+        <AnimatedLiveHeader concurrentUserCount={concurrentUserCount} liveTitle={liveTitle} />
         <RecommendLiveInformation>
-          <RecommendLiveProfile>
-            <img />
-          </RecommendLiveProfile>
-          <RecommendLiveArea>
-            <span className="video_card_name">네이버 부스트캠프</span>
-            <span className="video_card_category">🧑🏻‍💻 기술 공유</span>
-          </RecommendLiveArea>
+          <AnimatedProfileSection channel={channel} category={category} profileImage={sampleProfile} />
+          <RecommendList mainLiveData={mainLiveData} onSelect={onSelect} currentLiveId={liveId} />
         </RecommendLiveInformation>
       </RecommendLiveWrapper>
     </RecommendLiveContainer>
@@ -31,92 +35,54 @@ const RecommendLive = () => {
 
 export default RecommendLive;
 
-const RecommendLiveContainer = styled.div`
+const RecommendLiveContainer = styled.div<{ $height: string }>`
   word-wrap: break-word;
   background: #141517;
   border-radius: 12px;
-  height: 370px;
+  height: ${({ $height }) => $height};
   overflow: hidden;
   position: relative;
   word-break: break-all;
   z-index: 0;
 `;
 
-const RecommendLiveBox = styled.div`
-  background: #4f4f4f;
+const RecommendLiveBox = styled.div<{ $isTransitioning: boolean }>`
+  background: ${({ theme }) => theme.tokenColors['surface-default']};
   padding-top: 56.25%;
   position: absolute;
   right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 0;
   width: 100%;
+  height: 100%;
   z-index: -1;
   box-shadow: inset 180px -180px 300px 0px #141517;
+  opacity: ${({ $isTransitioning }) => ($isTransitioning ? 0 : 0.6)};
+  transition: opacity 0.3s ease-in-out;
+
+  video {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    object-fit: cover;
+    object-position: center;
+  }
 `;
 
 const RecommendLiveWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: -webkit-fill-available;
   justify-content: space-between;
-  padding: 24px 30px 30px;
+  padding: 22px 30px;
   position: relative;
-`;
-
-const RecommendLiveHeader = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  .recommend_live_status {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    ${({ theme }) => theme.tokenTypographys['display-bold16']}
-    color: ${({ theme }) => theme.tokenColors['red-default']};
-  }
-  .recommend_live_title {
-    ${({ theme }) => theme.tokenTypographys['display-bold24']}
-    color: ${({ theme }) => theme.tokenColors['color-white']};
-  }
+  cursor: pointer;
 `;
 
 const RecommendLiveInformation = styled.div`
-  height: fit-content;
   display: flex;
   align-items: center;
-  flex-grow: 0.5;
-`;
-
-const RecommendLiveProfile = styled.div`
-  margin-right: 10px;
-  background: ${({ theme }) => theme.tokenColors['surface-alt']} no-repeat 50% / cover;
-  border: 4px solid ${({ theme }) => theme.tokenColors['brand-default']};
-  border-radius: 50%;
-  display: block;
-  overflow: hidden;
-  position: relative;
-  width: 70px;
-  height: 70px;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-`;
-
-const RecommendLiveArea = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  .video_card_name {
-    ${({ theme }) => theme.tokenTypographys['display-bold20']}
-    color: ${({ theme }) => theme.tokenColors['text-strong']};
-    margin-bottom: 8px;
-  }
-  .video_card_category {
-    ${({ theme }) => theme.tokenTypographys['display-bold16']}
-    color: ${({ theme }) => theme.tokenColors['brand-default']};
-    margin-bottom: 4px;
-  }
+  justify-content: space-between;
+  gap: 10px;
 `;

@@ -1,1 +1,2 @@
-export { default as ChatRoom } from './ChatRoom';
+export { default as ClientChatRoom } from './ClientChatRoom';
+export { default as HostChatRoom } from './HostChatRoom';

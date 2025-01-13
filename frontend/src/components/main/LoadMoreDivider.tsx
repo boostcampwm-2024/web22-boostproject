@@ -1,21 +1,23 @@
 import styled from 'styled-components';
-import ChevronDownIcon from '@assets/icons/chevron-down.svg';
 
+import ChevronDownIcon from '@assets/icons/chevron-down.svg';
+import ChevronUpIcon from '@assets/icons/chevron-up.svg';
+import { VIDEO_VIEW } from '@constants/videoView';
 interface LoadMoreDividerProps {
   text: string;
-  onClick?: () => void;
+  onClick: () => void;
 }
 
 const MoreButton = ({ text, onClick }: LoadMoreDividerProps) => {
   return (
     <MoreButtonBox onClick={onClick}>
       <span>{text}</span>
-      <StyledChevronDown />
+      {text === VIDEO_VIEW.MORE_VIEW ? <StyledChevronDown /> : <StyledChevronUp />}
     </MoreButtonBox>
   );
 };
 
-const LoadMoreDivider = ({ text, onClick = () => {} }: LoadMoreDividerProps) => {
+const LoadMoreDivider = ({ text, onClick }: LoadMoreDividerProps) => {
   return (
     <LoadMoreDividerBox>
       <MoreButton text={text} onClick={onClick} />
@@ -44,6 +46,11 @@ const MoreButtonBox = styled.button`
 `;
 
 const StyledChevronDown = styled(ChevronDownIcon)`
+  width: 16px;
+  height: 16px;
+`;
+
+const StyledChevronUp = styled(ChevronUpIcon)`
   width: 16px;
   height: 16px;
 `;

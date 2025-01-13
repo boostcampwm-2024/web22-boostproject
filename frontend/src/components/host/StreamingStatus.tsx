@@ -7,7 +7,7 @@ interface StreamingStatusProps {
 export default function StreamingStatus({ onStreaming }: StreamingStatusProps) {
   return (
     <StatusContainer>
-      <StatusIcon onStreaming={onStreaming} />
+      <StatusIcon $onStreaming={onStreaming} />
       {onStreaming ? '온라인' : '오프라인'}
     </StatusContainer>
   );
@@ -25,10 +25,10 @@ const StatusContainer = styled.strong`
   color: #ffffff;
 `;
 
-const StatusIcon = styled.i<{ onStreaming: boolean }>`
+const StatusIcon = styled.i<{ $onStreaming: boolean }>`
   width: 8px;
   height: 8px;
-  background: ${({ onStreaming }) => (onStreaming ? 'red' : 'rgba(255, 255, 255, 0.5)')};
+  background: ${({ $onStreaming }) => ($onStreaming ? 'red' : 'rgba(255, 255, 255, 0.5)')};
   border-radius: 4px;
   margin-right: 8px;
   position: relative;

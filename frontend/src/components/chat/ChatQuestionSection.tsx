@@ -1,55 +1,149 @@
-import { useState } from 'react';
+import { memo, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import QuestionCard from './QuestionCard';
+import { MessageReceiveData, MessageSendData, UserInfoData } from '@type/chat';
+import { CHATTING_SOCKET_SEND_EVENT } from '@constants/chat';
+import { getStoredId } from '@utils/id';
+import { UserType } from '@type/user';
+import { useChat } from '@contexts/chatContext';
 
-export const ChatQuestionSection = () => {
+export interface ChatQuestionSectionProps {
+  questions: MessageReceiveData[];
+  worker: MessagePort | null;
+  userType: UserType;
+  roomId: string;
+}
+
+const ChatQuestionSection = ({ questions, worker, userType, roomId }: ChatQuestionSectionProps) => {
   const [expanded, setExpanded] = useState(false);
 
-  const toggleSection = () => {
+  const userId = getStoredId();
+
+  const toggleSection = useCallback(() => {
     setExpanded((prev) => !prev);
-  };
+  }, []);
+
+  const handleQuestionDone = useCallback(
+    (questionId: number) => {
+      if (!worker) return;
+
+      worker.postMessage({
+        type: CHATTING_SOCKET_SEND_EVENT.QUESTION_DONE,
+        payload: {
+          roomId,
+          userId,
+          questionId
+        } as MessageSendData
+      });
+    },
+    [worker, roomId, userId]
+  );
+
+  const { dispatch } = useChat();
+
+  const onNicknameClick = useCallback(
+    (data: UserInfoData) => {
+      dispatch({
+        type: 'SET_SELECTED_USER',
+        payload: data
+      });
+    },
+    [dispatch]
+  );
 
   return (
-    <SectionContainer>
-      <QuestionCard
-        type="host"
-        user="부스트"
-        message="설명해주셨던 내용 중에 yarn-berry를 설정했던 방법이 인상깊었는데 거기서 생겼던 오류가 있나요?"
-      />
-      {expanded && <QuestionCard type="host" user="라이부" message="다른 질문들" />}
-      <SwipeBtn onClick={toggleSection} />
-    </SectionContainer>
+    <SectionWrapper>
+      <SectionContainer>
+        {questions.length === 0 ? (
+          <NoQuestionMessage>아직 질문이 없어요 ( °ᗝ° ).ᐟ.ᐟ</NoQuestionMessage>
+        ) : (
+          <>
+            <QuestionCard
+              key={questions[0].questionId}
+              type={userType}
+              question={questions[0]}
+              handleQuestionDone={handleQuestionDone}
+              ellipsis={!expanded}
+              onNicknameClick={() =>
+                onNicknameClick({
+                  nickname: questions[0].nickname,
+                  socketId: questions[0].socketId,
+                  entryTime: questions[0].entryTime,
+                  owner: questions[0].owner
+                })
+              }
+            />
+            {expanded &&
+              questions.slice(1).map((question) => (
+                <QuestionCard
+                  key={question.questionId}
+                  type={userType}
+                  question={question}
+                  handleQuestionDone={handleQuestionDone}
+                  onNicknameClick={() =>
+                    onNicknameClick({
+                      nickname: question.nickname,
+                      socketId: question.socketId,
+                      entryTime: question.entryTime,
+                      owner: question.owner
+                    })
+                  }
+                />
+              ))}
+            <SwipeBtn onClick={toggleSection} />
+          </>
+        )}
+      </SectionContainer>
+    </SectionWrapper>
   );
 };
-export default ChatQuestionSection;
+
+export default memo(ChatQuestionSection);
+
+const SectionWrapper = styled.div`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background-color: #090909;
+  border-top: 1px solid ${({ theme }) => theme.tokenColors['surface-alt']};
+  border-bottom: 1px solid ${({ theme }) => theme.tokenColors['surface-alt']};
+`;
 
 const SectionContainer = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  min-height: 95px;
-  padding: 13px 20px 0px 20px;
+  min-height: 25px;
+  max-height: 300px;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  padding: 13px 20px 25px 20px;
   gap: 10px;
-  border-top: 1px solid ${({ theme }) => theme.tokenColors['surface-alt']};
-  border-bottom: 1px solid ${({ theme }) => theme.tokenColors['surface-alt']};
-  overflow: hidden;
 `;
 
-const SwipeBtn = styled.button`
-  position: relative;
+const SwipeBtn = memo(styled.button`
+  position: absolute;
+  bottom: 0;
+  left: 0;
   width: 100%;
-  height: 25px;
+  height: 20px;
   cursor: pointer;
-
+  background-color: #090909;
   &::before {
     content: '';
     position: absolute;
-    top: 35%;
+    top: 40%;
     left: 50%;
     background-color: ${({ theme }) => theme.tokenColors['text-weak']};
     border-radius: 2px;
-    height: 5px;
-    width: 50px;
+    height: 4px;
+    width: 60px;
     transform: translate(-50%, -50%);
   }
+`);
+
+const NoQuestionMessage = styled.div`
+  text-align: center;
+  ${({ theme }) => theme.tokenTypographys['display-medium14']};
+  color: ${({ theme }) => theme.tokenColors['text-weak']};
+  padding: 15px 0 0 0;
 `;

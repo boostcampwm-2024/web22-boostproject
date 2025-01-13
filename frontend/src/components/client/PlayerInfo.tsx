@@ -1,33 +1,42 @@
-import { useState } from 'react';
 import styled from 'styled-components';
 
-const PlayerInfo = () => {
-  const [videoStatus] = useState(true);
+import ElapsedTime from './ElapsedTime';
+import sampleProfile from '@assets/sample_profile.png';
+import ShowInfoBadge from '@common/ShowInfoBadge';
+import { ASSETS } from '@constants/assets';
+import { ClientLive } from '@type/live';
+
+const PlayerInfo = ({ clientLiveData }: { clientLiveData: ClientLive }) => {
+  const { channel, concurrentUserCount, liveTitle, category, tags, startDate } = clientLiveData;
 
   return (
     <PlayerInfoContainer>
-      <VideoTitle>크롱의 클라이언트 상태관리 라이부</VideoTitle>
+      <VideoTitle>{liveTitle}</VideoTitle>
       <PlayerInfoBox>
-        <ImageBox>{videoStatus && <LiveBox>LIVE</LiveBox>}</ImageBox>
+        <HostProfileBox>
+          <HostProfile>
+            <img src={sampleProfile} />
+          </HostProfile>
+          <LiveBox>LIVE</LiveBox>
+        </HostProfileBox>
         <VideoInfo>
-          <VideoUploader>네이버 부스트캠프</VideoUploader>
-          <Category>frontend</Category>
-          {videoStatus && (
-            <LiveInfo>
-              <p>192명 시청 중</p>
-              <p>·</p>
-              <p>45:13 스트리밍 중</p>
-            </LiveInfo>
-          )}
+          <VideoUploader>{channel?.channelName}</VideoUploader>
+          <Category>{category}</Category>
+          <TagBox>
+            {tags?.map((tag, index) => (
+              <ShowInfoBadge key={index} badgeType="tag" text={tag} />
+            ))}
+          </TagBox>
+          <LiveInfo>
+            <p>{concurrentUserCount}명 시청 중</p>
+            <p>·</p>
+            <ElapsedTime startDate={startDate} />
+          </LiveInfo>
         </VideoInfo>
       </PlayerInfoBox>
-      <VideoDescription>
-        <DescriptionTitle>컨퍼런스 설명</DescriptionTitle>
-        <DescriptionContent>
-          크롱님의 혼신의 상태관리 설명입니다. 어쩌구저쩌구 엄청 긴 내용의 설명도 감당할 수 있도록 컨테이너 크기를
-          조절해야합니다.
-        </DescriptionContent>
-      </VideoDescription>
+      <BannerLink href="https://boostcamp.connect.or.kr/" target="_blank" rel="noopener noreferrer">
+        <Banner src={ASSETS.IMAGES.BANNER.CLIENT} alt="Client Banner" />
+      </BannerLink>
     </PlayerInfoContainer>
   );
 };
@@ -37,7 +46,8 @@ export default PlayerInfo;
 const PlayerInfoContainer = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 32px 0;
+  padding: 16px 0;
+  gap: 8px;
   background-color: ${({ theme }) => theme.tokenColors['surface-default']};
 `;
 
@@ -52,24 +62,49 @@ const PlayerInfoBox = styled.div`
   gap: 16px;
 `;
 
-const ImageBox = styled.div`
+const HostProfileBox = styled.div`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  height: 100px;
+`;
+
+const HostProfile = styled.div`
+  position: relative;
+  background: ${({ theme }) => theme.tokenColors['surface-alt']} no-repeat 50% / cover;
+  border: 2px solid ${({ theme }) => theme.tokenColors['brand-default']};
+  border-radius: 50%;
+  display: block;
+  overflow: hidden;
+  position: relative;
   width: 70px;
   height: 70px;
-  position: relative;
-  border-radius: 100%;
-  background-color: ${({ theme }) => theme.tokenColors['brand-default']};
+
+  &:hover {
+    outline: 4px solid ${({ theme }) => theme.tokenColors['brand-default']};
+    outline-offset: -2px;
+    cursor: pointer;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 `;
 
 const LiveBox = styled.div`
   position: absolute;
-  bottom: 0;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   padding: 2px 8px;
-  border-radius: 7px;
+  border-radius: 4px;
   background-color: ${({ theme }) => theme.tokenColors['red-default']};
   color: ${({ theme }) => theme.tokenColors['text-strong']};
-  ${({ theme }) => theme.tokenTypographys['display-bold16']};
+  ${({ theme }) => theme.tokenTypographys['display-bold14']};
   line-height: 1.2;
 `;
 
@@ -89,6 +124,11 @@ const Category = styled.p`
   ${({ theme }) => theme.tokenTypographys['display-bold12']};
 `;
 
+const TagBox = styled.div`
+  display: flex;
+  gap: 8px;
+`;
+
 const LiveInfo = styled.div`
   display: flex;
   gap: 8px;
@@ -96,22 +136,21 @@ const LiveInfo = styled.div`
   ${({ theme }) => theme.tokenTypographys['display-bold12']};
 `;
 
-const VideoDescription = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 16px 24px;
+const BannerLink = styled.a`
+  display: block;
   margin-top: 24px;
-  gap: 16px;
   border-radius: 7px;
-  color: ${({ theme }) => theme.tokenColors['text-strong']};
-  ${({ theme }) => theme.tokenTypographys['display-medium14']};
-  background-color: ${({ theme }) => theme.tokenColors['surface-alt']};
+  overflow: hidden;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.9;
+  }
 `;
 
-const DescriptionTitle = styled.p`
-  ${({ theme }) => theme.tokenTypographys['display-bold12']};
-`;
-
-const DescriptionContent = styled.p`
-  ${({ theme }) => theme.tokenTypographys['display-medium14']};
+const Banner = styled.img`
+  width: 100%;
+  aspect-ratio: 16 / 2;
+  object-fit: cover;
+  display: block;
 `;

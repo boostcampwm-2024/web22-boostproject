@@ -1,6 +1,6 @@
 {
   "name": "web22-liboo",
-  "packageManager": "yarn@4.5.1",
+  "packageManager": "yarn@4.5.3",
   "workspaces": [
     "backend",
     "frontend",
@@ -8,6 +8,7 @@
   ],
   "scripts": {
     "build": "yarn workspaces foreach -W run build",
+    "build:fe": "yarn workspace frontend run build",
     "build:be": "yarn workspace backend run build"
   },
   "devDependencies": {

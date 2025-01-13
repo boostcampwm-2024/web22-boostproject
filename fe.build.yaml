@@ -1,0 +1,14 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  nginx:
+    build:
+      context: nginx
+      dockerfile: dockerfile
+    image: liboost/nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8000:8000"
+      - "1935:1935"

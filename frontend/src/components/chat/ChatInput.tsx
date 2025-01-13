@@ -1,34 +1,106 @@
 import styled, { css } from 'styled-components';
 import SpeechBubbleIcon from '@assets/icons/speech-bubble.svg';
 import QuestionIcon from '@assets/icons/question.svg';
+import SpeakerIcon from '@assets/icons/speaker.svg';
 import SendIcon from '@assets/icons/send.svg';
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, KeyboardEvent, memo } from 'react';
+import { CHATTING_SOCKET_SEND_EVENT, CHATTING_TYPES } from '@constants/chat';
+import { ChattingSendTypes } from '@type/chat';
+import { getStoredId } from '@utils/id';
+import { UserType } from '@type/user';
 
 interface ChatInputProps {
-  type: 'normal' | 'question';
+  worker: MessagePort | null;
+  userType: UserType;
+  roomId: string;
 }
 
-export const ChatInput = ({ type }: ChatInputProps) => {
+const INITIAL_TEXTAREA_HEIGHT = 20;
+
+const ChatInput = ({ worker, userType, roomId }: ChatInputProps) => {
   const [hasInput, setHasInput] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const [msgType, setMsgType] = useState<ChattingSendTypes>(CHATTING_TYPES.NORMAL);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
+  const userId = getStoredId();
+
+  const handleMsgType = () => {
+    if (!userType) return;
+
+    setMsgType(() => {
+      if (userType === 'host') {
+        return msgType === CHATTING_TYPES.NORMAL ? CHATTING_TYPES.NOTICE : CHATTING_TYPES.NORMAL;
+      }
+      return msgType === CHATTING_TYPES.NORMAL ? CHATTING_TYPES.QUESTION : CHATTING_TYPES.NORMAL;
+    });
+  };
+
+  const handleMessageSend = () => {
+    if (!worker || !textareaRef.current || !textareaRef.current.value.trim()) return;
+
+    const message = textareaRef.current.value.trim();
+    const eventMap = {
+      [CHATTING_TYPES.NORMAL]: CHATTING_SOCKET_SEND_EVENT.NORMAL,
+      [CHATTING_TYPES.QUESTION]: CHATTING_SOCKET_SEND_EVENT.QUESTION,
+      [CHATTING_TYPES.NOTICE]: CHATTING_SOCKET_SEND_EVENT.NOTICE
+    };
+
+    const eventName = eventMap[msgType];
+
+    worker.postMessage({
+      type: eventName,
+      payload: {
+        roomId,
+        userId,
+        msg: message
+      }
+    });
+
+    resetTextareaHeight();
+    textareaRef.current.value = '';
+    setHasInput(false);
+  };
+
+  const handleInputChange = () => {
+    if (!textareaRef.current) return;
+
+    const value = textareaRef.current.value;
+
+    if (value.length > 150) {
+      textareaRef.current.value = value.slice(0, 150);
+      return;
+    }
+
+    setHasInput(value.length > 0);
+  };
+
+  const resetTextareaHeight = () => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = `${INITIAL_TEXTAREA_HEIGHT}px`;
+    }
+  };
+
   useEffect(() => {
+    const textarea = textareaRef.current;
+
     const handleResize = () => {
-      if (textareaRef.current) {
-        textareaRef.current.style.height = '14px';
-        textareaRef.current.style.height = `${textareaRef.current.scrollHeight - 5}px`;
+      if (textarea) {
+        requestAnimationFrame(() => {
+          textarea.style.height = `${INITIAL_TEXTAREA_HEIGHT}px`;
+          textarea.style.height = `${textarea.scrollHeight - 5}px`;
+        });
       }
     };
 
-    if (textareaRef.current) {
-      textareaRef.current.addEventListener('input', handleResize);
+    if (textarea) {
+      textarea.addEventListener('input', handleResize);
       handleResize();
     }
 
     return () => {
-      if (textareaRef.current) {
-        textareaRef.current.removeEventListener('input', handleResize);
+      if (textarea) {
+        textarea.removeEventListener('input', handleResize);
       }
     };
   }, []);
@@ -44,29 +116,59 @@ export const ChatInput = ({ type }: ChatInputProps) => {
     setIsFocused(true);
   };
 
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
+      e.preventDefault();
+      handleMessageSend();
+    }
+  };
+
+  const getButtonIcon = () => {
+    switch (msgType) {
+      case CHATTING_TYPES.NORMAL: {
+        return <StyledIcon as={SpeechBubbleIcon} />;
+      }
+      case CHATTING_TYPES.QUESTION: {
+        return <StyledIcon as={QuestionIcon} />;
+      }
+      case CHATTING_TYPES.NOTICE: {
+        return <StyledIcon as={SpeakerIcon} />;
+      }
+      default: {
+        return <StyledIcon as={SendIcon} />;
+      }
+    }
+  };
+
   return (
     <ChatInputWrapper $hasInput={hasInput} $isFocused={isFocused}>
-      <InputBtn aria-label={type}>
-        {type === 'normal' ? <StyledIcon as={SpeechBubbleIcon} /> : <StyledIcon as={QuestionIcon} />}
+      <InputBtn aria-label={msgType} onClick={handleMsgType}>
+        {getButtonIcon()}
       </InputBtn>
+
       <ChatInputArea
         ref={textareaRef}
-        placeholder={`${type === 'normal' ? '채팅' : '질문'}을 입력해주세요`}
+        placeholder={`${
+          msgType === CHATTING_TYPES.NORMAL ? '채팅을' : msgType === CHATTING_TYPES.QUESTION ? '질문을' : '공지를'
+        } 입력해주세요`}
+        onInput={handleInputChange}
         onBlur={handleBlur}
         onFocus={handleFocus}
+        onKeyDown={handleKeyDown}
       />
-      <InputBtn aria-label="전송">
+      <InputBtn aria-label="전송" onClick={handleMessageSend}>
         <StyledIcon as={SendIcon} />
       </InputBtn>
     </ChatInputWrapper>
   );
 };
-export default ChatInput;
+
+export default memo(ChatInput);
 
 const ChatInputWrapper = styled.div<{ $hasInput: boolean; $isFocused: boolean }>`
   min-height: 20px;
   display: flex;
-  padding: 5px 10px;
+  padding: 7px 10px 5px 10px;
   gap: 10px;
   border: 3px solid ${({ theme }) => theme.tokenColors['text-weak']};
   border-radius: 7px;
@@ -83,14 +185,17 @@ const ChatInputWrapper = styled.div<{ $hasInput: boolean; $isFocused: boolean }>
 
 const ChatInputArea = styled.textarea`
   width: 100%;
+  min-height: 20px;
   max-height: 40px;
-  overflow-y: auto;
+  scrollbar-width: none;
   resize: none;
   border: none;
   outline: none;
   color: ${({ theme }) => theme.tokenColors['text-strong']};
-  ${({ theme }) => theme.tokenTypographys['display-medium16']}
+  ${({ theme }) => theme.tokenTypographys['display-medium16']};
   background-color: transparent;
+  white-space: normal;
+  line-height: 23px;
 `;
 
 const InputBtn = styled.button`
@@ -99,6 +204,9 @@ const InputBtn = styled.button`
   align-items: center;
   color: ${({ theme }) => theme.tokenColors['text-strong']};
   cursor: pointer;
+  :hover {
+    color: ${({ theme }) => theme.tokenColors['brand-default']};
+  }
 `;
 
 const StyledIcon = styled.svg`

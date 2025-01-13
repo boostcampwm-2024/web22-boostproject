@@ -1,18 +1,32 @@
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import Player from './Player';
+
+import Player from './StreamingDisplay';
 import SettingForm from './SettingForm';
-import { useState } from 'react';
+import { useBroadcastStatusPolling } from '@queries/host/useBroadcastStatusPolling';
+import { getSessionKey } from '@utils/streamKey';
+
 
 export default function Setting() {
-  const [onStreaming, setOnStreaming] = useState(false);
-  const toggleStreaming = () => {
-    setOnStreaming((prev) => !prev);
-  };
+  const [sessionKey, setSessionKey] = useState(getSessionKey());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const currentKey = getSessionKey();
+      if (currentKey !== sessionKey) {
+        setSessionKey(currentKey);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [sessionKey]);
+
+  const { data: onStreaming } = useBroadcastStatusPolling(sessionKey);
 
   return (
     <Container>
       <Player onStreaming={onStreaming} />
-      <SettingForm toggleStreaming={toggleStreaming} />
+      <SettingForm />
     </Container>
   );
 }

@@ -1,16 +1,14 @@
 import { nanoid } from 'nanoid';
 
-type StorageKey = 'userId';
+const USER_ID_KEY = 'userId' as const;
 
-export const getStoredId = (key: StorageKey): string | null => localStorage.getItem(key);
+export const getStoredId = (): string => localStorage.getItem(USER_ID_KEY) ?? '';
+export const setStoredId = (id: string): void => localStorage.setItem(USER_ID_KEY, id);
 
-export const setStoredId = (key: StorageKey, id: string): void => localStorage.setItem(key, id);
-
-export const getOrCreateId = (key: StorageKey = 'userId'): string => {
-  const savedId = getStoredId(key);
-  if (savedId) return savedId;
-
-  const newId = nanoid();
-  setStoredId(key, newId);
-  return newId;
+export const initializeUserId = () => {
+  const savedId = getStoredId();
+  if (!savedId) {
+    const newId = nanoid();
+    setStoredId(newId);
+  }
 };

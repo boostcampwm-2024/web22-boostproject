@@ -1,21 +1,27 @@
 import styled from 'styled-components';
 import OBSIcon from '@assets/img_studio_obs.png';
 import DownloadIcon from '@assets/download.svg';
-import { getOrCreateId } from '@utils/id';
+import { getStoredId } from '@utils/id';
 import useFetchStreamKey from '@queries/host/useFetchStreamKey';
 import { useEffect } from 'react';
+import { setSessionKey, setStreamKey } from '@utils/streamKey';
 
 interface SettingInfoProps {
   closeModal: () => void;
 }
 
 export default function SettingInfo({ closeModal }: SettingInfoProps) {
-  const userId = getOrCreateId();
-  const { mutate: fetchKey, data } = useFetchStreamKey();
+  const userId = getStoredId();
+  const { mutate: fetchKey, data } = useFetchStreamKey({
+    onSuccess: ({ streamKey, sessionKey }) => {
+      setStreamKey(streamKey);
+      setSessionKey(sessionKey);
+    }
+  });
 
   useEffect(() => {
     fetchKey(userId);
-  }, []);
+  }, [fetchKey, userId]);
 
   return (
     <PopupOverlay onClick={closeModal}>
@@ -49,25 +55,19 @@ export default function SettingInfo({ closeModal }: SettingInfoProps) {
                 <StepTitle>2. 스트림 키를 소프트웨어에 붙여 넣어주세요.</StepTitle>
                 <StreamSettings>
                   <SettingRow>
-                    <Label htmlFor="stream-url">스트림 URL</Label>
+                    <Label htmlFor="streamUrl">스트림 URL</Label>
                     <ValueWithButton>
-                      <StreamURL>rtmp://global-rtmp.lip2.navercorp.com:8080/relay</StreamURL>
-                      <CopyButton
-                        onClick={() =>
-                          navigator.clipboard.writeText('rtmp://global-rtmp.lip2.navercorp.com:8080/relay')
-                        }
-                      >
+                      <StreamURL>rtmp://liboo.kr:1935/live</StreamURL>
+                      <CopyButton onClick={() => navigator.clipboard.writeText('rtmp://liboo.kr:1935/live')}>
                         복사
                       </CopyButton>
                     </ValueWithButton>
                   </SettingRow>
                   <SettingRow>
-                    <Label htmlFor="stream-key">스트림 키</Label>
+                    <Label htmlFor="streamKey">스트림 키</Label>
                     <ValueWithButton>
-                      <StreamKeyInput type="password" readOnly value={data?.['stream-key'] ?? ''} />
-                      <CopyButton
-                        onClick={() => data?.['stream-key'] && navigator.clipboard.writeText(data['stream-key'])}
-                      >
+                      <StreamKeyInput type="password" readOnly value={data?.streamKey ?? ''} />
+                      <CopyButton onClick={() => data?.streamKey && navigator.clipboard.writeText(data?.streamKey)}>
                         복사
                       </CopyButton>
                     </ValueWithButton>
